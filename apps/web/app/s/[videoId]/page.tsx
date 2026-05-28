@@ -14,8 +14,7 @@ import {
 } from "@cap/database/schema";
 import type { VideoMetadata } from "@cap/database/types";
 import { buildEnv } from "@cap/env";
-import { Logo } from "@cap/ui";
-import { userIsPro } from "@cap/utils";
+import { PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import {
 	Database,
 	ImageUploads,
@@ -35,6 +34,7 @@ import { and, eq, type InferSelectModel, isNull, sql } from "drizzle-orm";
 import { Effect, Option } from "effect";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
+import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getVideoAnalytics } from "@/actions/videos/get-analytics";
@@ -175,7 +175,14 @@ function PolicyDeniedView({ reason }: { reason?: string }) {
 
 	return (
 		<div className="flex flex-col justify-center items-center p-4 min-h-screen text-center">
-			<Logo className="size-32" />
+			<Image
+				src="/port-starboard-logo.svg"
+				alt={PORTSTBD_BRAND.logoAlt}
+				width={256}
+				height={64}
+				className="mb-8 h-16 w-auto max-w-64"
+				priority
+			/>
 			<h1 className="mb-2 text-2xl font-semibold">{title}</h1>
 			<p className="text-gray-400">{description}</p>
 		</div>
@@ -198,7 +205,7 @@ function getSharePageBranding(data: {
 	shareableLinkIconUrl?: ImageUpload.ImageUrl | null;
 }): SharePageBranding | null {
 	if (!data.owner.isPro) {
-		return { type: "cap" };
+		return { type: "default" };
 	}
 
 	const brandedIcon = data.orgSettings?.shareableLinkUseOrganizationIcon
@@ -217,7 +224,7 @@ function getSharePageBranding(data: {
 		return null;
 	}
 
-	return { type: "cap" };
+	return { type: "default" };
 }
 
 const getShareVideoPageCatchers = (
@@ -274,8 +281,8 @@ export async function generateMetadata(
 					).toString();
 
 					return {
-						title: `${video.name} | Cap Recording`,
-						description: "Watch this video on Cap",
+						title: `${video.name} | ${PORTSTBD_BRAND.recordingTitleSuffix}`,
+						description: PORTSTBD_BRAND.watchDescription,
 						openGraph: {
 							images: [
 								{
@@ -301,8 +308,8 @@ export async function generateMetadata(
 						},
 						twitter: {
 							card: "player",
-							title: `${video.name} | Cap Recording`,
-							description: "Watch this video on Cap",
+							title: `${video.name} | ${PORTSTBD_BRAND.recordingTitleSuffix}`,
+							description: PORTSTBD_BRAND.watchDescription,
 							images: [
 								{
 									url: previewImageUrl,
@@ -336,7 +343,7 @@ export async function generateMetadata(
 		Effect.catchTags({
 			PolicyDenied: () =>
 				Effect.succeed({
-					title: "Cap: This video is restricted",
+					title: `${PORTSTBD_BRAND.companyName}: This video is restricted`,
 					description: "This video has restricted access.",
 					openGraph: {
 						images: [
@@ -365,7 +372,7 @@ export async function generateMetadata(
 				}),
 			VerifyVideoPasswordError: () =>
 				Effect.succeed({
-					title: "Cap: Password Protected Video",
+					title: `${PORTSTBD_BRAND.companyName}: Password Protected Video`,
 					description: "This video is password protected.",
 					openGraph: {
 						images: [
@@ -381,7 +388,7 @@ export async function generateMetadata(
 					},
 					twitter: {
 						card: "summary_large_image",
-						title: "Cap: Password Protected Video",
+						title: `${PORTSTBD_BRAND.companyName}: Password Protected Video`,
 						description: "This video is password protected.",
 						images: [
 							new URL(

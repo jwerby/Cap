@@ -1,7 +1,8 @@
 "use client";
 
 import { buildEnv, NODE_ENV } from "@cap/env";
-import { Button, Logo } from "@cap/ui";
+import { Button } from "@cap/ui";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import type { ViewerSettingKey } from "@cap/web-backend";
 import {
 	faChartSimple,
@@ -270,11 +271,13 @@ export const ShareHeader = ({
 
 		try {
 			await hideShareableLinkCapLogo(data.orgId);
-			toast.success("Cap logo hidden");
+			toast.success("Port & Starboard logo hidden");
 			refresh();
 		} catch (error) {
 			toast.error(
-				error instanceof Error ? error.message : "Failed to hide Cap logo",
+				error instanceof Error
+					? error.message
+					: "Failed to hide Port & Starboard logo",
 			);
 		} finally {
 			setIsHidingBranding(false);
@@ -320,11 +323,11 @@ export const ShareHeader = ({
 							<Pencil className="size-3.5 text-gray-12" />
 							Change logo
 						</Button>
-						{branding.type === "cap" && (
+						{branding.type === "default" && (
 							<Button
 								variant="gray"
 								size="xs"
-								aria-label="Hide Cap logo"
+								aria-label="Hide Port & Starboard logo"
 								className="h-7 gap-1 whitespace-nowrap rounded-full px-2 text-[11px]"
 								disabled={isHidingBranding}
 								onClick={handleHideBranding}
@@ -353,7 +356,14 @@ export const ShareHeader = ({
 						href={`/?ref=video_${data.id}`}
 						className="inline-flex h-11 items-center"
 					>
-						<Logo className="h-7 w-auto" />
+						<Image
+							src="/port-starboard-logo.svg"
+							alt={PORTSTBD_BRAND.logoAlt}
+							width={220}
+							height={36}
+							className="h-7 w-auto max-w-48 object-contain"
+							priority
+						/>
 					</a>
 				)}
 			</div>
@@ -373,7 +383,7 @@ export const ShareHeader = ({
 						size="sm"
 						variant="blue"
 					>
-						Upgrade To Cap Pro
+						Upgrade plan
 					</Button>
 				</div>
 			)}

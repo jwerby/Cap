@@ -34,5 +34,5 @@ export type SharePageBranding =
 			name: string;
 	  }
 	| {
-			type: "cap";
+			type: "default";
 	  };

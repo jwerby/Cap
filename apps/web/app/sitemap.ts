@@ -1,5 +1,6 @@
 import { promises as fs } from "node:fs";
 import path from "node:path";
+import { getPortstbdWebUrl } from "@cap/utils";
 import { getBlogPosts, getDocs } from "@/utils/blog";
 import { seoPages } from "../lib/seo-pages";
 
@@ -86,7 +87,7 @@ export default async function sitemap() {
 
 	const routes = [...(homeRoute ? [homeRoute] : []), ...otherRoutes].map(
 		(route) => ({
-			url: `https://cap.so${route.path}`,
+			url: `${getPortstbdWebUrl()}${route.path}`,
 			lastModified: route.lastModified,
 		}),
 	);
