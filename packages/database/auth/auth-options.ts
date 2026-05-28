@@ -102,9 +102,12 @@ export const authOptions = (): NextAuthOptions => {
 						return crypto.randomInt(100000, 1000000).toString();
 					},
 					async sendVerificationRequest({ identifier, token }) {
-						console.log("sendVerificationRequest");
+						// Email is deliverable when Resend is configured OR when SES is
+						// (SES reuses CAP_AWS_* creds, so a region implies it can send).
+						const emailConfigured =
+							!!serverEnv().RESEND_API_KEY || !!serverEnv().CAP_AWS_REGION;
 
-						if (!serverEnv().RESEND_API_KEY) {
+						if (!emailConfigured) {
 							console.log("\n");
 							console.log(
 								"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━",
@@ -121,10 +124,8 @@ export const authOptions = (): NextAuthOptions => {
 							);
 							console.log("\n");
 						} else {
-							console.log({ identifier, token });
 							const { OTPEmail } = await import("../emails/otp-email");
 							const email = OTPEmail({ code: token, email: identifier });
-							console.log({ email });
 							await sendEmail({
 								email: identifier,
 								subject: PORTSTBD_BRAND.verificationEmailSubject,
