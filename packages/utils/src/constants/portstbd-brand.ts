@@ -3,19 +3,29 @@ type PublicUrlEnv = {
 	WEB_URL?: string;
 };
 
+const WEB_URL_WITH_PROTOCOL_PATTERN = /^[a-z][a-z\d+.-]*:\/\//i;
+const HTTP_WEB_URL_PATTERN = /^https?:\/\/[^/\s?#]+(?:[/?#].*)?$/i;
+
 const getRuntimeEnv = (): PublicUrlEnv => {
 	if (typeof process === "undefined") return {};
 
-	return process.env;
+	return {
+		NEXT_PUBLIC_WEB_URL: process.env.NEXT_PUBLIC_WEB_URL,
+		WEB_URL: process.env.WEB_URL,
+	};
 };
 
 const normalizeWebUrl = (url?: string) => {
 	const trimmedUrl = url?.trim();
 
 	if (!trimmedUrl) return undefined;
-	if (/^[a-z][a-z\d+.-]*:\/\//i.test(trimmedUrl)) return trimmedUrl;
+	if (trimmedUrl.startsWith("//")) return undefined;
+	if (HTTP_WEB_URL_PATTERN.test(trimmedUrl)) return trimmedUrl;
+	if (WEB_URL_WITH_PROTOCOL_PATTERN.test(trimmedUrl)) return undefined;
 
-	return `https://${trimmedUrl}`;
+	const normalizedUrl = `https://${trimmedUrl}`;
+
+	return HTTP_WEB_URL_PATTERN.test(normalizedUrl) ? normalizedUrl : undefined;
 };
 
 export const PORTSTBD_BRAND = {

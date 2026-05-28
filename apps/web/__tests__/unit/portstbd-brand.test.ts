@@ -43,6 +43,24 @@ describe("PORTSTBD_BRAND", () => {
 		).toBe("https://watch.portstbd.com");
 	});
 
+	it("skips protocol-relative runtime URL values", () => {
+		expect(
+			getPortstbdWebUrl({
+				NEXT_PUBLIC_WEB_URL: "//evil.example",
+				WEB_URL: "watch.portstbd.com",
+			}),
+		).toBe("https://watch.portstbd.com");
+	});
+
+	it("falls back when runtime URL values use unsupported protocols", () => {
+		expect(
+			getPortstbdWebUrl({
+				NEXT_PUBLIC_WEB_URL: "javascript://evil.example",
+				WEB_URL: "ftp://evil.example",
+			}),
+		).toBe("https://watch.portstbd.com");
+	});
+
 	it("uses the default URL when process is unavailable", () => {
 		const originalProcess = globalThis.process;
 
