@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, LogoBadge } from "@cap/ui";
+import { Button } from "@cap/ui";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
@@ -10,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
+import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
 
 export function VerifyOTPForm({
 	email,
@@ -104,10 +106,9 @@ export function VerifyOTPForm({
 
 	const handleResend = useMutation({
 		mutationFn: async () => {
-			// Check client-side rate limiting
 			if (lastResendTime) {
 				const timeSinceLastRequest = Date.now() - lastResendTime;
-				const waitTime = 30000; // 30 seconds
+				const waitTime = 30000;
 				if (timeSinceLastRequest < waitTime) {
 					const remainingSeconds = Math.ceil(
 						(waitTime - timeSinceLastRequest) / 1000,
@@ -123,7 +124,6 @@ export function VerifyOTPForm({
 			});
 
 			if (result?.error) {
-				// NextAuth returns generic "EmailSignin" error for all email errors
 				throw "Please wait 30 seconds before requesting a new code";
 			}
 		},
@@ -159,7 +159,7 @@ export function VerifyOTPForm({
 			</Link>
 
 			<Link className="flex mx-auto size-fit" href="/">
-				<LogoBadge className="size-12" />
+				<PortstbdAuthLogo />
 			</Link>
 
 			<div className="flex flex-col justify-center items-center my-7 text-center">
@@ -225,7 +225,7 @@ export function VerifyOTPForm({
 
 			<p className="mt-6 text-xs text-center text-gray-9">
 				By entering your email, you acknowledge that you have both read and
-				agree to Cap's{" "}
+				agree to {PORTSTBD_BRAND.companyName}'s{" "}
 				<Link
 					href="/terms"
 					target="_blank"

@@ -1,10 +1,11 @@
 import { getCurrentUser } from "@cap/database/auth/session";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { VerifyOTPForm } from "./form";
 
 export const metadata = {
-	title: "Verify Code | Cap",
+	title: `Verify Code | ${PORTSTBD_BRAND.productName}`,
 };
 
 export default async function VerifyOTPPage(props: {

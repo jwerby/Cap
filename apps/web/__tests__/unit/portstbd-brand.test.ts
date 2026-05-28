@@ -26,10 +26,18 @@ const task5BrandSources = {
 	desktopVideoApi: "../../app/api/desktop/[...route]/video.ts",
 	videosBackend: "../../../../packages/web-backend/src/Videos/index.ts",
 	httpApi: "../../../../packages/web-domain/src/Http/Api.ts",
+	authLogo: "../../components/PortstbdAuthLogo.tsx",
+	loginForm: "../../app/(org)/login/form.tsx",
+	signupForm: "../../app/(org)/signup/form.tsx",
+	verifyOtpForm: "../../app/(org)/verify-otp/form.tsx",
+	verifyOtpPage: "../../app/(org)/verify-otp/page.tsx",
+	shareAuthOverlay: "../../app/s/[videoId]/_components/AuthOverlay.tsx",
 } as const;
 
 const legacyTransactionalBrandPattern =
 	/Your Cap|Welcome to Cap|View Your Cap|created your first Cap|With Cap|Cap Recording|Cap Screenshot|Cap Upload|Cap HTTP API/;
+const legacyAuthBrandPattern =
+	/Sign in to Cap|Sign up to Cap|Beautiful screen recordings, owned by you|agree to Cap's|Verify Code \| Cap|LogoBadge/;
 
 type Task5BrandSourceName = keyof typeof task5BrandSources;
 
@@ -239,5 +247,20 @@ describe("PORTSTBD_BRAND", () => {
 			/name: `\$\{PORTSTBD_BRAND\.recordingTitleSuffix\} - \$\{formattedDate\}`,/,
 		);
 		expect(sources.httpApi).toContain("Port & Starboard Watch HTTP API");
+		expect(sources.authLogo).toContain("PORTSTBD_BRAND.logoAlt");
+		expect(sources.loginForm).toContain("PORTSTBD_BRAND.productName");
+		expect(sources.signupForm).toContain("PORTSTBD_BRAND.productName");
+		expect(sources.verifyOtpPage).toContain("PORTSTBD_BRAND.productName");
+
+		for (const source of [
+			sources.authLogo,
+			sources.loginForm,
+			sources.signupForm,
+			sources.verifyOtpForm,
+			sources.verifyOtpPage,
+			sources.shareAuthOverlay,
+		]) {
+			expect(source).not.toMatch(legacyAuthBrandPattern);
+		}
 	});
 });

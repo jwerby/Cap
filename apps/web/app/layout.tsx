@@ -79,6 +79,13 @@ export const dynamic = "force-dynamic";
 export default ({ children }: PropsWithChildren) =>
 	Effect.gen(function* () {
 		const bootstrapData = yield* Effect.promise(getBootstrapData);
+		const env = serverEnv();
+		const googleAuthAvailable = Boolean(
+			env.GOOGLE_CLIENT_ID?.trim() && env.GOOGLE_CLIENT_SECRET?.trim(),
+		);
+		const workosAuthAvailable = Boolean(
+			env.WORKOS_CLIENT_ID?.trim() && env.WORKOS_API_KEY?.trim(),
+		);
 
 		return (
 			<html
@@ -124,7 +131,7 @@ export default ({ children }: PropsWithChildren) =>
 								<SessionProvider>
 									<StripeContextProvider
 										plans={
-											serverEnv().VERCEL_ENV === "production"
+											env.VERCEL_ENV === "production"
 												? STRIPE_PLAN_IDS.production
 												: STRIPE_PLAN_IDS.development
 										}
@@ -132,8 +139,8 @@ export default ({ children }: PropsWithChildren) =>
 										<PublicEnvContext
 											value={{
 												webUrl: buildEnv.NEXT_PUBLIC_WEB_URL,
-												workosAuthAvailable: !!serverEnv().WORKOS_CLIENT_ID,
-												googleAuthAvailable: !!serverEnv().GOOGLE_CLIENT_ID,
+												workosAuthAvailable,
+												googleAuthAvailable,
 											}}
 										>
 											<ReactQueryProvider>

@@ -1,6 +1,7 @@
 "use client";
 
-import { Button, Input, LogoBadge } from "@cap/ui";
+import { Button, Input } from "@cap/ui";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import { Organisation } from "@cap/web-domain";
 import {
 	faArrowLeft,
@@ -15,14 +16,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useId, useState } from "react";
 import { toast } from "sonner";
 import { getOrganizationSSOData } from "@/actions/organization/get-organization-sso-data";
 import { trackEvent } from "@/app/utils/analytics";
+import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
 import { usePublicEnv } from "@/utils/public-env";
 
 const MotionInput = motion(Input);
-const MotionLogoBadge = motion(LogoBadge);
 const MotionLink = motion(Link);
 const MotionButton = motion(Button);
 
@@ -43,10 +44,7 @@ export function LoginForm() {
 	const theme = Cookies.get("theme") || "light";
 
 	useEffect(() => {
-		theme === "dark"
-			? (document.body.className = "dark")
-			: (document.body.className = "light");
-		//remove the dark mode when we leave the dashboard
+		document.body.className = theme === "dark" ? "dark" : "light";
 		return () => {
 			document.body.className = "light";
 		};
@@ -83,7 +81,6 @@ export function LoginForm() {
 			localStorage.removeItem("pendingPriceId");
 			localStorage.removeItem("pendingQuantity");
 
-			// Wait a bit to ensure the user is created
 			setTimeout(async () => {
 				const response = await fetch(`/api/settings/billing/subscribe`, {
 					method: "POST",
@@ -165,7 +162,7 @@ export function LoginForm() {
 				</motion.p>
 			</motion.div>
 			<MotionLink layout="position" className="flex mx-auto size-fit" href="/">
-				<MotionLogoBadge layout="position" className="size-12" />
+				<PortstbdAuthLogo />
 			</MotionLink>
 			<motion.div
 				layout="position"
@@ -176,14 +173,14 @@ export function LoginForm() {
 					layout="position"
 					className="text-2xl font-semibold text-gray-12"
 				>
-					Sign in to Cap
+					Sign in to {PORTSTBD_BRAND.productName}
 				</motion.h1>
 				<motion.p
 					key="subtitle"
 					layout="position"
 					className="text-[16px] text-gray-10"
 				>
-					Beautiful screen recordings, owned by you.
+					{PORTSTBD_BRAND.description}
 				</motion.p>
 			</motion.div>
 			<motion.div layout="position" className="flex flex-col space-y-3">
@@ -252,11 +249,10 @@ export function LoginForm() {
 											e.preventDefault();
 											if (!email) return;
 
-											// Check if we're rate limited on the client side
 											if (lastEmailSentTime) {
 												const timeSinceLastRequest =
 													Date.now() - lastEmailSentTime;
-												const waitTime = 30000; // 30 seconds
+												const waitTime = 30000;
 												if (timeSinceLastRequest < waitTime) {
 													const remainingSeconds = Math.ceil(
 														(waitTime - timeSinceLastRequest) / 1000,
@@ -301,9 +297,6 @@ export function LoginForm() {
 														});
 														router.push(`/verify-otp?${params.toString()}`);
 													} else {
-														// NextAuth always returns "EmailSignin" for all email provider errors
-														// Since we already check rate limiting on the client side before sending,
-														// if we get an error here, it's likely rate limiting from the server
 														toast.error(
 															"Please wait 30 seconds before requesting a new code",
 														);
@@ -312,7 +305,6 @@ export function LoginForm() {
 												.catch((_error) => {
 													setEmailSent(false);
 													setLoading(false);
-													// Catch block is rarely triggered with NextAuth
 													toast.error("Error sending email - try again?");
 												});
 										}}
@@ -336,7 +328,7 @@ export function LoginForm() {
 							className="pt-3 text-xs text-center text-gray-9"
 						>
 							By typing your email and clicking continue, you acknowledge that
-							you have both read and agree to Cap's{" "}
+							you have both read and agree to {PORTSTBD_BRAND.companyName}'s{" "}
 							<Link
 								href="/terms"
 								target="_blank"
@@ -372,6 +364,8 @@ const LoginWithSSO = ({
 	setOrganizationId: (organizationId: string) => void;
 	organizationName: string | null;
 }) => {
+	const organizationInputId = useId();
+
 	return (
 		<motion.form
 			layout
@@ -379,7 +373,7 @@ const LoginWithSSO = ({
 			className="relative space-y-2"
 		>
 			<MotionInput
-				id="organizationId"
+				id={organizationInputId}
 				placeholder="Enter your Organization ID..."
 				value={organizationId}
 				onChange={(e) => setOrganizationId(e.target.value)}
@@ -415,12 +409,13 @@ const NormalLogin = ({
 	handleGoogleSignIn: () => void;
 }) => {
 	const publicEnv = usePublicEnv();
+	const emailInputId = useId();
 
 	return (
 		<motion.div>
 			<motion.div layout className="flex flex-col space-y-3">
 				<MotionInput
-					id="email"
+					id={emailInputId}
 					name="email"
 					autoFocus
 					type="email"
@@ -441,16 +436,6 @@ const NormalLogin = ({
 				>
 					Login with email
 				</MotionButton>
-				{/* {NODE_ENV === "development" && (
-                  <div className="flex justify-center items-center px-6 py-3 mt-3 bg-red-600 rounded-xl">
-                    <p className="text-lg text-white">
-                      <span className="font-medium text-white">
-                        Development mode:
-                      </span>{" "}
-                      Auth URL will be logged to your dev console.
-                    </p>
-                  </div>
-                )} */}
 			</motion.div>
 			<motion.p
 				layout="position"

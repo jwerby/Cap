@@ -69,41 +69,57 @@ export const authOptions = (): NextAuthOptions => {
 		},
 		get providers() {
 			if (_providers) return _providers;
-			_providers = [
-				GoogleProvider({
-					clientId: serverEnv().GOOGLE_CLIENT_ID as string,
-					clientSecret: serverEnv().GOOGLE_CLIENT_SECRET as string,
-					authorization: {
-						params: {
-							scope: [
-								"https://www.googleapis.com/auth/userinfo.email",
-								"https://www.googleapis.com/auth/userinfo.profile",
-							].join(" "),
-							prompt: "select_account",
+			const env = serverEnv();
+			const googleClientId = env.GOOGLE_CLIENT_ID?.trim();
+			const googleClientSecret = env.GOOGLE_CLIENT_SECRET?.trim();
+			const workosClientId = env.WORKOS_CLIENT_ID?.trim();
+			const workosApiKey = env.WORKOS_API_KEY?.trim();
+
+			_providers = [];
+
+			if (googleClientId && googleClientSecret) {
+				_providers.push(
+					GoogleProvider({
+						clientId: googleClientId,
+						clientSecret: googleClientSecret,
+						authorization: {
+							params: {
+								scope: [
+									"https://www.googleapis.com/auth/userinfo.email",
+									"https://www.googleapis.com/auth/userinfo.profile",
+								].join(" "),
+								prompt: "select_account",
+							},
 						},
-					},
-				}),
-				WorkOSProvider({
-					clientId: serverEnv().WORKOS_CLIENT_ID as string,
-					clientSecret: serverEnv().WORKOS_API_KEY as string,
-					profile(profile) {
-						return {
-							id: profile.id,
-							name: profile.first_name
-								? `${profile.first_name} ${profile.last_name || ""}`
-								: profile.email?.split("@")[0] || profile.id,
-							email: profile.email,
-							image: profile.profile_picture_url,
-						};
-					},
-				}),
+					}),
+				);
+			}
+
+			if (workosClientId && workosApiKey) {
+				_providers.push(
+					WorkOSProvider({
+						clientId: workosClientId,
+						clientSecret: workosApiKey,
+						profile(profile) {
+							return {
+								id: profile.id,
+								name: profile.first_name
+									? `${profile.first_name} ${profile.last_name || ""}`
+									: profile.email?.split("@")[0] || profile.id,
+								email: profile.email,
+								image: profile.profile_picture_url,
+							};
+						},
+					}),
+				);
+			}
+
+			_providers.push(
 				EmailProvider({
 					async generateVerificationToken() {
 						return crypto.randomInt(100000, 1000000).toString();
 					},
 					async sendVerificationRequest({ identifier, token }) {
-						// Email is deliverable when Resend is configured OR when SES is
-						// (SES reuses CAP_AWS_* creds, so a region implies it can send).
 						const emailConfigured =
 							!!serverEnv().RESEND_API_KEY || !!serverEnv().CAP_AWS_REGION;
 
@@ -134,7 +150,7 @@ export const authOptions = (): NextAuthOptions => {
 						}
 					},
 				}),
-			];
+			);
 
 			return _providers;
 		},
@@ -170,7 +186,6 @@ export const authOptions = (): NextAuthOptions => {
 					.where(eq(users.email, userEmail))
 					.limit(1);
 
-				// Only apply domain restrictions for new users, existing ones can always sign in
 				if (
 					!existingUser &&
 					!isEmailAllowedForSignup(userEmail, allowedDomains)

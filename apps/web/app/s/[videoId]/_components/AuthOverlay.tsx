@@ -1,5 +1,6 @@
 import { NODE_ENV } from "@cap/env";
-import { Button, Dialog, DialogContent, Input, LogoBadge } from "@cap/ui";
+import { Button, Dialog, DialogContent, Input } from "@cap/ui";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import { faArrowLeft, faEnvelope } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Image from "next/image";
@@ -9,6 +10,7 @@ import { signIn } from "next-auth/react";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 import { trackEvent } from "@/app/utils/analytics";
+import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
 import { usePublicEnv } from "@/utils/public-env";
 import OtpForm from "./OtpForm";
 
@@ -34,7 +36,8 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="w-[90vw] bg-gray-3 relative sm:max-w-md p-6 rounded-xl">
 				{emailSent && (
-					<div
+					<button
+						type="button"
 						onClick={() => {
 							setEmailSent(false);
 							setEmail("");
@@ -47,10 +50,12 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
 					>
 						<FontAwesomeIcon className="w-2" icon={faArrowLeft} />
 						<p className="text-xs">Back</p>
-					</div>
+					</button>
 				)}
 				<div className="space-y-6">
-					<LogoBadge className="mx-auto w-auto h-12" />
+					<div className="flex justify-center">
+						<PortstbdAuthLogo />
+					</div>
 
 					<div className="text-center">
 						<h1 className="text-xl font-semibold">
@@ -89,7 +94,7 @@ export const AuthOverlay: React.FC<AuthOverlayProps> = ({
 						)}
 						<p className="mt-6 text-xs text-center text-gray-9">
 							By entering your email, you acknowledge that you have both read
-							and agree to Cap's{" "}
+							and agree to {PORTSTBD_BRAND.companyName}'s{" "}
 							<Link
 								href="/terms"
 								target="_blank"
