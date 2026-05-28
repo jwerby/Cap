@@ -11,6 +11,14 @@ const packageJson = JSON.parse(
 );
 const { version } = packageJson;
 
+const portlessTld = process.env.PORTLESS_TLD ?? "com";
+const portlessAppName = process.env.PORTLESS_APP_NAME ?? "cap.portless.moc11";
+const portlessHost = `${portlessAppName}.${portlessTld}`;
+
+const portlessAllowedDevOrigins = [portlessHost, `*.${portlessHost}`].filter(
+	(origin) => origin.endsWith(".portless.moc11.com"),
+);
+
 const ffmpegTracingIncludes = [
 	"./node_modules/ffmpeg-static/ffmpeg",
 	"./node_modules/.pnpm/ffmpeg-static@5.3.0/node_modules/ffmpeg-static/ffmpeg",
@@ -18,6 +26,7 @@ const ffmpegTracingIncludes = [
 
 const nextConfig = {
 	reactStrictMode: true,
+	allowedDevOrigins: portlessAllowedDevOrigins,
 	serverExternalPackages: ["ffmpeg-static", "prettier"],
 	outputFileTracingIncludes: {
 		"/.well-known/workflow/v1/step": ffmpegTracingIncludes,

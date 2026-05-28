@@ -1,4 +1,5 @@
 import * as Db from "@cap/database/schema";
+import { serverEnv } from "@cap/env";
 import {
 	Database,
 	provideOptionalAuth,
@@ -133,6 +134,29 @@ const resolveRawPreviewKey = (video: Video.Video) =>
 		return yield* Effect.fail(new HttpApiError.NotFound());
 	});
 
+const shouldProxyDefaultS3Objects = () => {
+	const env = serverEnv();
+	return (
+		env.WEB_URL.includes(".portless.") ||
+		(env.S3_PUBLIC_ENDPOINT?.includes(".portless.") ?? false)
+	);
+};
+
+const getStorageObjectUrl = (video: Video.Video, key: string) =>
+	`/api/storage/object?${new URLSearchParams({
+		videoId: video.id,
+		key,
+	}).toString()}`;
+
+const getS3ObjectRedirectUrl = <E, R>(
+	bucket: { getSignedObjectUrl: (key: string) => Effect.Effect<string, E, R> },
+	video: Video.Video,
+	key: string,
+) =>
+	shouldProxyDefaultS3Objects()
+		? Effect.succeed(getStorageObjectUrl(video, key))
+		: bucket.getSignedObjectUrl(key);
+
 const getPlaylistResponse = (
 	video: Video.Video,
 	urlParams: (typeof GetPlaylistParams)["Type"],
@@ -144,9 +168,9 @@ const getPlaylistResponse = (
 
 		if (urlParams.videoType === "raw-preview") {
 			const rawFileKey = yield* resolveRawPreviewKey(video);
-			return yield* bucket
-				.getSignedObjectUrl(rawFileKey)
-				.pipe(Effect.map(HttpServerResponse.redirect));
+			return yield* getS3ObjectRedirectUrl(bucket, video, rawFileKey).pipe(
+				Effect.map(HttpServerResponse.redirect),
+			);
 		}
 
 		if (
@@ -285,7 +309,7 @@ const getPlaylistResponse = (
 				redirect = `${video.ownerId}/${video.id}/output/video_recording_000.m3u8`;
 
 			return HttpServerResponse.redirect(
-				yield* bucket.getSignedObjectUrl(redirect),
+				yield* getS3ObjectRedirectUrl(bucket, video, redirect),
 			);
 		}
 

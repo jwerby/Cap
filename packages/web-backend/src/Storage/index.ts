@@ -166,6 +166,30 @@ const makeS3Access = (s3: S3BucketAccess) => ({
 		key: string,
 		signingArgs?: Parameters<S3BucketAccess["getInternalSignedObjectUrl"]>[1],
 	) => mapStorageError(s3.getInternalSignedObjectUrl(key, signingArgs)),
+	getObjectResponse: (key: string, range?: string | null) =>
+		mapStorageError(
+			s3.getInternalSignedObjectUrl(key).pipe(
+				Effect.flatMap((url) =>
+					Effect.tryPromise({
+						try: async () => {
+							const headers = new Headers();
+							if (range) headers.set("Range", range);
+
+							const response = await fetch(url, { headers });
+							if (!response.ok && response.status !== 206) {
+								const text = await response.text().catch(() => "");
+								throw new Error(
+									`S3 object request failed: ${response.status} ${text}`,
+								);
+							}
+
+							return response;
+						},
+						catch: (cause) => cause,
+					}),
+				),
+			),
+		),
 	getObject: (key: string) => mapStorageError(s3.getObject(key)),
 	listObjects: (input: {
 		prefix?: string;

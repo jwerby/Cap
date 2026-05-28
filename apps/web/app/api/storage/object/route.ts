@@ -120,11 +120,6 @@ export async function GET(request: NextRequest) {
 		}
 
 		const [storage] = yield* Storage.getAccessForVideo(video);
-		if (!("getObjectResponse" in storage)) {
-			const url = yield* storage.getSignedObjectUrl(key);
-			return Response.redirect(url);
-		}
-
 		const upstream = yield* storage.getObjectResponse(
 			key,
 			request.headers.get("range"),
