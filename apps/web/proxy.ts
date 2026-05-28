@@ -20,9 +20,14 @@ const mainOrigins = [
 	addHttps(serverEnv().VERCEL_PROJECT_PRODUCTION_URL_HOST),
 ].filter(Boolean) as string[];
 
+const publicAssetPattern =
+	/\.(?:avif|css|gif|ico|jpg|jpeg|js|json|map|mp3|mp4|ogg|otf|png|svg|txt|webmanifest|webp|woff|woff2|xml)$/i;
+
 export async function proxy(request: NextRequest) {
 	const url = new URL(request.url);
 	const path = url.pathname;
+
+	if (publicAssetPattern.test(path)) return NextResponse.next();
 
 	if (path.startsWith("/login")) {
 		const response = NextResponse.next();

@@ -32,6 +32,7 @@ const task5BrandSources = {
 	verifyOtpForm: "../../app/(org)/verify-otp/form.tsx",
 	verifyOtpPage: "../../app/(org)/verify-otp/page.tsx",
 	shareAuthOverlay: "../../app/s/[videoId]/_components/AuthOverlay.tsx",
+	proxy: "../../proxy.ts",
 } as const;
 
 const legacyTransactionalBrandPattern =
@@ -251,6 +252,8 @@ describe("PORTSTBD_BRAND", () => {
 		expect(sources.loginForm).toContain("PORTSTBD_BRAND.productName");
 		expect(sources.signupForm).toContain("PORTSTBD_BRAND.productName");
 		expect(sources.verifyOtpPage).toContain("PORTSTBD_BRAND.productName");
+		expect(sources.proxy).toContain("publicAssetPattern");
+		expect(sources.proxy).toContain("path)) return NextResponse.next()");
 
 		for (const source of [
 			sources.authLogo,
