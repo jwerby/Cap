@@ -1,4 +1,4 @@
-import { SendEmailCommand, SESv2Client } from "@aws-sdk/client-sesv2";
+import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 import { buildEnv, serverEnv } from "@cap/env";
 import { PORTSTBD_BRAND } from "@cap/utils";
 import { render } from "@react-email/render";
