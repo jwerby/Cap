@@ -5,6 +5,7 @@ import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { Effect } from "effect";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import Script from "next/script";
 import type { PropsWithChildren } from "react";
 import { SonnerToaster } from "@/components/SonnerToastProvider";
 import { runPromise } from "@/lib/server";
@@ -22,7 +23,6 @@ import {
 	SessionProvider,
 } from "./Layout/providers";
 import { StripeContextProvider } from "./Layout/StripeContext";
-//@ts-expect-error
 import { script } from "./themeScript";
 
 const defaultFont = localFont({
@@ -60,6 +60,8 @@ const defaultFont = localFont({
 	],
 });
 
+const themeScriptId = "theme-script";
+
 export const metadata: Metadata = {
 	title: "Port & Starboard Watch",
 	description: "Secure video watch and sharing for Port & Starboard work.",
@@ -79,7 +81,11 @@ export default ({ children }: PropsWithChildren) =>
 		const bootstrapData = yield* Effect.promise(getBootstrapData);
 
 		return (
-			<html className={defaultFont.className} lang="en">
+			<html
+				suppressHydrationWarning
+				className={defaultFont.className}
+				lang="en"
+			>
 				<head>
 					<link
 						rel="icon"
@@ -109,9 +115,9 @@ export default ({ children }: PropsWithChildren) =>
 					<meta name="theme-color" content="#163760" />
 				</head>
 				<body suppressHydrationWarning>
-					<script
-						dangerouslySetInnerHTML={{ __html: `(${script.toString()})()` }}
-					/>
+					<Script id={themeScriptId} strategy="beforeInteractive">
+						{`(${script.toString()})()`}
+					</Script>
 					<TooltipPrimitive.Provider>
 						<PostHogProvider bootstrapData={bootstrapData}>
 							<AuthContextProvider user={runPromise(resolveCurrentUser)}>
