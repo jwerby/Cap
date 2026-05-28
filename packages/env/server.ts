@@ -29,6 +29,9 @@ function createServerEnv() {
 			// Cap uses Resend for email sending, including sending login code emails
 			RESEND_API_KEY: z.string().optional(),
 			RESEND_FROM_DOMAIN: z.string().optional(),
+			// Self-hosted deployments can send via AWS SES instead of Resend.
+			// SES reuses the CAP_AWS_* credentials below; this only sets the From domain.
+			EMAIL_FROM_DOMAIN: z.string().optional(),
 
 			/// S3 configuration
 			// Though they are prefixed with `CAP_AWS`, these don't have to be
