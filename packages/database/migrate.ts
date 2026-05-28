@@ -20,10 +20,29 @@ function errorIsOrgIdMigration(e: unknown): e is DrizzleQueryError {
 	);
 }
 
+// A schema that already exists but whose drizzle bookkeeping table is missing
+// makes the migrator replay from 0000 and throw "already exists" (MySQL errno
+// 1050 / sqlState 42S01). Treat that as benign so boot does not crash-loop;
+// the schema is already present and the journal self-heals on the next migrate.
+function errorIsAlreadyApplied(e: unknown): boolean {
+	const cause = e instanceof DrizzleQueryError ? e.cause : e;
+	const code = (cause as { code?: string } | undefined)?.code;
+	const errno = (cause as { errno?: number } | undefined)?.errno;
+	return code === "ER_TABLE_EXISTS_ERROR" || errno === 1050;
+}
+
 export async function migrateDb() {
 	try {
 		await runMigrate();
 	} catch (e) {
+		if (errorIsAlreadyApplied(e)) {
+			console.warn(
+				"migrate: schema already present but drizzle journal missing; skipping replay",
+			);
+			await runSpaceMemberRoleBackfill();
+			return;
+		}
+
 		if (!errorIsOrgIdMigration(e)) throw e;
 
 		console.log("non-null videos.orgId migration failed, running backfill");
