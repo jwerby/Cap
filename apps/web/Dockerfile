@@ -1,6 +1,4 @@
-# syntax=docker.io/docker/dockerfile:1
-
-FROM node:24-alpine AS base
+FROM public.ecr.aws/docker/library/node:24-alpine AS base
 RUN corepack enable
 
 FROM base AS builder
