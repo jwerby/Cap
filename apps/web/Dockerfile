@@ -11,7 +11,12 @@ RUN corepack enable pnpm
 RUN --mount=type=cache,id=pnpm,target=/root/.local/share/pnpm/store pnpm i --frozen-lockfile
 
 ARG NEXT_PUBLIC_DOCKER_BUILD=true
-ENV NEXT_PUBLIC_WEB_URL=http://localhost:3000
+ARG NEXT_PUBLIC_WEB_URL=http://localhost:3000
+ARG BUILD_SHA=unknown
+
+ENV NEXT_PUBLIC_DOCKER_BUILD=$NEXT_PUBLIC_DOCKER_BUILD
+ENV NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL
+ENV BUILD_SHA=$BUILD_SHA
 
 RUN pnpm run build:web
 
@@ -31,6 +36,14 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/packages/database/migrations ./apps/web/migrations
 
+ARG NEXT_PUBLIC_DOCKER_BUILD=true
+ARG NEXT_PUBLIC_WEB_URL=http://localhost:3000
+ARG BUILD_SHA=unknown
+
+ENV NEXT_PUBLIC_DOCKER_BUILD=$NEXT_PUBLIC_DOCKER_BUILD
+ENV NEXT_PUBLIC_WEB_URL=$NEXT_PUBLIC_WEB_URL
+ENV BUILD_SHA=$BUILD_SHA
+ENV NODE_ENV=production
 
 USER nextjs
 
