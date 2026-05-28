@@ -3,6 +3,21 @@ type PublicUrlEnv = {
 	WEB_URL?: string;
 };
 
+const getRuntimeEnv = (): PublicUrlEnv => {
+	if (typeof process === "undefined") return {};
+
+	return process.env;
+};
+
+const normalizeWebUrl = (url?: string) => {
+	const trimmedUrl = url?.trim();
+
+	if (!trimmedUrl) return undefined;
+	if (/^[a-z][a-z\d+.-]*:\/\//i.test(trimmedUrl)) return trimmedUrl;
+
+	return `https://${trimmedUrl}`;
+};
+
 export const PORTSTBD_BRAND = {
 	companyName: "Port & Starboard",
 	productName: "Port & Starboard Watch",
@@ -22,8 +37,18 @@ export const PORTSTBD_BRAND = {
 	},
 } as const;
 
-export const getPortstbdWebUrl = (env: PublicUrlEnv = process.env) =>
-	env.NEXT_PUBLIC_WEB_URL ?? env.WEB_URL ?? PORTSTBD_BRAND.defaultWebUrl;
+export const getPortstbdWebUrl = (env: PublicUrlEnv = getRuntimeEnv()) =>
+	normalizeWebUrl(env.NEXT_PUBLIC_WEB_URL) ??
+	normalizeWebUrl(env.WEB_URL) ??
+	PORTSTBD_BRAND.defaultWebUrl;
 
-export const buildPortstbdAssetUrl = (path: `/${string}`, env?: PublicUrlEnv) =>
-	new URL(path, getPortstbdWebUrl(env)).toString();
+export const buildPortstbdAssetUrl = (
+	path: `/${string}`,
+	env?: PublicUrlEnv,
+) => {
+	if (path.startsWith("//")) {
+		throw new Error("Asset path must not be protocol-relative");
+	}
+
+	return new URL(path, getPortstbdWebUrl(env)).toString();
+};
