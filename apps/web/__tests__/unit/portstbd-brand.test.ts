@@ -202,7 +202,7 @@ describe("PORTSTBD_BRAND", () => {
 		}
 
 		expect(sources.emailConfig).toMatch(
-			/from = `\$\{PORTSTBD_BRAND\.companyName\} <auth@\$\{serverEnv\(\)\.RESEND_FROM_DOMAIN\}>`;/,
+			/from = `\$\{PORTSTBD_BRAND\.companyName\} <no-reply@\$\{emailFromDomain\(\)\}>`;/,
 		);
 		expect(sources.otpEmail).toContain(
 			'buildPortstbdAssetUrl("/port-starboard-logo-email.png")',
