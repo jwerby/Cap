@@ -41,6 +41,9 @@ const normalizeDependencyCheck = async (
 const firstPresent = (...values: Array<string | undefined>) =>
 	values.map((value) => value?.trim()).find(Boolean) ?? "unknown";
 
+const buildMediaServerHealthUrl = (mediaServerUrl: string) =>
+	new URL("health", `${mediaServerUrl.replace(/\/+$/, "")}/`).toString();
+
 export const resolveBuildSha = (
 	env: NodeJS.ProcessEnv | Record<string, string | undefined> = process.env,
 ) =>
@@ -72,11 +75,14 @@ export const checkMediaServerHealthForDeploy = async (
 		);
 
 		try {
-			const response = await fetcher(`${mediaServerUrl}/health`, {
-				method: "GET",
-				cache: "no-store",
-				signal: controller.signal,
-			});
+			const response = await fetcher(
+				buildMediaServerHealthUrl(mediaServerUrl),
+				{
+					method: "GET",
+					cache: "no-store",
+					signal: controller.signal,
+				},
+			);
 
 			if (!response.ok) {
 				return {

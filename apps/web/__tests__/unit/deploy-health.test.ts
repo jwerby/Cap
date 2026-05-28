@@ -151,7 +151,7 @@ describe("checkDatabaseHealth", () => {
 describe("checkMediaServerHealthForDeploy", () => {
 	it("checks the media server health endpoint", async () => {
 		mocks.serverEnv.mockReturnValue({
-			MEDIA_SERVER_URL: "https://media.example.com",
+			MEDIA_SERVER_URL: "https://media.example.com/",
 		});
 		const fetcher = vi.fn(
 			async () =>
@@ -165,6 +165,35 @@ describe("checkMediaServerHealthForDeploy", () => {
 			"https://media.example.com/health",
 			expect.objectContaining({ cache: "no-store", method: "GET" }),
 		);
+	});
+
+	it("times out slow media server health checks", async () => {
+		mocks.serverEnv.mockReturnValue({
+			MEDIA_SERVER_URL: "https://media.example.com",
+		});
+		vi.useFakeTimers();
+		const fetcher = vi.fn(
+			(_url: string | URL | Request, init?: RequestInit) =>
+				new Promise<Response>((_resolve, reject) => {
+					init?.signal?.addEventListener("abort", () => {
+						reject(new Error("aborted"));
+					});
+				}),
+		);
+
+		try {
+			const healthPromise = checkMediaServerHealthForDeploy(
+				fetcher as unknown as typeof fetch,
+			);
+
+			await vi.advanceTimersByTimeAsync(3000);
+			await expect(healthPromise).resolves.toEqual({
+				status: "error",
+				message: "aborted",
+			});
+		} finally {
+			vi.useRealTimers();
+		}
 	});
 
 	it("reports media server failures", async () => {
