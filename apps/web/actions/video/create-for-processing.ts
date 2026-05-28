@@ -5,7 +5,7 @@ import { getCurrentUser } from "@cap/database/auth/session";
 import { nanoId } from "@cap/database/helpers";
 import { videos, videoUploads } from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub, userIsPro } from "@cap/utils";
+import { dub, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import { Storage as StorageService } from "@cap/web-backend";
 import {
 	type Folder,
@@ -78,7 +78,7 @@ export async function createVideoForServerProcessing({
 		.insert(videos)
 		.values({
 			id: videoId,
-			name: `Cap Upload - ${formattedDate}`,
+			name: `${PORTSTBD_BRAND.companyName} Upload - ${formattedDate}`,
 			ownerId: user.id,
 			orgId,
 			source: { type: "webMP4" as const },

@@ -1,4 +1,4 @@
-import { CAP_LOGO_URL } from "@cap/utils";
+import { buildPortstbdAssetUrl, PORTSTBD_BRAND } from "@cap/utils";
 import {
 	Body,
 	Container,
@@ -23,16 +23,18 @@ export function OTPEmail({
 	return (
 		<Html>
 			<Head />
-			<Preview>Your Cap Verification Code: {code}</Preview>
+			<Preview>
+				{PORTSTBD_BRAND.companyName} verification code: {code}
+			</Preview>
 			<Tailwind>
 				<Body className="mx-auto my-auto bg-gray-1 font-sans">
 					<Container className="mx-auto my-10 max-w-[500px] rounded border border-solid border-gray-200 px-10 py-5">
 						<Section className="mt-8">
 							<Img
-								src={CAP_LOGO_URL}
-								width="40"
-								height="40"
-								alt="Cap"
+								src={buildPortstbdAssetUrl("/port-starboard-logo-email.png")}
+								width="220"
+								height="36"
+								alt={PORTSTBD_BRAND.logoAlt}
 								className="mx-auto my-0"
 							/>
 						</Section>
@@ -40,7 +42,7 @@ export function OTPEmail({
 							Your Verification Code
 						</Heading>
 						<Text className="text-sm leading-6 text-black">
-							Welcome to Cap!
+							Welcome to {PORTSTBD_BRAND.companyName}.
 						</Text>
 						<Text className="text-sm leading-6 text-black">
 							Please use the following verification code to sign in to your

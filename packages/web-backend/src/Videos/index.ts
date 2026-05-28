@@ -1,6 +1,6 @@
 import * as Db from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub } from "@cap/utils";
+import { dub, PORTSTBD_BRAND } from "@cap/utils";
 import { CurrentUser, type Folder, Policy, Video } from "@cap/web-domain";
 import * as Dz from "drizzle-orm";
 import { Array, Effect, Exit, Option } from "effect";
@@ -406,7 +406,7 @@ export class Videos extends Effect.Service<Videos>()("Videos", {
 					const createData: RepoCreateVideoInput = {
 						ownerId: user.id,
 						orgId: input.orgId,
-						name: `Cap Recording - ${formattedDate}`,
+						name: `${PORTSTBD_BRAND.recordingTitleSuffix} - ${formattedDate}`,
 						public: serverEnv().CAP_VIDEOS_DEFAULT_PUBLIC,
 						source: { type: "webMP4" },
 						bucketId,

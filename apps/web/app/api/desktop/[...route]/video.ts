@@ -11,7 +11,7 @@ import {
 	videoUploads,
 } from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub, userIsPro } from "@cap/utils";
+import { dub, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import { Storage } from "@cap/web-backend";
 import { Organisation, Video } from "@cap/web-domain";
 import { zValidator } from "@hono/zod-validator";
@@ -167,9 +167,10 @@ app.get(
 
 			const idToUse = Video.VideoId.make(nanoId());
 
-			const videoName =
-				name ??
-				`Cap ${isScreenshot ? "Screenshot" : "Recording"} - ${formattedDate}`;
+			const defaultVideoTitle = isScreenshot
+				? `${PORTSTBD_BRAND.companyName} Screenshot`
+				: PORTSTBD_BRAND.recordingTitleSuffix;
+			const videoName = name ?? `${defaultVideoTitle} - ${formattedDate}`;
 			const clientSupportsGoogleDriveUpload = hasDesktopFeature(
 				c.req,
 				GOOGLE_DRIVE_UPLOAD_FEATURE,
@@ -248,19 +249,20 @@ app.get(
 						"[SendFirstShareableLinkEmail] Sending first shareable link email with 5-minute delay",
 					);
 
-					const videoUrl = buildEnv.NEXT_PUBLIC_IS_CAP
+					const isCapDeployment = Boolean(buildEnv.NEXT_PUBLIC_IS_CAP);
+					const videoUrl = isCapDeployment
 						? `https://cap.link/${idToUse}`
 						: `${serverEnv().WEB_URL}/s/${idToUse}`;
 
 					await sendEmail({
 						email: user.email,
-						subject: "You created your first Cap! 🥳",
+						subject: `Your first ${PORTSTBD_BRAND.companyName} share link is ready`,
 						react: FirstShareableLink({
 							email: user.email,
 							url: videoUrl,
-							videoName: videoName,
+							marketing: isCapDeployment,
 						}),
-						marketing: true,
+						marketing: isCapDeployment,
 						scheduledAt: "in 5 min",
 					});
 

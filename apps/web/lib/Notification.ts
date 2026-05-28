@@ -4,6 +4,7 @@ import { FirstView } from "@cap/database/emails/first-view";
 import { nanoId } from "@cap/database/helpers";
 import { comments, notifications, users, videos } from "@cap/database/schema";
 import { buildEnv, serverEnv } from "@cap/env";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import type { Notification, NotificationBase } from "@cap/web-api-contract";
 import { type Comment, User, Video } from "@cap/web-domain";
 import { and, eq, gte, isNull, sql } from "drizzle-orm";
@@ -381,7 +382,7 @@ export async function sendFirstViewEmail(
 
 		await sendEmail({
 			email: videoWithOwner.ownerEmail,
-			subject: `Your Cap "${displayName}" just got its first view!`,
+			subject: `Your ${PORTSTBD_BRAND.companyName} video "${displayName}" just got its first view!`,
 			react: FirstView({
 				email: videoWithOwner.ownerEmail,
 				url: videoUrl,

@@ -1,5 +1,6 @@
 import crypto from "node:crypto";
 import { serverEnv } from "@cap/env";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import { User } from "@cap/web-domain";
 import { eq } from "drizzle-orm";
 import type { NextAuthOptions } from "next-auth";
@@ -126,7 +127,7 @@ export const authOptions = (): NextAuthOptions => {
 							console.log({ email });
 							await sendEmail({
 								email: identifier,
-								subject: `Your Cap Verification Code`,
+								subject: PORTSTBD_BRAND.verificationEmailSubject,
 								react: email,
 							});
 						}

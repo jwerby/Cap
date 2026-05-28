@@ -5,7 +5,7 @@ import { getCurrentUser } from "@cap/database/auth/session";
 import { nanoId } from "@cap/database/helpers";
 import { videos, videoUploads } from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub, userIsPro } from "@cap/utils";
+import { dub, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import { Storage as StorageService } from "@cap/web-backend";
 import {
 	type Folder,
@@ -198,11 +198,15 @@ export async function createVideoAndGetUploadUrl({
 				organizationId: orgId,
 			});
 
+		const defaultVideoTitle = isScreenshot
+			? `${PORTSTBD_BRAND.companyName} Screenshot`
+			: isUpload
+				? `${PORTSTBD_BRAND.companyName} Upload`
+				: PORTSTBD_BRAND.recordingTitleSuffix;
+
 		const videoData = {
 			id: idToUse,
-			name: `Cap ${
-				isScreenshot ? "Screenshot" : isUpload ? "Upload" : "Recording"
-			} - ${formattedDate}`,
+			name: `${defaultVideoTitle} - ${formattedDate}`,
 			ownerId: user.id,
 			orgId,
 			source: { type: "webMP4" as const },
