@@ -14,7 +14,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { retryVideoProcessing } from "@/actions/video/retry-processing";
 import { PortstbdSpinner } from "@/components/PortstbdSpinner";
-import { getActiveCaptionText } from "./caption-cues";
+import { getCaptionTextAtTime } from "./caption-cues";
 import {
 	canRetryFailedProcessing,
 	getUploadFailureMessage,
@@ -457,7 +457,9 @@ export function HLSVideoPlayer({
 		let captionTrack: TextTrack | null = null;
 
 		const handleCueChange = (): void => {
-			setCurrentCue(getActiveCaptionText(captionTrack?.activeCues));
+			setCurrentCue(
+				getCaptionTextAtTime(captionTrack?.cues, video.currentTime),
+			);
 		};
 
 		const setupTracks = (): void => {
@@ -468,9 +470,13 @@ export function HLSVideoPlayer({
 					track &&
 					(track.kind === "captions" || track.kind === "subtitles")
 				) {
+					if (captionTrack && captionTrack !== track) {
+						captionTrack.removeEventListener("cuechange", handleCueChange);
+					}
 					captionTrack = track;
 					track.mode = "hidden";
 					track.addEventListener("cuechange", handleCueChange);
+					handleCueChange();
 					break;
 				}
 			}
@@ -501,6 +507,8 @@ export function HLSVideoPlayer({
 		};
 
 		video.addEventListener("loadedmetadata", handleLoadedMetadata);
+		video.addEventListener("seeked", handleCueChange);
+		video.addEventListener("timeupdate", handleCueChange);
 
 		video.textTracks.addEventListener("change", handleTrackChange);
 		video.textTracks.addEventListener("addtrack", handleTrackChange);
@@ -512,6 +520,8 @@ export function HLSVideoPlayer({
 
 		return () => {
 			video.removeEventListener("loadedmetadata", handleLoadedMetadata);
+			video.removeEventListener("seeked", handleCueChange);
+			video.removeEventListener("timeupdate", handleCueChange);
 			video.textTracks.removeEventListener("change", handleTrackChange);
 			video.textTracks.removeEventListener("addtrack", handleTrackChange);
 			video.textTracks.removeEventListener("removetrack", handleTrackChange);

@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { retryVideoProcessing } from "@/actions/video/retry-processing";
 import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import CommentStamp from "./CommentStamp";
-import { getActiveCaptionText } from "./caption-cues";
+import { getCaptionTextAtTime } from "./caption-cues";
 import {
 	AVC_LEVEL_IOS_HARDWARE_CEILING,
 	createLevelPatchedMp4ObjectUrl,
@@ -153,6 +153,7 @@ export function CapVideoPlayer({
 	const [showPlayButton, setShowPlayButton] = useState(false);
 	const [videoLoaded, setVideoLoaded] = useState(false);
 	const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
+	const hasPlayedOnceRef = useRef(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [hasError, setHasError] = useState(false);
 	const [isRetryingProcessing, setIsRetryingProcessing] = useState(false);
@@ -163,6 +164,11 @@ export function CapVideoPlayer({
 		null,
 	);
 	const queryClient = useQueryClient();
+
+	const markHasPlayedOnce = useCallback(() => {
+		hasPlayedOnceRef.current = true;
+		setHasPlayedOnce(true);
+	}, []);
 
 	useEffect(() => {
 		const checkMobile = () => {
@@ -371,7 +377,7 @@ export function CapVideoPlayer({
 		const handleLoadedData = () => {
 			setVideoLoaded(true);
 			setHasError(false);
-			if (!hasPlayedOnce) {
+			if (!hasPlayedOnceRef.current) {
 				setShowPlayButton(true);
 			}
 		};
@@ -379,13 +385,13 @@ export function CapVideoPlayer({
 		const handleCanPlay = () => {
 			setVideoLoaded(true);
 			setHasError(false);
-			if (!hasPlayedOnce) {
+			if (!hasPlayedOnceRef.current) {
 				setShowPlayButton(true);
 			}
 		};
 
 		const handlePlay = () => {
-			setHasPlayedOnce(true);
+			markHasPlayedOnce();
 		};
 
 		const handleError = () => {
@@ -410,7 +416,14 @@ export function CapVideoPlayer({
 		let captionTrack: TextTrack | null = null;
 
 		const handleCueChange = (): void => {
-			setCurrentCue(getActiveCaptionText(captionTrack?.activeCues));
+			if (!captionsSrc) {
+				setCurrentCue("");
+				return;
+			}
+
+			setCurrentCue(
+				getCaptionTextAtTime(captionTrack?.cues, video.currentTime),
+			);
 		};
 
 		const setupTracks = (): void => {
@@ -418,9 +431,13 @@ export function CapVideoPlayer({
 
 			for (const track of tracks) {
 				if (track.kind === "captions" || track.kind === "subtitles") {
+					if (captionTrack && captionTrack !== track) {
+						captionTrack.removeEventListener("cuechange", handleCueChange);
+					}
 					captionTrack = track;
 					track.mode = "hidden";
 					track.addEventListener("cuechange", handleCueChange);
+					handleCueChange();
 					break;
 				}
 			}
@@ -440,7 +457,7 @@ export function CapVideoPlayer({
 		const handleLoadedMetadataWithTracks = () => {
 			setVideoLoaded(true);
 			setHasError(false);
-			if (!hasPlayedOnce) {
+			if (!hasPlayedOnceRef.current) {
 				setShowPlayButton(true);
 			}
 			setupTracks();
@@ -455,6 +472,8 @@ export function CapVideoPlayer({
 		video.addEventListener("canplay", handleCanPlay);
 		video.addEventListener("loadedmetadata", handleLoadedMetadataWithTracks);
 		video.addEventListener("play", handlePlay);
+		video.addEventListener("seeked", handleCueChange);
+		video.addEventListener("timeupdate", handleCueChange);
 		video.addEventListener("error", handleError as EventListener);
 
 		video.textTracks.addEventListener("change", handleTrackChange);
@@ -464,11 +483,16 @@ export function CapVideoPlayer({
 		if (video.readyState === 4) {
 			handleLoadedData();
 		}
+		if (video.readyState >= 1) {
+			setupTracks();
+		}
 
 		return () => {
 			video.removeEventListener("loadeddata", handleLoadedData);
 			video.removeEventListener("canplay", handleCanPlay);
 			video.removeEventListener("play", handlePlay);
+			video.removeEventListener("seeked", handleCueChange);
+			video.removeEventListener("timeupdate", handleCueChange);
 			video.removeEventListener("error", handleError as EventListener);
 			video.removeEventListener(
 				"loadedmetadata",
@@ -482,8 +506,9 @@ export function CapVideoPlayer({
 			}
 		};
 	}, [
-		hasPlayedOnce,
+		captionsSrc,
 		hasTriedRawFallback,
+		markHasPlayedOnce,
 		rawFallbackSrc,
 		resolvedSrc.data?.type,
 		resolvedSrc.isPending,
@@ -702,7 +727,7 @@ export function CapVideoPlayer({
 					}}
 					onPlay={() => {
 						setShowPlayButton(false);
-						setHasPlayedOnce(true);
+						markHasPlayedOnce();
 					}}
 					crossOrigin={
 						resolvedSrc.data.supportsCrossOrigin ? "anonymous" : undefined
