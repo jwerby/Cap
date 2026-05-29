@@ -84,7 +84,7 @@ export default async function DashboardLayout({
 					userPreferences={userPreferences}
 					referClicked={referClicked === "true"}
 				>
-					<div className="bg-gray-2 dashboard-grid">
+					<div className="dashboard-grid bg-[radial-gradient(circle_at_top_left,#E6F2F5_0%,#EDF5F7_34%,#F7FBFC_100%)]">
 						<DesktopNav />
 						<div className="flex h-full [grid-area:main] focus:outline-none">
 							<MobileNav />

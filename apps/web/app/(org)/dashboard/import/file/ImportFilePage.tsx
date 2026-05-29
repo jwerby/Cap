@@ -113,13 +113,14 @@ export const ImportFilePage = () => {
 					<FontAwesomeIcon className="size-3" icon={faArrowLeft} />
 					Back to Import
 				</Link>
-				<h1 className="text-2xl font-medium text-gray-12">Upload File</h1>
-				<p className="mt-1 text-sm text-gray-10">
+				<h1 className="text-2xl font-bold text-[#163760]">Upload File</h1>
+				<p className="mt-1 text-sm text-[#3C7486]">
 					Upload a video file from your device.
 				</p>
 			</div>
 
-			<div
+			<section
+				aria-label="Upload video dropzone"
 				onDragOver={(e) => {
 					e.preventDefault();
 					if (!isUploading) setIsDragOver(true);
@@ -128,16 +129,16 @@ export const ImportFilePage = () => {
 				onDrop={handleDrop}
 				className={`relative flex flex-col items-center justify-center w-full max-w-2xl rounded-xl border-2 border-dashed transition-all duration-200 py-16 px-8 ${
 					isUploading
-						? "border-gray-4 bg-gray-2 cursor-not-allowed"
+						? "border-[#D8E7EB] bg-[#EDF5F7] cursor-not-allowed"
 						: isDragOver
-							? "border-blue-10 bg-blue-3"
-							: "border-gray-4 bg-gray-1 hover:border-gray-6 hover:bg-gray-2"
+							? "border-[#63A1B4] bg-[#EDF5F7]"
+							: "border-[#D8E7EB] bg-white/70 hover:border-[#63A1B4] hover:bg-[#F7FBFC]"
 				}`}
 			>
 				{isUploading ? (
 					<div className="flex flex-col items-center gap-4">
-						<div className="flex items-center justify-center size-16 rounded-full bg-gray-3">
-							<div className="size-6 border-2 border-gray-8 border-t-blue-10 rounded-full animate-spin" />
+						<div className="flex items-center justify-center size-16 rounded-full bg-[#EDF5F7]">
+							<div className="size-6 border-2 border-[#D8E7EB] border-t-[#163760] rounded-full animate-spin" />
 						</div>
 						<div className="flex flex-col items-center gap-1">
 							<p className="text-sm font-medium text-gray-12">{statusLabel}</p>
@@ -153,7 +154,7 @@ export const ImportFilePage = () => {
 					</div>
 				) : (
 					<div className="flex flex-col items-center gap-4">
-						<div className="flex items-center justify-center size-16 rounded-full bg-gray-3 text-gray-10">
+						<div className="flex items-center justify-center size-16 rounded-full bg-[#EDF5F7] text-[#163760]">
 							<FontAwesomeIcon className="size-6" icon={faUpload} />
 						</div>
 						<div className="flex flex-col items-center gap-1">
@@ -174,7 +175,7 @@ export const ImportFilePage = () => {
 						</Button>
 					</div>
 				)}
-			</div>
+			</section>
 
 			<input
 				ref={inputRef}

@@ -17,7 +17,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@cap/ui";
-import { classNames } from "@cap/utils";
+import { classNames, PORTSTBD_BRAND } from "@cap/utils";
 import {
 	faBuilding,
 	faCircleInfo,
@@ -69,7 +69,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 
 	const manageNavigation = [
 		{
-			name: "My Caps",
+			name: "Recordings",
 			href: `/dashboard/caps`,
 			extraText: userCapsCount,
 			icon: <CapIcon />,
@@ -83,7 +83,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 			subNav: [],
 		},
 		{
-			name: "Record a Cap",
+			name: "Record Video",
 			href: `/dashboard/caps/record`,
 			icon: <RecordIcon />,
 			subNav: [],
@@ -163,7 +163,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 								duration: 0.2,
 							}}
 							className={clsx(
-								"mt-1.5 mx-auto rounded-xl cursor-pointer bg-gray-3",
+								"mt-1.5 mx-auto rounded-xl cursor-pointer border border-[#D8E7EB] bg-white/65 shadow-[0_12px_28px_-24px_#163760]",
 								sidebarCollapsed ? "w-fit px-2 py-0.5" : "w-full p-2.5",
 							)}
 						>
@@ -351,7 +351,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 											},
 										}}
 										layoutId="navlinks"
-										className="absolute h-[36px] w-full rounded-xl pointer-events-none bg-gray-3"
+										className="absolute h-[36px] w-full rounded-xl pointer-events-none bg-[#D8E7EB]"
 									/>
 								)}
 
@@ -386,14 +386,14 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 						</div>
 					)}
 					<p className="mt-2 text-xs text-center truncate text-gray-10">
-						Cap Software, Inc. {new Date().getFullYear()}.
+						{PORTSTBD_BRAND.companyName} {new Date().getFullYear()}.
 					</p>
 				</div>
 			</nav>
 			<DialogContent className="p-0 w-full max-w-md rounded-xl bg-gray-2">
 				<DialogHeader
 					icon={<FontAwesomeIcon icon={faBuilding} />}
-					description="A new organization to share caps with your team"
+					description="A new organization to share recordings with your team"
 				>
 					<DialogTitle className="text-lg text-gray-12">
 						Create New Organization
@@ -471,7 +471,7 @@ const NavItem = ({
 						: "px-3 py-2 w-full",
 					isPathActive(href, matchChildren)
 						? "bg-transparent pointer-events-none"
-						: "hover:bg-gray-2",
+						: "hover:bg-white/70",
 					"flex overflow-hidden justify-start items-center tracking-tight rounded-xl outline-none",
 				)}
 			>

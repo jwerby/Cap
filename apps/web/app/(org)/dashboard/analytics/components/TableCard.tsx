@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	LogoBadge,
 	Table,
 	TableBody,
 	TableCell,
@@ -20,6 +19,7 @@ import clsx from "clsx";
 import getUnicodeFlagIcon from "country-flag-icons/unicode";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { PortstbdMark } from "@/components/PortstbdAuthLogo";
 
 const countryCodeToIcon = (countryCode: string | undefined | null) => {
 	if (!countryCode || countryCode.trim() === "") {
@@ -289,7 +289,7 @@ const getIconForRow = (
 			);
 		}
 		case "cap":
-			return <LogoBadge className="size-4" />;
+			return <PortstbdMark className="size-4 rounded-md" />;
 		default:
 			return null;
 	}

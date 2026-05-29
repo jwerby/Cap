@@ -52,10 +52,9 @@ const VideoCard: React.FC<VideoCardProps> = memo(
 		});
 
 		return (
-			<div
+			<button
+				type="button"
 				onClick={onToggle}
-				role="button"
-				tabIndex={0}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
 						e.preventDefault();
@@ -187,12 +186,12 @@ const VideoCard: React.FC<VideoCardProps> = memo(
 									icon={faRecordVinyl}
 									className="size-3 text-gray-10"
 								/>
-								<p className="font-medium truncate text-gray-11">Caps</p>
+								<p className="font-medium truncate text-gray-11">Recordings</p>
 							</>
 						)}
 					</div>
 				</div>
-			</div>
+			</button>
 		);
 	},
 );

@@ -14,6 +14,7 @@ export async function updateDomain(
 	domain: string,
 	organizationId: Organisation.OrganisationId,
 ) {
+	const normalizedDomain = domain.trim().toLowerCase();
 	const user = await getCurrentUser();
 
 	if (!user) {
@@ -33,11 +34,10 @@ export async function updateDomain(
 
 	await requireOrganizationSettingsManager(user.id, organizationId);
 
-	// Check if domain is already being used by another organization
 	const existingDomain = await db()
 		.select()
 		.from(organizations)
-		.where(eq(organizations.customDomain, domain))
+		.where(eq(organizations.customDomain, normalizedDomain))
 		.limit(1);
 
 	if (existingDomain.length > 0 && existingDomain[0]?.id !== organizationId) {
@@ -45,21 +45,23 @@ export async function updateDomain(
 	}
 
 	try {
-		const addDomainResponse = await addDomain(domain);
+		const addDomainResponse = await addDomain(normalizedDomain);
 
 		if (addDomainResponse.error) {
-			throw new Error(addDomainResponse.error.message);
+			throw new Error(
+				addDomainResponse.error.message || "Failed to add custom domain",
+			);
 		}
 
 		await db()
 			.update(organizations)
 			.set({
-				customDomain: domain,
+				customDomain: normalizedDomain,
 				domainVerified: null,
 			})
 			.where(eq(organizations.id, organizationId));
 
-		const status = await checkDomainStatus(domain);
+		const status = await checkDomainStatus(normalizedDomain);
 
 		if (status.verified) {
 			await db()
@@ -77,5 +79,6 @@ export async function updateDomain(
 		if (error instanceof Error) {
 			throw new Error(error.message);
 		}
+		throw new Error("Failed to update domain settings");
 	}
 }

@@ -1,11 +1,12 @@
 "use client";
-import { Button, Logo } from "@cap/ui";
+import { Button } from "@cap/ui";
 import clsx from "clsx";
 import { motion } from "framer-motion";
 import { useDetectPlatform } from "hooks/useDetectPlatform";
 import { ArrowLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
+import { PortstbdLogo, PortstbdMark } from "@/components/PortstbdAuthLogo";
 import { Tooltip } from "@/components/Tooltip";
 import { useDashboardContext } from "../../Contexts";
 import { DeveloperSidebarContent } from "../../developers/_components/DeveloperSidebarContent";
@@ -36,7 +37,7 @@ export const DesktopNav = () => {
 		<motion.aside
 			initial={false}
 			animate={{
-				width: sidebarCollapsed ? 70 : 220,
+				width: sidebarCollapsed ? 74 : 244,
 				transition: {
 					duration: 0.6,
 					type: "spring",
@@ -44,11 +45,11 @@ export const DesktopNav = () => {
 				},
 			}}
 			className={clsx(
-				"hidden relative z-50 flex-1 h-full [grid-area:sidebar] will-change-[width] lg:flex group bg-gray-1",
+				"hidden relative z-50 flex-1 h-full [grid-area:sidebar] will-change-[width] lg:flex group border-r border-[#D8E7EB] bg-[linear-gradient(180deg,#F7FBFC_0%,#EDF5F7_58%,#E6F2F5_100%)] dark:border-gray-3 dark:bg-none dark:bg-gray-1",
 			)}
 		>
 			<div className="flex flex-col mx-auto w-full h-full">
-				<div className="flex justify-between items-center px-3 pt-5 mb-3.5 w-full truncate min-h-8">
+				<div className="flex justify-between items-center px-4 pt-5 mb-3.5 w-full truncate min-h-8">
 					{isDeveloperSection ? (
 						<Link
 							href="/dashboard/caps"
@@ -63,17 +64,18 @@ export const DesktopNav = () => {
 							)}
 						</Link>
 					) : (
-						<Link href="/dashboard">
-							<Logo
-								hideLogoName={sidebarCollapsed}
-								viewBoxDimensions={
-									sidebarCollapsed ? "0 0 40 40" : "0 0 120 40"
-								}
-								className={clsx(
-									"w-[120px] h-[40px]",
-									sidebarCollapsed ? "mx-auto" : "",
-								)}
-							/>
+						<Link
+							href="/dashboard"
+							className={clsx(
+								"flex items-center",
+								sidebarCollapsed ? "justify-center w-full" : "",
+							)}
+						>
+							{sidebarCollapsed ? (
+								<PortstbdMark className="size-10" />
+							) : (
+								<PortstbdLogo className="h-9 w-auto max-w-[184px]" priority />
+							)}
 						</Link>
 					)}
 					<Tooltip

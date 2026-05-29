@@ -286,10 +286,6 @@ const CustomDomainDialog = ({
 		],
 	);
 
-	if (!currentStep) {
-		return null;
-	}
-
 	const handleDomainSubmit = async () => {
 		if (!domain.trim()) {
 			dispatch({
@@ -344,7 +340,6 @@ const CustomDomainDialog = ({
 	};
 
 	useEffect(() => {
-		//if current step is success, close dialog in 8 seconds
 		if (stepState.currentIndex === 2) {
 			setTimeout(() => {
 				handleClose();
@@ -353,6 +348,10 @@ const CustomDomainDialog = ({
 			handleNext();
 		}
 	}, [isVerified, stepState.currentIndex, handleClose, handleNext]);
+
+	if (!currentStep) {
+		return null;
+	}
 
 	return (
 		<>
@@ -374,7 +373,7 @@ const CustomDomainDialog = ({
 				>
 					<DialogHeader
 						icon={<FontAwesomeIcon icon={faGlobe} />}
-						description="Let's get you setup with your custom domain for your caps."
+						description="Set up a custom domain for your shared recordings."
 					>
 						<DialogTitle className="text-lg text-gray-12">
 							Custom Domain
@@ -466,7 +465,7 @@ const CustomDomainDialog = ({
 											handleClose();
 										}}
 									>
-										Upgrade To Cap Pro
+										Upgrade To Watch Pro
 									</Button>
 								))}
 						</DialogFooter>

@@ -1,8 +1,8 @@
 "use client";
 
-import { LogoSpinner } from "@cap/ui";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 
 const MAX_REFRESH_ATTEMPTS = 30;
 const REFRESH_INTERVAL_MS = 2000;
@@ -31,8 +31,12 @@ export function PendingRecordingShare() {
 	}, [router]);
 
 	return (
-		<div className="flex flex-col justify-center items-center p-4 min-h-screen text-center bg-gray-2">
-			<LogoSpinner className="mb-6 w-10 h-auto animate-spin" />
+		<div className="flex flex-col justify-center items-center p-4 min-h-screen text-center bg-[#EDF5F7]">
+			<PortstbdSpinner
+				className="mb-6 size-12"
+				markClassName="text-3xl"
+				label="Preparing recording"
+			/>
 			<h1 className="mb-2 text-2xl font-semibold text-gray-12">
 				Preparing your recording
 			</h1>

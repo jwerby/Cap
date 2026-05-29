@@ -32,7 +32,7 @@ export const Bottom = () => {
 	return (
 		<div className="flex right-0 bottom-0 left-0 justify-between items-center p-0 lg:mb-10 my-5 mx-auto w-full lg:w-[calc(100%-120px)] lg:absolute lg:mt-0">
 			<Button
-				className="w-fit"
+				className="w-fit border-[#D8E7EB] bg-white/80 text-[#163760] hover:bg-white"
 				variant="outline"
 				size="sm"
 				onClick={() => signOut()}
@@ -40,10 +40,10 @@ export const Bottom = () => {
 				Sign out
 			</Button>
 			<Button
-				className="px-0 w-fit"
+				className="px-0 w-fit text-[#163760] hover:text-[#63A1B4]"
 				variant="transparent"
 				spinner={skipToDashboard.isPending}
-				spinnerColor="black"
+				spinnerColor="#163760"
 				spinnerBorderColor="rgba(0, 0, 0, 0.2)"
 				disabled={skipToDashboard.isPending || skipToDashboard.isSuccess}
 				size="sm"

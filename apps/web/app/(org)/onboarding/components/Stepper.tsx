@@ -63,7 +63,7 @@ export default function Stepper({
 			</div>
 
 			{/* Desktop Stepper - shows on devices 1024px and up */}
-			<div className="hidden absolute right-0 left-0 top-6 justify-center items-center p-4 mx-auto rounded-xl border lg:flex max-w-fit bg-gray-2 border-gray-4">
+			<div className="hidden absolute right-0 left-0 top-6 justify-center items-center p-4 mx-auto rounded-xl border lg:flex max-w-fit bg-white/80 border-[#D8E7EB] backdrop-blur-xl">
 				{steps.map((step, idx) => {
 					return (
 						<Fragment key={step.id}>
@@ -76,9 +76,9 @@ export default function Stepper({
 										className={clsx(
 											"flex justify-center items-center text-xs text-white rounded-full size-5 min-size-5",
 											currentStep === step.name && !step.completed
-												? "bg-blue-500"
+												? "bg-[#163760]"
 												: step.completed
-													? "bg-green-500"
+													? "bg-[#C7D857] text-[#163760]"
 													: "bg-gray-7",
 										)}
 									>
@@ -95,7 +95,7 @@ export default function Stepper({
 										className={clsx(
 											"text-[13px] text-nowrap",
 											step.completed || currentStep === step.name
-												? "text-gray-12"
+												? "text-[#163760]"
 												: "text-gray-9",
 										)}
 									>
@@ -127,21 +127,21 @@ const MobileStepper = ({
 	if (!activeStep) return null;
 
 	return (
-		<div className="flex gap-x-4 items-center p-3 rounded-xl border bg-gray-2 border-gray-4">
+		<div className="flex gap-x-4 items-center p-3 rounded-xl border bg-white/80 border-[#D8E7EB] backdrop-blur-xl">
 			<div className="flex gap-2 items-center">
 				<div
 					className={clsx(
 						"flex justify-center items-center text-xs text-white rounded-full size-5 min-size-5",
-						"bg-blue-500",
+						"bg-[#163760]",
 					)}
 				>
 					<p>{activeStep.id}</p>
 				</div>
-				<p className="text-sm font-medium text-gray-12">{activeStep.name}</p>
+				<p className="text-sm font-medium text-[#163760]">{activeStep.name}</p>
 			</div>
 			<div>
-				<p className="text-[13px] text-gray-10">
-					Step <span className="text-gray-11">{activeStep.id}/5</span>
+				<p className="text-[13px] text-[#6B8791]">
+					Step <span className="text-[#163760]">{activeStep.id}/5</span>
 				</p>
 			</div>
 		</div>

@@ -7,7 +7,6 @@ import {
 	DialogHeader,
 	DialogTitle,
 	Input,
-	LoadingSpinner,
 } from "@cap/ui";
 import type { Video } from "@cap/web-domain";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
@@ -20,7 +19,18 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import VirtualizedVideoGrid from "./VirtualizedVideoGrid";
+
+type ActionResult<T> =
+	| { success: true; data: T; error?: never; message?: string }
+	| { success: false; data?: never; error?: string; message?: string };
+
+type UpdateVideosResult = {
+	success: boolean;
+	message?: string;
+	error?: string;
+};
 
 interface AddVideosDialogBaseProp<T> {
 	open: boolean;
@@ -28,10 +38,16 @@ interface AddVideosDialogBaseProp<T> {
 	entityId: T;
 	entityName: string;
 	onVideosAdded?: () => void;
-	addVideos: (entityId: T, videoIds: Video.VideoId[]) => Promise<any>;
-	removeVideos: (entityId: T, videoIds: Video.VideoId[]) => Promise<any>;
-	getVideos: () => Promise<any>;
-	getEntityVideoIds: () => Promise<any>;
+	addVideos: (
+		entityId: T,
+		videoIds: Video.VideoId[],
+	) => Promise<UpdateVideosResult>;
+	removeVideos: (
+		entityId: T,
+		videoIds: Video.VideoId[],
+	) => Promise<UpdateVideosResult>;
+	getVideos: () => Promise<ActionResult<VideoData[]>>;
+	getEntityVideoIds: () => Promise<ActionResult<Video.VideoId[]>>;
 }
 
 export interface VideoData {
@@ -82,7 +98,7 @@ function AddVideosDialogBase<T>({
 		queryFn: async () => {
 			const result = await getVideos();
 			if (!result.success) {
-				throw new Error(result.error);
+				throw new Error(result.error ?? "Failed to fetch videos");
 			}
 			return result.data;
 		},
@@ -96,7 +112,7 @@ function AddVideosDialogBase<T>({
 		queryFn: async () => {
 			const result = await getEntityVideoIds();
 			if (!result.success) {
-				throw new Error(result.error);
+				throw new Error(result.error ?? "Failed to fetch video IDs");
 			}
 			return result.data;
 		},
@@ -115,8 +131,8 @@ function AddVideosDialogBase<T>({
 			toAdd: Video.VideoId[];
 			toRemove: Video.VideoId[];
 		}) => {
-			let addResult = { success: true, message: "", error: "" };
-			let removeResult = { success: true, message: "", error: "" };
+			let addResult: UpdateVideosResult = { success: true, message: "" };
+			let removeResult: UpdateVideosResult = { success: true, message: "" };
 			if (toAdd.length > 0) {
 				addResult = await addVideos(entityId, toAdd);
 			}
@@ -265,7 +281,11 @@ function AddVideosDialogBase<T>({
 					<div className="flex-1 w-full h-64">
 						{isLoading ? (
 							<div className="flex justify-center items-center w-full h-64">
-								<LoadingSpinner size={36} />
+								<PortstbdSpinner
+									className="size-10"
+									markClassName="text-2xl"
+									label="Loading videos"
+								/>
 							</div>
 						) : filteredVideos.length === 0 ? (
 							<div className="flex flex-col justify-center items-center h-24 text-center">

@@ -2,6 +2,7 @@ import { getCurrentUser } from "@cap/database/auth/session";
 import { PORTSTBD_BRAND } from "@cap/utils";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { PortstbdAuthScaffold } from "@/components/PortstbdAuthScaffold";
 import { VerifyOTPForm } from "./form";
 
 export const metadata = {
@@ -23,7 +24,7 @@ export default async function VerifyOTPPage(props: {
 	}
 
 	return (
-		<div className="flex h-screen w-full items-center justify-center">
+		<PortstbdAuthScaffold contentClassName="min-h-dvh items-center justify-center px-4 py-10">
 			<Suspense fallback={null}>
 				<VerifyOTPForm
 					email={searchParams.email?.toLowerCase() ?? ""}
@@ -31,6 +32,6 @@ export default async function VerifyOTPPage(props: {
 					lastSent={searchParams.lastSent}
 				/>
 			</Suspense>
-		</div>
+		</PortstbdAuthScaffold>
 	);
 }

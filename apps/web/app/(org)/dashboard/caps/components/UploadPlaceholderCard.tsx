@@ -1,8 +1,9 @@
 "use client";
 
-import { LogoSpinner } from "@cap/ui";
 import { calculateStrokeDashoffset, getProgressCircleConfig } from "@cap/utils";
 import { useStore } from "@tanstack/react-store";
+import Image from "next/image";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import { type UploadStatus, useUploadingContext } from "../UploadingContext";
 
 const { circumference } = getProgressCircleConfig();
@@ -24,15 +25,23 @@ export const UploadPlaceholderCard = () => {
 	return (
 		<div className="flex flex-col gap-4 w-full h-full rounded-xl bg-gray-1 border-gray-3 border-[1px]">
 			<div className="overflow-hidden relative w-full bg-black rounded-t-xl border-b border-gray-3 aspect-video group">
-				{uploadStatus.status === "uploadingVideo" ? (
-					<img
+				{uploadStatus.status === "uploadingVideo" &&
+				uploadStatus.thumbnailUrl ? (
+					<Image
 						src={uploadStatus.thumbnailUrl}
 						alt="Uploading thumbnail"
+						fill
+						unoptimized
+						sizes="(max-width: 768px) 100vw, 33vw"
 						className="object-cover w-full h-full"
 					/>
 				) : (
 					<div className="flex justify-center items-center w-full h-full">
-						<LogoSpinner className="w-8 h-8 animate-spin" />
+						<PortstbdSpinner
+							className="size-10"
+							markClassName="text-2xl"
+							label="Processing upload"
+						/>
 					</div>
 				)}
 
@@ -42,7 +51,11 @@ export const UploadPlaceholderCard = () => {
 					<span className="text-sm font-semibold text-white">
 						{getFriendlyStatus(uploadStatus.status)}
 					</span>
-					<svg className="w-4 h-4 transform -rotate-90" viewBox="0 0 20 20">
+					<svg
+						className="w-4 h-4 transform -rotate-90"
+						viewBox="0 0 20 20"
+						aria-hidden="true"
+					>
 						<circle
 							cx="10"
 							cy="10"

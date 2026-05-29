@@ -1,4 +1,3 @@
-import { LogoSpinner } from "@cap/ui";
 import type { Video } from "@cap/web-domain";
 import clsx from "clsx";
 import { Effect } from "effect";
@@ -6,6 +5,7 @@ import moment from "moment";
 import Image from "next/image";
 import type { CSSProperties } from "react";
 import { memo, useEffect, useRef, useState } from "react";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import { useEffectQuery } from "@/lib/EffectRuntime";
 import { ThumbnailRequest } from "@/lib/Requests/ThumbnailRequest";
 
@@ -167,7 +167,11 @@ export const VideoThumbnail: React.FC<VideoThumbnailProps> = memo(
 					) : (
 						showLoading &&
 						!thumbnailUrl.data && (
-							<LogoSpinner className="w-5 h-auto animate-spin md:w-8" />
+							<PortstbdSpinner
+								className="size-6 md:size-9"
+								markClassName="text-base md:text-xl"
+								label="Loading thumbnail"
+							/>
 						)
 					)}
 				</div>

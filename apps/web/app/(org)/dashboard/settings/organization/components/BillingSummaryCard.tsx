@@ -71,9 +71,9 @@ export function BillingSummaryCard() {
 		return (
 			<Card className="flex flex-wrap gap-6 justify-between items-center w-full">
 				<CardHeader>
-					<CardTitle>Upgrade to Cap Pro</CardTitle>
+					<CardTitle>Upgrade to Watch Pro</CardTitle>
 					<CardDescription>
-						Get unlimited sharing, custom domains, Cap AI, and more.
+						Get unlimited sharing, custom domains, Watch AI, and more.
 					</CardDescription>
 				</CardHeader>
 				<Button
@@ -82,7 +82,7 @@ export function BillingSummaryCard() {
 					variant="primary"
 					onClick={() => setUpgradeModalOpen(true)}
 				>
-					Upgrade to Pro
+					Upgrade to Watch Pro
 				</Button>
 			</Card>
 		);

@@ -19,7 +19,7 @@ export const UsageButton = memo(
 		const { sidebarCollapsed } = useDashboardContext();
 		if (subscribed) {
 			return (
-				<Tooltip position="right" content="Cap Pro">
+				<Tooltip position="right" content="Watch Pro">
 					<Link
 						className="flex justify-center mx-auto w-full"
 						href="/dashboard/settings/workspace"
@@ -27,7 +27,7 @@ export const UsageButton = memo(
 						<Button
 							size="lg"
 							className={clsx(
-								"overflow-hidden truncate",
+								"overflow-hidden truncate bg-[#163760] border-[#102947] hover:bg-[#102947]",
 								sidebarCollapsed
 									? "p-0 w-10 h-10 rounded-full min-w-[unset] max-w-10"
 									: "w-full",
@@ -41,7 +41,9 @@ export const UsageButton = memo(
 								)}
 								icon={faCheck}
 							/>
-							{sidebarCollapsed ? null : <p className="text-white">Cap Pro</p>}
+							{sidebarCollapsed ? null : (
+								<p className="text-white">Watch Pro</p>
+							)}
 						</Button>
 					</Link>
 				</Tooltip>
@@ -52,7 +54,7 @@ export const UsageButton = memo(
 			<Tooltip
 				disable={!sidebarCollapsed}
 				position="right"
-				content="Upgrade to Pro"
+				content="Upgrade to Watch Pro"
 			>
 				<ProRiveButton toggleMobileNav={toggleMobileNav} />
 			</Tooltip>
@@ -92,7 +94,7 @@ const ProRiveButton = memo(
 				}}
 				className={clsx(
 					"flex overflow-visible relative gap-3 justify-evenly items-center cursor-pointer",
-					"mx-auto",
+					"mx-auto bg-[#163760] border-[#102947] hover:bg-[#102947]",
 					sidebarCollapsed ? "py-0 h-10 min-w-[unset]" : "py-3 w-full h-fit",
 				)}
 				onClick={() => {
@@ -110,7 +112,7 @@ const ProRiveButton = memo(
 				/>
 				{!sidebarCollapsed ? (
 					<p className="relative left-8 text-center text-white truncate">
-						Upgrade to Pro
+						Upgrade to Watch Pro
 					</p>
 				) : null}
 			</Button>

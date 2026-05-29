@@ -59,7 +59,7 @@ export const ImportLoomButton = ({
 			}
 
 			toast.success(
-				"Loom video import started! It will appear in your caps shortly.",
+				"Loom video import started. It will appear in your recordings shortly.",
 			);
 			setDialogOpen(false);
 			setLoomUrl("");
@@ -101,8 +101,8 @@ export const ImportLoomButton = ({
 					</DialogHeader>
 					<div className="p-5">
 						<p className="mb-3 text-sm text-gray-11">
-							Paste a Loom video URL to import it to Cap. The video will be
-							downloaded and processed in the background.
+							Paste a Loom video URL to import it to Port & Starboard Watch. The
+							video will be downloaded and processed in the background.
 						</p>
 						<Input
 							value={loomUrl}

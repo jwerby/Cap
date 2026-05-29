@@ -4,7 +4,7 @@ import { STRIPE_PLAN_IDS } from "@cap/utils";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { Effect } from "effect";
 import type { Metadata } from "next";
-import localFont from "next/font/local";
+import { Lato } from "next/font/google";
 import Script from "next/script";
 import type { PropsWithChildren } from "react";
 import { SonnerToaster } from "@/components/SonnerToastProvider";
@@ -25,39 +25,10 @@ import {
 import { StripeContextProvider } from "./Layout/StripeContext";
 import { script } from "./themeScript";
 
-const defaultFont = localFont({
-	src: [
-		{
-			path: "../public/fonts/NeueMontreal-Bold.otf",
-			weight: "700",
-			style: "normal",
-		},
-		{
-			path: "../public/fonts/NeueMontreal-Regular.otf",
-			weight: "400",
-			style: "normal",
-		},
-		{
-			path: "../public/fonts/NeueMontreal-Medium.otf",
-			weight: "500",
-			style: "normal",
-		},
-		{
-			path: "../public/fonts/NeueMontreal-MediumItalic.otf",
-			weight: "500",
-			style: "italic",
-		},
-		{
-			path: "../public/fonts/NeueMontreal-Italic.otf",
-			weight: "400",
-			style: "italic",
-		},
-		{
-			path: "../public/fonts/NeueMontreal-BoldItalic.otf",
-			weight: "700",
-			style: "italic",
-		},
-	],
+const defaultFont = Lato({
+	subsets: ["latin"],
+	weight: ["400", "700"],
+	display: "swap",
 });
 
 const themeScriptId = "theme-script";

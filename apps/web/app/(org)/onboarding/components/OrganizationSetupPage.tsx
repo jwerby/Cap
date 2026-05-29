@@ -83,7 +83,7 @@ export function OrganizationSetupPage({
 	return (
 		<Base
 			title="Organization Setup"
-			description="Let's get your dashboard setup with your organization"
+			description="Let's set up your Port & Starboard Watch dashboard"
 		>
 			<form onSubmit={handleSubmit} className="space-y-7">
 				<div className="space-y-3">
@@ -96,12 +96,12 @@ export function OrganizationSetupPage({
 						name="organizationName"
 						required
 					/>
-					<div className="rounded-xl border bg-gray-1 h-fit border-gray-4">
-						<h3 className="px-3 py-3 text-sm font-medium border-b border-gray-4 text-gray-12">
+					<div className="rounded-xl border bg-white h-fit border-[#D8E7EB]">
+						<h3 className="px-3 py-3 text-sm font-medium border-b border-[#D8E7EB] text-[#163760]">
 							Organization Logo
 						</h3>
 						<div className="flex gap-5 p-5">
-							<div className="flex justify-center items-center rounded-full border border-dashed size-14 bg-gray-3 border-gray-6">
+							<div className="flex justify-center items-center rounded-full border border-dashed size-14 bg-[#EDF5F7] border-[#63A1B4]/50">
 								{selectedFile ? (
 									<Image
 										src={URL.createObjectURL(selectedFile)}
@@ -134,7 +134,7 @@ export function OrganizationSetupPage({
 								>
 									Upload Image
 								</Button>
-								<p className="text-xs text-gray-10">
+								<p className="text-xs text-[#6B8791]">
 									Recommended size: 120x120
 								</p>
 							</div>
@@ -145,7 +145,7 @@ export function OrganizationSetupPage({
 				<Button
 					type="submit"
 					variant="dark"
-					className="mx-auto w-full"
+					className="mx-auto w-full bg-[#163760] text-white hover:bg-[#102947] border-[#163760]"
 					spinner={orgSetupMutation.isPending}
 					disabled={orgSetupMutation.isPending}
 				>

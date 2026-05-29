@@ -158,29 +158,29 @@ const settingOptions: {
 	{
 		label: "Enable comments",
 		value: "disableComments",
-		description: "Allow viewers to comment on caps in this space",
+		description: "Allow viewers to comment on recordings in this space",
 	},
 	{
 		label: "Enable summary",
 		value: "disableSummary",
-		description: "Show AI-generated summary for caps in this space",
+		description: "Show AI-generated summary for recordings in this space",
 		pro: true,
 	},
 	{
 		label: "Enable captions",
 		value: "disableCaptions",
-		description: "Allow viewers to use captions for caps in this space",
+		description: "Allow viewers to use captions for recordings in this space",
 	},
 	{
 		label: "Enable chapters",
 		value: "disableChapters",
-		description: "Show AI-generated chapters for caps in this space",
+		description: "Show AI-generated chapters for recordings in this space",
 		pro: true,
 	},
 	{
 		label: "Enable reactions",
 		value: "disableReactions",
-		description: "Allow viewers to react to caps in this space",
+		description: "Allow viewers to react to recordings in this space",
 	},
 	{
 		label: "Enable transcript",
@@ -443,7 +443,7 @@ export const NewSpaceForm: React.FC<NewSpaceFormProps> = (props) => {
 										Require password
 									</p>
 									<p className="text-xs text-gray-10">
-										All caps in this space require this password
+										All recordings in this space require this password
 									</p>
 								</div>
 							</div>

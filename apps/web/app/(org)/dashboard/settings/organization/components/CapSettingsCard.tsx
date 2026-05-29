@@ -43,7 +43,7 @@ const options: Array<{
 	{
 		label: "Enable comments",
 		value: "disableComments",
-		description: "Allow viewers to comment on caps",
+		description: "Allow viewers to comment on recordings",
 	},
 	{
 		label: "Enable summary",
@@ -54,7 +54,7 @@ const options: Array<{
 	{
 		label: "Enable captions",
 		value: "disableCaptions",
-		description: "Allow viewers to use captions for caps",
+		description: "Allow viewers to use captions for recordings",
 	},
 	{
 		label: "Enable chapters",
@@ -65,7 +65,7 @@ const options: Array<{
 	{
 		label: "Enable reactions",
 		value: "disableReactions",
-		description: "Allow viewers to react to caps",
+		description: "Allow viewers to react to recordings",
 	},
 	{
 		label: "Enable transcript",
@@ -74,9 +74,9 @@ const options: Array<{
 		pro: true,
 	},
 	{
-		label: "Show Cap logo",
+		label: "Show Port & Starboard logo",
 		value: "hideShareableLinkCapLogo",
-		description: "Show Cap branding at the top of shareable links",
+		description: "Show Port & Starboard branding at the top of shareable links",
 		pro: true,
 	},
 ];
@@ -169,8 +169,8 @@ const CapSettingsCard = () => {
 						if (changedKey === "hideShareableLinkCapLogo") {
 							toast.success(
 								debouncedUpdateSettings[changedKey]
-									? "Cap logo hidden"
-									: "Cap logo shown",
+									? "Port & Starboard logo hidden"
+									: "Port & Starboard logo shown",
 							);
 						} else {
 							const isDisabled = Boolean(debouncedUpdateSettings[changedKey]);
@@ -229,10 +229,10 @@ const CapSettingsCard = () => {
 	return (
 		<Card className="flex relative flex-col flex-1 gap-6 w-full min-h-fit">
 			<CardHeader>
-				<CardTitle>Cap Settings</CardTitle>
+				<CardTitle>Recording Settings</CardTitle>
 				<CardDescription>
 					Enable or disable specific settings for your organization. These
-					settings will be applied as defaults for new caps.
+					settings will be applied as defaults for new recordings.
 				</CardDescription>
 			</CardHeader>
 

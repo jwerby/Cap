@@ -1,6 +1,5 @@
 "use client";
 
-import { LoadingSpinner } from "@cap/ui";
 import clsx from "clsx";
 import {
 	Circle,
@@ -13,6 +12,7 @@ import {
 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 
 type CameraPreviewSize = "sm" | "lg";
 type CameraPreviewShape = "round" | "square" | "full";
@@ -602,7 +602,11 @@ export const CameraPreviewWindow = ({
 					/>
 					{!videoDimensions && (
 						<div className="absolute inset-0 flex items-center justify-center">
-							<LoadingSpinner size={32} themeColors />
+							<PortstbdSpinner
+								className="size-9"
+								markClassName="text-xl"
+								label="Loading camera preview"
+							/>
 						</div>
 					)}
 					{isPictureInPictureSupported && isInPictureInPicture && (

@@ -13,6 +13,11 @@ import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
 
+const authCardClassName =
+	"relative w-full p-[28px] max-w-[432px] rounded-2xl border border-[#63A1B4]/30 bg-white/90 shadow-[0_26px_90px_-58px_#163760] backdrop-blur-xl";
+const primaryAuthButtonClassName =
+	"bg-[#163760] text-white hover:bg-[#102947] border-[#163760] disabled:bg-[#D8E7EB] disabled:text-[#6B8791]";
+
 export function VerifyOTPForm({
 	email,
 	next,
@@ -148,11 +153,11 @@ export function VerifyOTPForm({
 		<motion.div
 			initial={{ opacity: 0, y: 20 }}
 			animate={{ opacity: 1, y: 0 }}
-			className="relative w-[calc(100%-5%)] p-[28px] max-w-[432px] bg-gray-3 border border-gray-5 rounded-2xl"
+			className={authCardClassName}
 		>
 			<Link
 				href="/login"
-				className="absolute top-5 left-5 z-20 flex gap-2 items-center py-1.5 px-3 text-gray-12 bg-transparent border border-gray-4 rounded-full hover:bg-gray-1 transition-colors duration-300"
+				className="absolute top-5 left-5 z-20 flex gap-2 items-center py-1.5 px-3 text-[#163760] bg-transparent border border-[#D8E7EB] rounded-full hover:bg-[#EDF5F7] transition-colors duration-300"
 			>
 				<FontAwesomeIcon className="w-2" icon={faArrowLeft} />
 				<p className="text-xs">Back</p>
@@ -163,10 +168,10 @@ export function VerifyOTPForm({
 			</Link>
 
 			<div className="flex flex-col justify-center items-center my-7 text-center">
-				<h1 className="text-xl font-semibold text-gray-12">
+				<h1 className="text-xl font-semibold text-[#163760]">
 					Enter verification code
 				</h1>
-				<p className="text-sm text-gray-10">
+				<p className="text-sm text-[#6B8791]">
 					We sent a 6-digit code to {normalizedEmail}
 				</p>
 			</div>
@@ -194,7 +199,7 @@ export function VerifyOTPForm({
 								.replace(/\D/g, "");
 							handleChange(0, pastedData);
 						}}
-						className="flex-1 h-[52px] text-xl font-semibold text-center rounded-lg border transition-all bg-gray-1 border-gray-5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+						className="flex-1 h-[52px] text-xl font-semibold text-center rounded-lg border transition-all bg-white border-[#D8E7EB] text-[#163760] focus:outline-none focus:ring-2 focus:ring-[#63A1B4] focus:border-transparent"
 						disabled={handleVerify.isPending || handleVerify.isSuccess}
 					/>
 				))}
@@ -202,7 +207,7 @@ export function VerifyOTPForm({
 
 			<Button
 				variant="primary"
-				className="w-full"
+				className={`w-full ${primaryAuthButtonClassName}`}
 				spinner={isVerifying}
 				onClick={() => handleVerify.mutate(code.join(""))}
 				disabled={code.some((digit) => !digit) || isVerifying}
@@ -215,7 +220,7 @@ export function VerifyOTPForm({
 					type="button"
 					onClick={() => handleResend.mutate()}
 					disabled={handleResend.isPending}
-					className="text-sm underline transition-colors text-gray-10 hover:text-gray-12"
+					className="text-sm underline transition-colors text-[#6B8791] hover:text-[#163760]"
 				>
 					{handleResend.isPending
 						? "Sending..."
@@ -223,13 +228,13 @@ export function VerifyOTPForm({
 				</button>
 			</div>
 
-			<p className="mt-6 text-xs text-center text-gray-9">
+			<p className="mt-6 text-xs text-center text-[#6B8791]">
 				By entering your email, you acknowledge that you have both read and
 				agree to {PORTSTBD_BRAND.companyName}'s{" "}
 				<Link
 					href="/terms"
 					target="_blank"
-					className="text-xs font-semibold text-gray-12 hover:text-blue-300"
+					className="text-xs font-semibold text-[#163760] hover:text-[#63A1B4]"
 				>
 					Terms of Service
 				</Link>{" "}
@@ -237,7 +242,7 @@ export function VerifyOTPForm({
 				<Link
 					href="/privacy"
 					target="_blank"
-					className="text-xs font-semibold text-gray-12 hover:text-blue-300"
+					className="text-xs font-semibold text-[#163760] hover:text-[#63A1B4]"
 				>
 					Privacy Policy
 				</Link>

@@ -26,6 +26,12 @@ import { usePublicEnv } from "@/utils/public-env";
 const MotionInput = motion(Input);
 const MotionLink = motion(Link);
 const MotionButton = motion(Button);
+const authCardClassName =
+	"overflow-hidden relative w-full p-[28px] max-w-[432px] rounded-2xl border border-[#63A1B4]/30 bg-white/90 shadow-[0_26px_90px_-58px_#163760] backdrop-blur-xl";
+const primaryAuthButtonClassName =
+	"bg-[#163760] text-white hover:bg-[#102947] border-[#163760] disabled:bg-[#D8E7EB] disabled:text-[#6B8791]";
+const secondaryAuthButtonClassName =
+	"bg-white text-[#163760] hover:bg-[#EDF5F7] border-[#D8E7EB]";
 
 export function LoginForm() {
 	const searchParams = useSearchParams();
@@ -142,7 +148,7 @@ export function LoginForm() {
 				layout: { duration: 0.3, ease: "easeInOut" },
 				height: { duration: 0.3, ease: "easeInOut" },
 			}}
-			className="overflow-hidden relative w-[calc(100%-5%)] p-[28px] max-w-[432px] bg-gray-3 border border-gray-5 rounded-2xl"
+			className={authCardClassName}
 		>
 			<motion.div
 				layout="position"
@@ -154,7 +160,7 @@ export function LoginForm() {
 					transition: { duration: 0.1, delay: 0.2 },
 				}}
 				onClick={() => setShowOrgInput(false)}
-				className="absolute overflow-hidden top-5 rounded-full left-5 z-20 hover:bg-gray-1 gap-2 items-center py-1.5 px-3 text-gray-12 bg-transparent border border-gray-4 transition-colors duration-300 cursor-pointer"
+				className="absolute overflow-hidden top-5 rounded-full left-5 z-20 hover:bg-[#EDF5F7] gap-2 items-center py-1.5 px-3 text-[#163760] bg-transparent border border-[#D8E7EB] transition-colors duration-300 cursor-pointer"
 			>
 				<FontAwesomeIcon className="w-2" icon={faArrowLeft} />
 				<motion.p layout="position" className="text-xs text-inherit">
@@ -171,14 +177,14 @@ export function LoginForm() {
 				<motion.h1
 					key="title"
 					layout="position"
-					className="text-2xl font-semibold text-gray-12"
+					className="text-2xl font-semibold text-[#163760]"
 				>
 					Sign in to {PORTSTBD_BRAND.productName}
 				</motion.h1>
 				<motion.p
 					key="subtitle"
 					layout="position"
-					className="text-[16px] text-gray-10"
+					className="text-[16px] text-[#6B8791]"
 				>
 					{PORTSTBD_BRAND.description}
 				</motion.p>
@@ -325,14 +331,14 @@ export function LoginForm() {
 						</AnimatePresence>
 						<motion.p
 							layout="position"
-							className="pt-3 text-xs text-center text-gray-9"
+							className="pt-3 text-xs text-center text-[#6B8791]"
 						>
 							By typing your email and clicking continue, you acknowledge that
 							you have both read and agree to {PORTSTBD_BRAND.companyName}'s{" "}
 							<Link
 								href="/terms"
 								target="_blank"
-								className="text-xs font-semibold text-gray-12 hover:text-blue-300"
+								className="text-xs font-semibold text-[#163760] hover:text-[#63A1B4]"
 							>
 								Terms of Service
 							</Link>{" "}
@@ -340,7 +346,7 @@ export function LoginForm() {
 							<Link
 								href="/privacy"
 								target="_blank"
-								className="text-xs font-semibold text-gray-12 hover:text-blue-300"
+								className="text-xs font-semibold text-[#163760] hover:text-[#63A1B4]"
 							>
 								Privacy Policy
 							</Link>
@@ -380,10 +386,16 @@ const LoginWithSSO = ({
 				className="w-full max-w-full"
 			/>
 			{organizationName && (
-				<p className="text-sm text-gray-1">Signing in to: {organizationName}</p>
+				<p className="text-sm text-[#6B8791]">
+					Signing in to: {organizationName}
+				</p>
 			)}
 			<div>
-				<Button type="submit" variant="dark" className="w-full max-w-full">
+				<Button
+					type="submit"
+					variant="dark"
+					className={`w-full max-w-full ${primaryAuthButtonClassName}`}
+				>
 					Continue with SSO
 				</Button>
 			</div>
@@ -432,6 +444,7 @@ const NormalLogin = ({
 					variant="dark"
 					type="submit"
 					disabled={loading || emailSent}
+					className={primaryAuthButtonClassName}
 					icon={<FontAwesomeIcon className="mr-1 size-4" icon={faEnvelope} />}
 				>
 					Login with email
@@ -439,12 +452,12 @@ const NormalLogin = ({
 			</motion.div>
 			<motion.p
 				layout="position"
-				className="mt-3 mb-2 text-xs text-center text-gray-9"
+				className="mt-3 mb-2 text-xs text-center text-[#6B8791]"
 			>
 				Don't have an account?{" "}
 				<Link
 					href="/signup"
-					className="text-xs font-semibold text-blue-9 hover:text-blue-8"
+					className="text-xs font-semibold text-[#163760] hover:text-[#63A1B4]"
 				>
 					Sign up here
 				</Link>
@@ -454,7 +467,7 @@ const NormalLogin = ({
 				<>
 					<div className="flex gap-4 items-center mt-4 mb-4">
 						<span className="flex-1 h-px bg-gray-5" />
-						<p className="text-sm text-center text-gray-10">OR</p>
+						<p className="text-sm text-center text-[#6B8791]">OR</p>
 						<span className="flex-1 h-px bg-gray-5" />
 					</div>
 					<motion.div
@@ -465,7 +478,7 @@ const NormalLogin = ({
 							<MotionButton
 								variant="gray"
 								type="button"
-								className="flex gap-2 justify-center items-center w-full text-sm"
+								className={`flex gap-2 justify-center items-center w-full text-sm ${secondaryAuthButtonClassName}`}
 								onClick={handleGoogleSignIn}
 								disabled={loading || emailSent}
 							>
@@ -490,7 +503,7 @@ const NormalLogin = ({
 							<MotionButton
 								variant="gray"
 								type="button"
-								className="w-full"
+								className={`w-full ${secondaryAuthButtonClassName}`}
 								layout
 								onClick={() => setShowOrgInput(true)}
 								disabled={loading || emailSent}

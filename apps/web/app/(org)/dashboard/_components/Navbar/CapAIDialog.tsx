@@ -33,9 +33,9 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 			className="w-[calc(100%-20px)] max-w-[500px]"
 		>
 			<DialogHeader icon={<FontAwesomeIcon icon={faInfoCircle} />}>
-				<DialogTitle className="flex gap-2 items-center text-lg font-medium text-gray-12">
-					Cap AI
-					<span className="inline-flex items-center text-xs font-medium px-2 py-0.5 rounded-full bg-gradient-to-br from-blue-400 to-blue-600 text-white">
+				<DialogTitle className="flex gap-2 items-center text-lg font-bold text-[#163760]">
+					Watch AI
+					<span className="inline-flex items-center text-xs font-bold px-2 py-0.5 rounded-full bg-[#163760] text-white">
 						Pro
 					</span>
 				</DialogTitle>
@@ -44,7 +44,7 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 				<CapAIArt className="w-full max-w-[450px] mx-auto h-[240px]" />
 				<div className="pt-5 space-y-4">
 					<p className="text-base text-gray-11">
-						Cap AI automatically processes your recordings to make them more
+						Watch AI automatically processes your recordings to make them more
 						useful and accessible.
 					</p>
 					<h4 className="text-sm font-medium text-gray-12">
@@ -63,7 +63,7 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 							>
 								<FontAwesomeIcon
 									icon={faWandMagicSparkles}
-									className="mr-2 mt-0.5 text-blue-11 size-3"
+									className="mr-2 mt-0.5 text-[#163760] size-3"
 								/>
 								<span className="text-gray-12">{feature}</span>
 							</li>
@@ -91,7 +91,7 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 								setUpgradeModalOpen(true);
 							}}
 						>
-							Upgrade to Pro
+							Upgrade to Watch Pro
 						</Button>
 					</div>
 				) : (

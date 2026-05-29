@@ -1,10 +1,10 @@
-import { LoadingSpinner } from "@cap/ui";
 import clsx from "clsx";
 import { Check, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { parse } from "tldts";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import type { DomainConfig, DomainVerification } from "./types";
 
 interface VerifyStepProps {
@@ -144,7 +144,11 @@ const VerifyStep = ({
 
 			{initialConfigLoading && !domainConfig ? (
 				<div className="flex justify-center items-center w-full h-20">
-					<LoadingSpinner size={36} />
+					<PortstbdSpinner
+						className="size-10"
+						markClassName="text-2xl"
+						label="Loading domain records"
+					/>
 				</div>
 			) : (
 				!isVerified &&

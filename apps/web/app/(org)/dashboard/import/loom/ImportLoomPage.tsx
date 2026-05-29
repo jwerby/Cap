@@ -342,7 +342,7 @@ export const ImportLoomPage = () => {
 			}
 
 			toast.success(
-				"Loom video import started! It will appear in your caps shortly.",
+				"Loom video import started. It will appear in your recordings shortly.",
 			);
 			router.push("/dashboard/caps");
 		} catch {
@@ -505,17 +505,17 @@ export const ImportLoomPage = () => {
 					Back to Import
 				</Link>
 				<div className="flex gap-4 items-start">
-					<div className="flex flex-shrink-0 justify-center items-center rounded-full size-12 bg-gray-3">
+					<div className="flex flex-shrink-0 justify-center items-center rounded-full size-12 bg-[#EDF5F7] text-[#163760]">
 						<LoomMark size={20} />
 					</div>
 					<div>
-						<h1 className="text-2xl font-medium text-gray-12">
+						<h1 className="text-2xl font-bold text-[#163760]">
 							Import from Loom
 						</h1>
-						<p className="mt-1 max-w-xl text-sm text-gray-10">
+						<p className="mt-1 max-w-xl text-sm text-[#3C7486]">
 							{isOrganizationOwner
-								? "Bring a single Loom video into Cap, or bulk import recordings for organization members from a CSV."
-								: "Paste a Loom share link to bring it into Cap."}
+								? "Bring a single Loom video into Port & Starboard Watch, or bulk import recordings for organization members from a CSV."
+								: "Paste a Loom share link to bring it into Port & Starboard Watch."}
 						</p>
 					</div>
 				</div>
@@ -789,7 +789,10 @@ export const ImportLoomPage = () => {
 												</p>
 												<p className="mt-1 text-red-10">
 													Split this file into smaller batches or{" "}
-													<a className="underline" href="mailto:hello@cap.so">
+													<a
+														className="underline"
+														href="mailto:hello@portstbd.com"
+													>
 														contact support
 													</a>{" "}
 													to raise the limit.

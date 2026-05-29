@@ -37,8 +37,8 @@ export function WelcomePage() {
 
 	return (
 		<Base
-			title="Welcome to Cap"
-			description="Let's get you started"
+			title="Welcome to Port & Starboard Watch"
+			description="Let's get your secure video workspace ready"
 			hideBackButton
 		>
 			<form className="space-y-7" onSubmit={handleSubmit}>
@@ -67,7 +67,7 @@ export function WelcomePage() {
 					disabled={!firstName || welcomeMutation.isPending}
 					type="submit"
 					variant="dark"
-					className="mx-auto w-full"
+					className="mx-auto w-full bg-[#163760] text-white hover:bg-[#102947] border-[#163760]"
 				>
 					Continue
 				</Button>

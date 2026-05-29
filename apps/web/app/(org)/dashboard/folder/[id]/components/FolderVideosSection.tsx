@@ -59,21 +59,21 @@ export default function FolderVideosSection({
 			}).pipe(Effect.fork);
 
 			toast.promise(Effect.runPromise(fiber.await.pipe(Effect.flatten)), {
-				loading: `Deleting ${ids.length} cap${ids.length === 1 ? "" : "s"}...`,
+				loading: `Deleting ${ids.length} recording${ids.length === 1 ? "" : "s"}...`,
 				success: (data) => {
 					if (data.error) {
-						return `Successfully deleted ${data.success} cap${
+						return `Successfully deleted ${data.success} recording${
 							data.success === 1 ? "" : "s"
-						}, but failed to delete ${data.error} cap${
+						}, but failed to delete ${data.error} recording${
 							data.error === 1 ? "" : "s"
 						}`;
 					}
-					return `Successfully deleted ${data.success} cap${
+					return `Successfully deleted ${data.success} recording${
 						data.success === 1 ? "" : "s"
 					}`;
 				},
 				error: (error) =>
-					error.message || "An error occurred while deleting caps",
+					error.message || "An error occurred while deleting recordings",
 			});
 
 			return yield* fiber.await.pipe(Effect.flatten);
@@ -87,11 +87,11 @@ export default function FolderVideosSection({
 	const { mutate: deleteCap, isPending: isDeletingCap } = useEffectMutation({
 		mutationFn: (id: Video.VideoId) => rpc.VideoDelete(id),
 		onSuccess: () => {
-			toast.success("Cap deleted successfully");
+			toast.success("Recording deleted successfully");
 			router.refresh();
 		},
 		onError: () => {
-			toast.error("Failed to delete cap");
+			toast.error("Failed to delete recording");
 		},
 	});
 

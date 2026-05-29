@@ -24,16 +24,16 @@ const CapAIBox = ({
 					}}
 					onMouseEnter={() => setHovered(true)}
 					onMouseLeave={() => setHovered(false)}
-					className="hidden p-3 mb-6 w-[calc(100%-12px)] mx-auto rounded-xl border transition-colors cursor-pointer md:block hover:bg-gray-2 h-fit border-gray-3"
+					className="hidden p-3 mb-6 w-[calc(100%-12px)] mx-auto rounded-xl border transition-colors cursor-pointer md:block hover:bg-white/70 h-fit border-[#D8E7EB] bg-white/45"
 				>
 					<div className="flex justify-between items-center px-3 pb-3 w-full">
-						<h3 className="text-sm font-medium text-gray-12">Cap AI</h3>
+						<h3 className="text-sm font-bold text-[#163760]">Watch AI</h3>
 						<p className="text-[11px] text-gray-10">Available now</p>
 					</div>
 					<CapAIArt />
 					<div
 						className={clsx(
-							"overflow-hidden pt-3 text-xs font-medium text-center text-gray-12 read-more-transition",
+							"overflow-hidden pt-3 text-xs font-bold text-center text-[#163760] read-more-transition",
 						)}
 						style={{
 							maxHeight: hovered ? 32 : 0, // 32px for one line of text, adjust if multiline

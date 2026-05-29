@@ -8,6 +8,7 @@ import {
 	organizations,
 	users,
 } from "@cap/database/schema";
+import { PORTSTBD_BRAND } from "@cap/utils";
 import { eq } from "drizzle-orm";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -27,8 +28,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 	}
 
 	return {
-		title: `Join ${invite.organizationName} on Cap`,
-		description: `You've been invited to join ${invite.organizationName} on Cap.`,
+		title: `Join ${invite.organizationName} on ${PORTSTBD_BRAND.productName}`,
+		description: `You've been invited to join ${invite.organizationName} on ${PORTSTBD_BRAND.productName}.`,
 	};
 }
 

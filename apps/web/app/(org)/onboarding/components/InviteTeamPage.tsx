@@ -22,15 +22,16 @@ export function InviteTeamPage() {
 	const router = useRouter();
 	const rpc = useRpcClient();
 
-	const CAP_PRO_ANNUAL_PRICE_PER_USER = homepageCopy.pricing.pro.pricing.annual;
-	const CAP_PRO_MONTHLY_PRICE_PER_USER =
+	const WATCH_PRO_ANNUAL_PRICE_PER_USER =
+		homepageCopy.pricing.pro.pricing.annual;
+	const WATCH_PRO_MONTHLY_PRICE_PER_USER =
 		homepageCopy.pricing.pro.pricing.monthly;
 
 	const currentTotalPrice =
 		users *
 		(isAnnually
-			? CAP_PRO_ANNUAL_PRICE_PER_USER
-			: CAP_PRO_MONTHLY_PRICE_PER_USER);
+			? WATCH_PRO_ANNUAL_PRICE_PER_USER
+			: WATCH_PRO_MONTHLY_PRICE_PER_USER);
 	const billingCycleText = isAnnually
 		? "per user, billed annually"
 		: "per user, billed monthly";
@@ -85,7 +86,7 @@ export function InviteTeamPage() {
 			}
 			const data = await response.json();
 			if (data.subscription === true) {
-				toast.success("You are already on the Cap Pro plan");
+				toast.success("You are already on the Watch Pro plan");
 				return;
 			}
 
@@ -112,7 +113,7 @@ export function InviteTeamPage() {
 		<Base
 			title="Invite your team"
 			descriptionClassName="max-w-[360px]"
-			description="Invite members of your team to join your organization and share Caps together"
+			description="Invite members of your team to join your organization and share recordings together"
 		>
 			<div className="text-center">
 				<span className="mr-2 text-2xl tabular-nums lg:text-3xl text-gray-12">
@@ -126,7 +127,7 @@ export function InviteTeamPage() {
 					<p className="text-base text-gray-10">
 						or,{" "}
 						<NumberFlow
-							value={CAP_PRO_MONTHLY_PRICE_PER_USER * users}
+							value={WATCH_PRO_MONTHLY_PRICE_PER_USER * users}
 							className="text-sm tabular-nums lg:text-base text-gray-12"
 							format={{
 								notation: "compact",
@@ -150,7 +151,7 @@ export function InviteTeamPage() {
 					<p className="text-base text-gray-10">
 						or,{" "}
 						<NumberFlow
-							value={CAP_PRO_ANNUAL_PRICE_PER_USER * users}
+							value={WATCH_PRO_ANNUAL_PRICE_PER_USER * users}
 							className="text-sm tabular-nums lg:text-base text-gray-12"
 							format={{
 								notation: "compact",
@@ -174,7 +175,7 @@ export function InviteTeamPage() {
 			</div>
 
 			<div className="space-y-3">
-				<div className="flex flex-wrap gap-5 justify-center items-center p-5 w-full rounded-xl border bg-gray-3 border-gray-4 xs:gap-3 xs:p-3 xs:rounded-full xs:justify-between">
+				<div className="flex flex-wrap gap-5 justify-center items-center p-5 w-full rounded-xl border bg-white border-[#D8E7EB] xs:gap-3 xs:p-3 xs:rounded-full xs:justify-between">
 					<div className="flex gap-2 items-center">
 						<p className="text-sm text-gray-12">Per user</p>
 						<div className="flex items-center">
@@ -230,7 +231,7 @@ export function InviteTeamPage() {
 					</div>
 				</div>
 				<Button
-					className="w-full"
+					className="w-full bg-[#163760] text-white hover:bg-[#102947] border-[#163760]"
 					variant="blue"
 					spinner={planCheckoutMutation.isPending}
 					disabled={planCheckoutMutation.isPending}
@@ -242,7 +243,7 @@ export function InviteTeamPage() {
 			<div className="w-full h-px bg-gray-4" />
 			<Button
 				variant="dark"
-				className="mx-auto w-full"
+				className="mx-auto w-full bg-[#163760] text-white hover:bg-[#102947] border-[#163760]"
 				onClick={handleSubmit}
 				spinner={inviteTeamMutation.isPending}
 				disabled={inviteTeamMutation.isPending}

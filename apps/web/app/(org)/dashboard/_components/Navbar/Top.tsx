@@ -58,10 +58,10 @@ const Top = () => {
 	const params = useParams();
 
 	const titles: Record<string, string> = {
-		"/dashboard/caps": "Caps",
-		"/dashboard/folder": "Caps",
-		"/dashboard/shared-caps": "Shared Caps",
-		"/dashboard/caps/record": "Record a Cap",
+		"/dashboard/caps": "Recordings",
+		"/dashboard/folder": "Recordings",
+		"/dashboard/shared-caps": "Shared Recordings",
+		"/dashboard/caps/record": "Record Video",
 		"/dashboard/settings/organization": "Organization Settings",
 		"/dashboard/settings/organization/preferences": "Organization Settings",
 		"/dashboard/settings/organization/billing": "Organization Settings",
@@ -70,8 +70,8 @@ const Top = () => {
 		"/dashboard/spaces": "Spaces",
 		"/dashboard/spaces/browse": "Browse Spaces",
 		"/dashboard/analytics": "Analytics",
-		[`/dashboard/folder/${params.id}`]: "Caps",
-		[`/dashboard/analytics/s/${params.id}`]: "Analytics: Cap video title",
+		[`/dashboard/folder/${params.id}`]: "Recordings",
+		[`/dashboard/analytics/s/${params.id}`]: "Analytics: Recording",
 		"/dashboard/developers": "Developers",
 		"/dashboard/developers/apps": "Developer Apps",
 		"/dashboard/developers/usage": "Developer Usage",
@@ -104,7 +104,7 @@ const Top = () => {
 		<div
 			className={clsx(
 				"flex fixed z-40 justify-between items-center py-3 pr-2 pl-5 w-full md:relative mt-[60px] lg:mt-0 lg:py-[19px] lg:pl-0 lg:pr-5",
-				"top-0 bg-gray-1",
+				"top-0 border-b border-[#D8E7EB]/80 bg-[#F7FBFC]/95 backdrop-blur lg:border-b-0",
 			)}
 		>
 			<div className="flex flex-col gap-0.5">
@@ -118,14 +118,15 @@ const Top = () => {
 							className="relative flex-shrink-0 size-5"
 						/>
 					)}
-					<p className="relative text-lg truncate text-gray-12 lg:text-2xl">
+					<p className="relative text-lg font-bold truncate text-[#163760] lg:text-2xl">
 						{title}
 					</p>
 				</div>
 			</div>
 			<div className="flex gap-4 items-center">
 				{buildEnv.NEXT_PUBLIC_IS_CAP && <ReferButton />}
-				<div
+				<button
+					type="button"
 					data-state={toggleNotifications ? "open" : "closed"}
 					ref={bellRef}
 					onClick={() => {
@@ -143,15 +144,13 @@ const Top = () => {
 							setToggleNotifications(!toggleNotifications);
 						}
 					}}
-					tabIndex={0}
-					role="button"
 					aria-label={`Notifications${
 						anyNewNotifications ? " (new notifications available)" : ""
 					}`}
 					aria-expanded={toggleNotifications}
-					className="hidden relative justify-center data-[state=open]:hover:bg-gray-5 items-center bg-gray-3
+					className="hidden relative justify-center data-[state=open]:hover:bg-[#D8E7EB] items-center bg-[#EDF5F7]
                 rounded-full transition-colors cursor-pointer lg:flex
-                hover:bg-gray-5 data-[state=open]:bg-gray-5
+                hover:bg-[#D8E7EB] data-[state=open]:bg-[#D8E7EB]
                 focus:outline-none
                 size-9"
 				>
@@ -163,13 +162,14 @@ const Top = () => {
 							</div>
 						</div>
 					)}
-					<FontAwesomeIcon className="text-gray-12 size-3.5" icon={faBell} />
+					<FontAwesomeIcon className="text-[#163760] size-3.5" icon={faBell} />
 					<AnimatePresence>
 						{toggleNotifications && <Notifications ref={notificationsRef} />}
 					</AnimatePresence>
-				</div>
+				</button>
 				{!isDeveloperSection && (
-					<div
+					<button
+						type="button"
 						onClick={() => {
 							if (document.startViewTransition) {
 								document.startViewTransition(() => {
@@ -179,10 +179,11 @@ const Top = () => {
 								setThemeHandler(theme === "light" ? "dark" : "light");
 							}
 						}}
-						className="hidden justify-center items-center rounded-full transition-colors cursor-pointer bg-gray-3 lg:flex hover:bg-gray-5 size-9"
+						aria-label="Toggle theme"
+						className="hidden justify-center items-center rounded-full transition-colors cursor-pointer bg-[#EDF5F7] lg:flex hover:bg-[#D8E7EB] size-9 text-[#163760]"
 					>
 						<ThemeToggleIcon />
-					</div>
+					</button>
 				)}
 				<User />
 			</div>
@@ -198,7 +199,7 @@ const User = () => {
 	const menuItems = useMemo(
 		() => [
 			{
-				name: "Homepage",
+				name: "Watch Home",
 				icon: <HomeIcon />,
 				href: "/home",
 				onClick: () => setMenuOpen(false),
@@ -239,9 +240,10 @@ const User = () => {
 				showCondition: true,
 			},
 			{
-				name: "Download App",
+				name: "Record Video",
 				icon: <DownloadIcon />,
-				onClick: () => window.open("https://cap.so/download", "_blank"),
+				href: "/dashboard/caps/record",
+				onClick: () => setMenuOpen(false),
 				iconClassName: "text-gray-11 group-hover:text-gray-12",
 				showCondition: true,
 			},
@@ -359,7 +361,19 @@ const ReferButton = () => {
 		useDashboardContext();
 
 	return (
-		<Link href="/dashboard/refer" className="hidden relative lg:block">
+		<Link
+			href="/dashboard/refer"
+			className="hidden relative lg:block"
+			onClick={() => {
+				setReferClickedStateHandler(true);
+			}}
+			onMouseEnter={() => {
+				iconRef.current?.startAnimation();
+			}}
+			onMouseLeave={() => {
+				iconRef.current?.stopAnimation();
+			}}
+		>
 			{!referClickedState && (
 				<div className="absolute right-0 top-1 z-10">
 					<div className="relative">
@@ -369,18 +383,7 @@ const ReferButton = () => {
 				</div>
 			)}
 
-			<div
-				onClick={() => {
-					setReferClickedStateHandler(true);
-				}}
-				onMouseEnter={() => {
-					iconRef.current?.startAnimation();
-				}}
-				onMouseLeave={() => {
-					iconRef.current?.stopAnimation();
-				}}
-				className="flex justify-center items-center rounded-full transition-colors cursor-pointer bg-gray-3 hover:bg-gray-5 size-9"
-			>
+			<div className="flex justify-center items-center rounded-full transition-colors cursor-pointer bg-gray-3 hover:bg-gray-5 size-9">
 				{cloneElement(<ReferIcon />, {
 					ref: iconRef,
 					className: "text-gray-12 size-3.5",

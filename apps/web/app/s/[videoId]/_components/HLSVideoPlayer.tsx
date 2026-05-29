@@ -1,6 +1,5 @@
 "use client";
 
-import { LogoSpinner } from "@cap/ui";
 import { calculateStrokeDashoffset, getProgressCircleConfig } from "@cap/utils";
 import type { Video } from "@cap/web-domain";
 import { faPlay } from "@fortawesome/free-solid-svg-icons";
@@ -14,6 +13,7 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { retryVideoProcessing } from "@/actions/video/retry-processing";
+import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import { getActiveCaptionText } from "./caption-cues";
 import {
 	canRetryFailedProcessing,
@@ -626,7 +626,11 @@ export function HLSVideoPlayer({
 				)}
 			>
 				<div className="flex flex-col gap-2 items-center">
-					<LogoSpinner className="w-8 h-auto animate-spin sm:w-10" />
+					<PortstbdSpinner
+						className="size-9 sm:size-11"
+						markClassName="text-xl sm:text-2xl"
+						label="Loading video"
+					/>
 				</div>
 			</div>
 			<AnimatePresence>

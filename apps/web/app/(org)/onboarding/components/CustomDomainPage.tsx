@@ -40,11 +40,11 @@ export function CustomDomainPage() {
 			title="Custom Domain"
 			description={
 				<div>
-					<p className="w-full text-base max-w-[340px] text-gray-10">
-						Pro users can setup a custom domain to access their shareable Cap
-						links i.e{" "}
-						<span className="font-medium text-blue-500">
-							cap.yourdomain.com
+					<p className="w-full text-base max-w-[340px] text-[#6B8791]">
+						Pro users can set up a custom domain for shareable recording links,
+						e.g.{" "}
+						<span className="font-medium text-[#163760]">
+							watch.yourdomain.com
 						</span>
 					</p>
 				</div>
@@ -53,7 +53,7 @@ export function CustomDomainPage() {
 		>
 			<Button
 				onClick={() => setShowUpgradeModal(true)}
-				className="w-full"
+				className="w-full bg-[#163760] text-white hover:bg-[#102947] border-[#163760]"
 				disabled={customDomainMutation.isPending}
 				variant="blue"
 			>
@@ -65,7 +65,7 @@ export function CustomDomainPage() {
 				variant="dark"
 				spinner={customDomainMutation.isPending}
 				disabled={customDomainMutation.isPending}
-				className="mx-auto w-full"
+				className="mx-auto w-full bg-[#163760] text-white hover:bg-[#102947] border-[#163760]"
 				onClick={() => handleSubmit()}
 			>
 				Skip

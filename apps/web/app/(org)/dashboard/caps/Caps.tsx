@@ -164,7 +164,7 @@ export const Caps = ({
 			const message =
 				error instanceof Error
 					? error.message
-					: "An error occurred while deleting caps";
+					: "An error occurred while deleting recordings";
 			toast.error(message);
 		},
 	});
@@ -174,10 +174,10 @@ export const Caps = ({
 			yield* rpc.VideoDelete(id);
 		}),
 		onSuccess: () => {
-			toast.success("Cap deleted successfully");
+			toast.success("Recording deleted successfully");
 			router.refresh();
 		},
-		onError: (_error: unknown) => toast.error("Failed to delete cap"),
+		onError: (_error: unknown) => toast.error("Failed to delete recording"),
 	});
 
 	useEffect(() => {

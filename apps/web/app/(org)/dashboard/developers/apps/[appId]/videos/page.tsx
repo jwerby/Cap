@@ -8,7 +8,7 @@ import { getDeveloperAppVideos } from "../../../developer-data";
 import { VideosClient } from "./VideosClient";
 
 export const metadata: Metadata = {
-	title: "Developer Videos — Cap",
+	title: "Developer Videos — Port & Starboard Watch",
 };
 
 export default async function VideosPage({

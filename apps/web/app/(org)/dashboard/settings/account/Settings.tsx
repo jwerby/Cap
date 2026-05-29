@@ -203,7 +203,7 @@ export const Settings = () => {
 							<CardTitle>Your name</CardTitle>
 							<CardDescription>
 								Changing your name below will update how your name appears when
-								sharing a Cap, and in your profile.
+								sharing a recording, and in your profile.
 							</CardDescription>
 						</div>
 						<div className="flex flex-col flex-wrap gap-3 w-full">
@@ -233,7 +233,8 @@ export const Settings = () => {
 						<div className="space-y-1">
 							<CardTitle>Contact email address</CardTitle>
 							<CardDescription>
-								This is the email address you used to sign up to Cap with.
+								This is the email address you used to sign up to Port &
+								Starboard Watch with.
 							</CardDescription>
 						</div>
 						<Input
@@ -292,8 +293,8 @@ export const Settings = () => {
 				<div className="space-y-1">
 					<CardTitle>Sign out of all devices</CardTitle>
 					<CardDescription>
-						Invalidate every Cap web session and desktop app authentication
-						token connected to your account.
+						Invalidate every Port & Starboard Watch web session and desktop app
+						authentication token connected to your account.
 					</CardDescription>
 				</div>
 				<Button
@@ -313,7 +314,7 @@ export const Settings = () => {
 				<DialogContent>
 					<DialogHeader
 						icon={<LogOut className="size-4" />}
-						description="This will immediately invalidate existing Cap web sessions, desktop session tokens, and desktop API keys for your account."
+						description="This will immediately invalidate existing Port & Starboard Watch web sessions, desktop session tokens, and desktop API keys for your account."
 					>
 						<DialogTitle>Sign out of all devices?</DialogTitle>
 					</DialogHeader>
@@ -322,7 +323,7 @@ export const Settings = () => {
 							You will be signed out of this browser after the reset completes.
 						</p>
 						<p>
-							The Cap desktop app may need you to click Sign out, then sign in
+							The desktop recorder may need you to click Sign out, then sign in
 							again before uploads and settings sync work.
 						</p>
 					</div>
