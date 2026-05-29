@@ -42,13 +42,13 @@ export async function getSpaceVideoIds(spaceId: Space.SpaceIdOrOrganisationId) {
 					);
 
 		return {
-			success: true,
+			success: true as const,
 			data: videoIds.map((v) => v.videoId),
 		};
 	} catch (error) {
 		console.error("Error fetching space video IDs:", error);
 		return {
-			success: false,
+			success: false as const,
 			error:
 				error instanceof Error ? error.message : "Failed to fetch space videos",
 		};

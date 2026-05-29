@@ -33,10 +33,10 @@ export type DomainVerification = {
 };
 
 export type DomainConfig = {
-	name: string;
-	apexName: string;
+	name?: string;
+	apexName?: string;
 	verification: DomainVerification[];
-	verified: boolean;
+	verified?: boolean;
 	misconfigured?: boolean;
 	aValues?: string[];
 	currentAValues?: string[];

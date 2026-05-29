@@ -1,0 +1,104 @@
+---
+title: "Secure AWS S3 + CloudFront"
+summary: "Serve default Cap bucket videos through private S3 and CloudFront signed URLs."
+tags: "Cap Apps, AWS, S3, CloudFront"
+image: "/docs/s3-config/aws-s3.jpg"
+---
+
+# Secure AWS S3 + CloudFront
+
+This guide configures the default Cap bucket for private S3 storage and CloudFront signed read URLs. Uploads should continue to use direct S3 presigned URLs.
+
+## Project Plan And Status
+
+1. Audit existing S3, CloudFront, upload, processing, and thumbnail paths.
+2. Keep browser uploads direct to S3 presigned URLs.
+3. Serve default-bucket reads through CloudFront signed URLs only when all required env vars are present.
+4. Reject partial or insecure CloudFront config at startup.
+5. Document private S3, OAC, trusted key group, HTTPS, encryption, and least-privilege IAM setup.
+6. Add a dry-run-first operator script for default-bucket thumbnail backfill.
+7. Verify with CloudFront config tests, thumbnail backfill helper tests, multipart thumbnail regression tests, full app typecheck, and workspace tests.
+
+Execution status: steps 1 through 7 are implemented in this branch. For Portstbd Watch, the production S3 bucket is also wired to `media.watch.portstbd.com` through CloudFront with OAC, a trusted key group, `TLSv1.2_2021`, a TLS-only bucket policy, and app secrets for signed URLs. Redeploy the app after changing the secret store so the runtime picks up the new values.
+
+## AWS Resources
+
+1. Create or update the S3 bucket.
+   - Enable Block all public access.
+   - Set Object Ownership to Bucket owner enforced.
+   - Enable default encryption. Use SSE-S3 at minimum; use SSE-KMS when the app IAM principal and CloudFront OAC have key access.
+   - Add a bucket policy that denies non-TLS access.
+   - Allow `s3:GetObject` only from the CloudFront distribution through `AWS:SourceArn`.
+   - Configure CORS for only required web origins and `GET`, `HEAD`, `POST`, and `PUT`.
+
+2. Create the CloudFront distribution.
+   - Origin: S3 bucket regional domain name.
+   - Origin access: Origin Access Control with signing behavior `always` and SigV4.
+   - Viewer protocol policy: redirect HTTP to HTTPS.
+   - Allowed methods: `GET`, `HEAD`, `OPTIONS`.
+   - Signed URL enforcement: trusted key group with the CloudFront public key.
+   - TLS: use `TLSv1.2_2021` or newer with a custom certificate and media domain.
+   - HTTP versions: enable HTTP/2 and HTTP/3.
+
+3. Configure signing keys.
+   - Generate an RSA key pair outside the repo.
+   - Store the private key only in the app secret store.
+   - Upload the public key to CloudFront and attach it to a trusted key group.
+   - Rotate by adding a new public key, updating app env, then removing the old key after old signed URLs expire.
+
+## App Environment
+
+Set all four CloudFront env vars together. Partial config fails startup instead of silently falling back to S3 reads.
+
+```bash
+CAP_AWS_BUCKET_URL=https://<media-domain>
+CAP_CLOUDFRONT_DISTRIBUTION_ID=<distribution-id>
+CLOUDFRONT_KEYPAIR_ID=<cloudfront-public-key-id>
+CLOUDFRONT_KEYPAIR_PRIVATE_KEY='-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----'
+```
+
+Keep uploads direct to S3:
+
+```bash
+S3_PUBLIC_ENDPOINT=https://s3.us-east-1.amazonaws.com
+S3_INTERNAL_ENDPOINT=https://s3.us-east-1.amazonaws.com
+S3_PATH_STYLE=false
+CAP_VIDEOS_DEFAULT_PUBLIC=false
+```
+
+## Thumbnail Backfill
+
+Dry run first:
+
+```bash
+pnpm with-env node scripts/backfill-missing-thumbnails.mjs --limit 25
+```
+
+Apply one video:
+
+```bash
+pnpm with-env node scripts/backfill-missing-thumbnails.mjs --video-id <video-id> --apply
+```
+
+Apply a batch:
+
+```bash
+pnpm with-env node scripts/backfill-missing-thumbnails.mjs --limit 50 --apply
+```
+
+The script only handles default-bucket videos. It skips custom bucket/storage-integration rows, existing thumbnails, and videos missing `result.mp4`.
+
+## Verification
+
+1. Upload a new video from the web app.
+2. Confirm the dashboard card thumbnail appears.
+3. Open the share page and confirm the video plays.
+4. In browser dev tools, confirm signed asset URLs use the CloudFront host, not S3.
+5. Replace or edit a default-bucket video and confirm playback updates after invalidation.
+6. Run the thumbnail backfill dry run, apply one missing video, then refresh the dashboard and share page to confirm the thumbnail appears.
+
+## References
+
+- [AWS CloudFront OAC for S3 origins](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-restricting-access-to-s3.html)
+- [AWS CloudFront signed URLs](https://docs.aws.amazon.com/AmazonCloudFront/latest/DeveloperGuide/private-content-signed-urls.html)
+- [AWS S3 security best practices](https://docs.aws.amazon.com/AmazonS3/latest/userguide/security-best-practices.html)

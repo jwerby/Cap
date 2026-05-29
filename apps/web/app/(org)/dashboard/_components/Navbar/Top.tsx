@@ -50,7 +50,7 @@ const Top = () => {
 	const { activeSpace, anyNewNotifications, isDeveloperSection } =
 		useDashboardContext();
 	const [toggleNotifications, setToggleNotifications] = useState(false);
-	const bellRef = useRef<HTMLDivElement>(null);
+	const bellRef = useRef<HTMLButtonElement>(null);
 	const { theme, setThemeHandler } = useTheme();
 	const queryClient = useQueryClient();
 

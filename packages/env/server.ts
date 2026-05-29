@@ -83,6 +83,7 @@ function createServerEnv() {
 				.string()
 				.optional()
 				.describe("Comma-separated list of permitted signup domains"),
+			PORTSTBD_AUTO_JOIN_ORG_ID: z.string().optional(),
 
 			/// AI providers
 			DEEPGRAM_API_KEY: z.string().optional().describe("Audio transcription"),

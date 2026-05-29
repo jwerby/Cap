@@ -44,6 +44,7 @@ export const docsConfig = {
 			items: [
 				{ title: "Overview", slug: "self-hosting" },
 				{ title: "S3: AWS", slug: "s3-config/aws-s3" },
+				{ title: "S3: AWS + CloudFront", slug: "s3-config/aws-cloudfront" },
 				{ title: "S3: Cloudflare R2", slug: "s3-config/cloudflare-r2" },
 			],
 		},

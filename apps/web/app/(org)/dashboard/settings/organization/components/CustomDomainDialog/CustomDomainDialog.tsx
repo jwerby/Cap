@@ -194,7 +194,7 @@ const CustomDomainDialog = ({
 		},
 		onSuccess: ({ data, showToasts }) => {
 			setIsVerified(data.verified);
-			setDomainConfig(data.config);
+			setDomainConfig(data.config ?? null);
 
 			if (data.verified) {
 				dispatch({ type: "NEXT_STEP" });

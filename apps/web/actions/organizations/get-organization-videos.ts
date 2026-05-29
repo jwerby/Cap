@@ -33,13 +33,13 @@ export async function getOrganizationVideoIds(
 			);
 
 		return {
-			success: true,
+			success: true as const,
 			data: videoIds.map((v) => v.videoId),
 		};
 	} catch (error) {
 		console.error("Error fetching organization video IDs:", error);
 		return {
-			success: false,
+			success: false as const,
 			error:
 				error instanceof Error
 					? error.message

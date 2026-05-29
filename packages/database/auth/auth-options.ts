@@ -16,6 +16,7 @@ import { db } from "../index.ts";
 import { users } from "../schema.ts";
 import { isEmailAllowedForSignup } from "./domain-utils.ts";
 import { DrizzleAdapter } from "./drizzle-adapter.ts";
+import { autoJoinPortstbdOrganization } from "./organization-auto-join.ts";
 
 export const maxDuration = 120;
 
@@ -208,7 +209,7 @@ export const authOptions = (): NextAuthOptions => {
 
 				return session;
 			},
-			async jwt({ token, user }) {
+			async jwt({ token, user, account }) {
 				if (user || !token.id) {
 					const [dbUser] = await db()
 						.select({
@@ -226,9 +227,20 @@ export const authOptions = (): NextAuthOptions => {
 					if (!dbUser) {
 						if (user) {
 							token.id = user?.id;
+							await autoJoinPortstbdOrganization({
+								provider: account?.provider,
+								userId: user.id,
+								email: user.email,
+							});
 						}
 						return token;
 					}
+
+					await autoJoinPortstbdOrganization({
+						provider: account?.provider,
+						userId: dbUser.id,
+						email: dbUser.email,
+					});
 
 					return {
 						id: dbUser.id,

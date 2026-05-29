@@ -32,3 +32,28 @@ export const getMultipartFileKey = (
 
 export const isRawRecorderUpload = (subpath: string) =>
 	subpath.startsWith("raw-upload.");
+
+export type MultipartRemuxJobInput = {
+	videoId: string;
+	userId: string;
+	videoUrl: string;
+	outputPresignedUrl: string;
+	thumbnailPresignedUrl: string;
+	previewGifPresignedUrl: string;
+	webhookUrl?: string;
+	webhookSecret?: string;
+	inputExtension?: string;
+};
+
+export const getMultipartPreviewAssetKeys = (
+	userId: string,
+	videoId: string,
+) => ({
+	thumbnailKey: `${userId}/${videoId}/screenshot/screen-capture.jpg`,
+	previewGifKey: `${userId}/${videoId}/preview/animated-preview.gif`,
+});
+
+export const buildMultipartRemuxJobBody = (input: MultipartRemuxJobInput) => ({
+	...input,
+	remuxOnly: true,
+});

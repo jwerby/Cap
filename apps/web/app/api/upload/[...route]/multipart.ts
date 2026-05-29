@@ -21,7 +21,9 @@ import { runPromise } from "@/lib/server";
 import { startVideoProcessingWorkflow } from "@/lib/video-processing";
 import { stringOrNumberOptional } from "@/utils/zod";
 import {
+	buildMultipartRemuxJobBody,
 	getMultipartFileKey,
+	getMultipartPreviewAssetKeys,
 	getSubpath,
 	isRawRecorderUpload,
 } from "./multipart-utils";
@@ -525,6 +527,9 @@ app.post(
 						mediaServerUrl
 					) {
 						const webhookSecret = serverEnv().MEDIA_SERVER_WEBHOOK_SECRET;
+						const webhookBaseUrl =
+							serverEnv().MEDIA_SERVER_WEBHOOK_URL || serverEnv().WEB_URL;
+						const fileExtension = fileKey.split(".").at(-1)?.toLowerCase();
 						const inputUrl = yield* bucket.getInternalSignedObjectUrl(fileKey, {
 							expiresIn: MEDIA_SERVER_PRESIGNED_GET_EXPIRES_SECONDS,
 						});
@@ -540,7 +545,16 @@ app.post(
 							},
 							{ expiresIn: MEDIA_SERVER_PRESIGNED_PUT_EXPIRES_SECONDS },
 						);
-						const previewGifKey = `${user.id}/${videoId}/preview/animated-preview.gif`;
+						const { thumbnailKey, previewGifKey } =
+							getMultipartPreviewAssetKeys(user.id, videoId);
+						const thumbnailPresignedUrl =
+							yield* bucket.getInternalPresignedPutUrl(
+								thumbnailKey,
+								{
+									ContentType: "image/jpeg",
+								},
+								{ expiresIn: MEDIA_SERVER_PRESIGNED_PUT_EXPIRES_SECONDS },
+							);
 						const previewGifPresignedUrl =
 							yield* bucket.getInternalPresignedPutUrl(
 								previewGifKey,
@@ -563,14 +577,21 @@ app.post(
 												? { "x-media-server-secret": webhookSecret }
 												: {}),
 										},
-										body: JSON.stringify({
-											videoId,
-											userId: user.id,
-											videoUrl: inputUrl,
-											outputPresignedUrl,
-											previewGifPresignedUrl,
-											remuxOnly: true,
-										}),
+										body: JSON.stringify(
+											buildMultipartRemuxJobBody({
+												videoId,
+												userId: user.id,
+												videoUrl: inputUrl,
+												outputPresignedUrl,
+												thumbnailPresignedUrl,
+												previewGifPresignedUrl,
+												webhookUrl: `${webhookBaseUrl}/api/webhooks/media-server/progress?retryable=true`,
+												webhookSecret: webhookSecret || undefined,
+												inputExtension: fileExtension
+													? `.${fileExtension}`
+													: ".mp4",
+											}),
+										),
 									},
 								);
 

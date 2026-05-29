@@ -7,6 +7,7 @@ import { Config, Effect, Layer, Option } from "effect";
 
 import { AwsCredentials } from "../Aws.ts";
 import { Database } from "../Database.ts";
+import { resolveCloudFrontConfig } from "./CloudFront.ts";
 import { createS3BucketAccess } from "./S3BucketAccess.ts";
 import { S3BucketClientProvider } from "./S3BucketClientProvider.ts";
 import { S3BucketsRepo } from "./S3BucketsRepo.ts";
@@ -85,27 +86,39 @@ export class S3Buckets extends Effect.Service<S3Buckets>()("S3Buckets", {
 			});
 		};
 
-		const cloudfrontEnvs = yield* Config.all({
-			distributionId: Config.string("CAP_CLOUDFRONT_DISTRIBUTION_ID"),
-			keypairId: Config.string("CLOUDFRONT_KEYPAIR_ID"),
-			privateKey: Config.string("CLOUDFRONT_KEYPAIR_PRIVATE_KEY"),
-			bucketUrl: Config.string("CAP_AWS_BUCKET_URL"),
-		}).pipe(
-			Effect.match({
-				onSuccess: (v) => v,
-				onFailure: () => null,
-			}),
-			Effect.map(Option.fromNullable),
-		);
+		const cloudfrontConfigInput = yield* Config.all({
+			distributionId: Config.option(
+				Config.string("CAP_CLOUDFRONT_DISTRIBUTION_ID"),
+			),
+			keypairId: Config.option(Config.string("CLOUDFRONT_KEYPAIR_ID")),
+			privateKey: Config.option(
+				Config.string("CLOUDFRONT_KEYPAIR_PRIVATE_KEY"),
+			),
+			bucketUrl: Config.option(Config.string("CAP_AWS_BUCKET_URL")),
+		});
+		const cloudfrontConfig = resolveCloudFrontConfig({
+			distributionId: Option.getOrUndefined(
+				cloudfrontConfigInput.distributionId,
+			),
+			keypairId: Option.getOrUndefined(cloudfrontConfigInput.keypairId),
+			privateKey: Option.getOrUndefined(cloudfrontConfigInput.privateKey),
+			bucketUrl: Option.getOrUndefined(cloudfrontConfigInput.bucketUrl),
+		});
 
-		const cloudfrontBucketAccess = cloudfrontEnvs.pipe(
-			Option.map((cloudfrontEnvs) =>
+		if (cloudfrontConfig._tag === "invalid") {
+			yield* Effect.die(new Error(cloudfrontConfig.message));
+		}
+
+		const cloudfrontBucketAccess = Option.fromNullable(
+			cloudfrontConfig._tag === "enabled" ? cloudfrontConfig.config : null,
+		).pipe(
+			Option.map((cloudfrontConfig) =>
 				Effect.flatMap(createS3BucketAccess, (s3) => {
 					const getCloudFrontSignedUrl = (
 						key: string,
 						signingArgs?: RequestPresigningArguments,
 					) => {
-						const url = `${cloudfrontEnvs.bucketUrl}/${key}`;
+						const url = `${cloudfrontConfig.bucketUrl}/${key}`;
 						const expiresIn = signingArgs?.expiresIn ?? 3600;
 						const expires = Math.floor((Date.now() + expiresIn * 1000) / 1000);
 
@@ -125,8 +138,8 @@ export class S3Buckets extends Effect.Service<S3Buckets>()("S3Buckets", {
 						return Effect.succeed(
 							CloudFrontPresigner.getSignedUrl({
 								url,
-								keyPairId: cloudfrontEnvs.keypairId,
-								privateKey: cloudfrontEnvs.privateKey,
+								keyPairId: cloudfrontConfig.keypairId,
+								privateKey: cloudfrontConfig.privateKey,
 								policy: JSON.stringify(policy),
 							}),
 						);

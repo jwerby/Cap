@@ -124,9 +124,9 @@ export async function getUserVideos(spaceId: Space.SpaceIdOrOrganisationId) {
 			};
 		});
 
-		return { success: true, data: processedVideoData };
+		return { success: true as const, data: processedVideoData };
 	} catch (error) {
 		console.error("Error fetching user videos:", error);
-		return { success: false, error: "Failed to fetch videos" };
+		return { success: false as const, error: "Failed to fetch videos" };
 	}
 }

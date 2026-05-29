@@ -8,6 +8,7 @@ export * from "./Loom/index.ts";
 export { Organisations } from "./Organisations/index.ts";
 export { OrganisationsPolicy } from "./Organisations/OrganisationsPolicy.ts";
 export * from "./Rpcs.ts";
+export { resolveCloudFrontConfig } from "./S3Buckets/CloudFront.ts";
 export { S3Buckets } from "./S3Buckets/index.ts";
 export { Spaces } from "./Spaces/index.ts";
 export { SpacesPolicy } from "./Spaces/SpacesPolicy.ts";

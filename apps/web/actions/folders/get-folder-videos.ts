@@ -34,13 +34,13 @@ export async function getFolderVideoIds(
 					.where(eq(spaceVideos.folderId, folderId));
 
 		return {
-			success: true,
+			success: true as const,
 			data: rows.map((r) => r.id as Video.VideoId),
 		};
 	} catch (error) {
 		console.error("Error fetching folder video IDs:", error);
 		return {
-			success: false,
+			success: false as const,
 			error:
 				error instanceof Error
 					? error.message
