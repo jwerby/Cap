@@ -209,7 +209,7 @@ export const authOptions = (): NextAuthOptions => {
 
 				return session;
 			},
-			async jwt({ token, user, account }) {
+			async jwt({ token, user }) {
 				if (user || !token.id) {
 					const [dbUser] = await db()
 						.select({
@@ -228,7 +228,6 @@ export const authOptions = (): NextAuthOptions => {
 						if (user) {
 							token.id = user?.id;
 							await autoJoinPortstbdOrganization({
-								provider: account?.provider,
 								userId: user.id,
 								email: user.email,
 							});
@@ -237,7 +236,6 @@ export const authOptions = (): NextAuthOptions => {
 					}
 
 					await autoJoinPortstbdOrganization({
-						provider: account?.provider,
 						userId: dbUser.id,
 						email: dbUser.email,
 					});

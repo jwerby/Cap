@@ -1,6 +1,6 @@
 import { serverEnv } from "@cap/env";
 import { Organisation, User } from "@cap/web-domain";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, or } from "drizzle-orm";
 import { nanoId } from "../helpers.ts";
 import { db } from "../index.ts";
 import { addUserToOrganizationSpaces } from "../organization-space-membership.ts";
@@ -8,8 +8,10 @@ import { organizationMembers, organizations, users } from "../schema.ts";
 
 export const PORTSTBD_AUTO_JOIN_EMAIL_DOMAIN = "portstbd.com";
 
+export const PORTSTBD_ORG_RECONCILIATION_FAILED =
+	"PORTSTBD_ORG_RECONCILIATION_FAILED";
+
 type AutoJoinCheckInput = {
-	provider?: string | null;
 	email?: string | null;
 	organizationId?: string | null;
 };
@@ -23,35 +25,57 @@ function emailHasPortstbdDomain(email: string | null | undefined) {
 }
 
 export function shouldAutoJoinPortstbdOrganization({
-	provider,
 	email,
 	organizationId,
 }: AutoJoinCheckInput) {
-	return (
-		provider === "google" &&
-		!!organizationId?.trim() &&
-		emailHasPortstbdDomain(email)
-	);
+	return !!organizationId?.trim() && emailHasPortstbdDomain(email);
+}
+
+type OrganizationAccessClient = Pick<ReturnType<typeof db>, "select">;
+
+async function userCanAccessOrganization(
+	tx: OrganizationAccessClient,
+	organizationId: Organisation.OrganisationId,
+	userId: User.UserId,
+) {
+	const [organization] = await tx
+		.select({ ownerId: organizations.ownerId })
+		.from(organizations)
+		.where(
+			and(
+				eq(organizations.id, organizationId),
+				isNull(organizations.tombstoneAt),
+			),
+		)
+		.limit(1);
+
+	if (!organization) return false;
+	if (organization.ownerId === userId) return true;
+
+	const [membership] = await tx
+		.select({ id: organizationMembers.id })
+		.from(organizationMembers)
+		.where(
+			and(
+				eq(organizationMembers.organizationId, organizationId),
+				eq(organizationMembers.userId, userId),
+			),
+		)
+		.limit(1);
+
+	return !!membership;
 }
 
 export async function autoJoinPortstbdOrganization({
-	provider,
 	userId,
 	email,
 }: {
-	provider?: string | null;
 	userId: string;
 	email?: string | null;
 }) {
 	const organizationId = serverEnv().PORTSTBD_AUTO_JOIN_ORG_ID?.trim() ?? "";
 
-	if (
-		!shouldAutoJoinPortstbdOrganization({
-			provider,
-			email,
-			organizationId,
-		})
-	) {
+	if (!shouldAutoJoinPortstbdOrganization({ email, organizationId })) {
 		return;
 	}
 
@@ -71,7 +95,11 @@ export async function autoJoinPortstbdOrganization({
 				)
 				.limit(1);
 
-			if (!organization) return;
+			if (!organization) {
+				throw new Error(
+					`Configured PORTSTBD_AUTO_JOIN_ORG_ID ${targetOrganizationId} is missing or tombstoned`,
+				);
+			}
 
 			const [membership] = await tx
 				.select({ id: organizationMembers.id })
@@ -84,7 +112,10 @@ export async function autoJoinPortstbdOrganization({
 				)
 				.limit(1);
 
-			if (!membership && organization.ownerId !== targetUserId) {
+			const isOwner = organization.ownerId === targetUserId;
+			const newlyEnrolled = !membership && !isOwner;
+
+			if (newlyEnrolled) {
 				await tx.insert(organizationMembers).values({
 					id: nanoId(),
 					organizationId: targetOrganizationId,
@@ -93,13 +124,44 @@ export async function autoJoinPortstbdOrganization({
 				});
 			}
 
-			await tx
-				.update(users)
-				.set({
-					activeOrganizationId: targetOrganizationId,
-					defaultOrgId: targetOrganizationId,
-				})
-				.where(eq(users.id, targetUserId));
+			const [currentUser] = await tx
+				.select({ activeOrganizationId: users.activeOrganizationId })
+				.from(users)
+				.where(eq(users.id, targetUserId))
+				.limit(1);
+
+			const activeOrganizationId = currentUser?.activeOrganizationId ?? null;
+			const activeAccessible =
+				!!activeOrganizationId &&
+				(activeOrganizationId === targetOrganizationId ||
+					(await userCanAccessOrganization(
+						tx,
+						Organisation.OrganisationId.make(activeOrganizationId),
+						targetUserId,
+					)));
+
+			if (newlyEnrolled || !activeAccessible) {
+				await tx
+					.update(users)
+					.set({
+						activeOrganizationId: targetOrganizationId,
+						defaultOrgId: targetOrganizationId,
+					})
+					.where(eq(users.id, targetUserId));
+			} else {
+				await tx
+					.update(users)
+					.set({ defaultOrgId: targetOrganizationId })
+					.where(
+						and(
+							eq(users.id, targetUserId),
+							or(
+								isNull(users.defaultOrgId),
+								eq(users.defaultOrgId, targetOrganizationId),
+							),
+						),
+					);
+			}
 
 			await addUserToOrganizationSpaces(tx, {
 				organizationId: targetOrganizationId,
@@ -107,6 +169,10 @@ export async function autoJoinPortstbdOrganization({
 			});
 		});
 	} catch (error) {
-		console.error("Failed to auto-join Port & Starboard organization", error);
+		console.error(PORTSTBD_ORG_RECONCILIATION_FAILED, {
+			userId: targetUserId,
+			organizationId: targetOrganizationId,
+			error,
+		});
 	}
 }
