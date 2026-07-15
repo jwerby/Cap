@@ -2389,6 +2389,22 @@ fn progress<T: UploadedChunk, E>(
     }
 }
 
+pub(crate) async fn delete_recording_dir_after_upload<F, Fut>(
+    upload_handle: tokio::task::JoinHandle<Result<(), AuthedApiError>>,
+    delete_setting: bool,
+    delete_fn: F,
+) -> bool
+where
+    F: FnOnce() -> Fut,
+    Fut: std::future::Future<Output = ()>,
+{
+    let upload_succeeded = upload_handle.await.is_ok_and(|r| r.is_ok());
+    if upload_succeeded && delete_setting {
+        delete_fn().await;
+    }
+    upload_succeeded
+}
+
 pub fn emit_upload_complete(app: &AppHandle, video_id: &str) {
     UploadProgressEvent {
         video_id: video_id.to_string(),
@@ -3020,6 +3036,119 @@ mod tests {
         assert!(
             shutdown_duration < Duration::from_millis(200),
             "manifest shutdown should be near-instant via Notify, took {shutdown_duration:?}"
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_happens_after_successful_commit() {
+        let dir = tempfile::tempdir().unwrap();
+        let recording_dir = dir.path().to_path_buf();
+        std::fs::write(recording_dir.join("video.mp4"), b"data").unwrap();
+
+        let handle = tokio::spawn(async { Ok::<(), AuthedApiError>(()) });
+        let recording_dir_clone = recording_dir.clone();
+
+        delete_recording_dir_after_upload(handle, true, || async move {
+            tokio::fs::remove_dir_all(&recording_dir_clone).await.ok();
+        })
+        .await;
+
+        assert!(
+            !recording_dir.exists(),
+            "recording dir must be deleted after successful commit"
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_does_not_happen_when_commit_fails() {
+        let dir = tempfile::tempdir().unwrap();
+        let recording_dir = dir.path().to_path_buf();
+        std::fs::write(recording_dir.join("video.mp4"), b"data").unwrap();
+
+        let handle = tokio::spawn(async {
+            Err::<(), AuthedApiError>(AuthedApiError::Other(
+                "upload_multipart_complete failed: network error".to_string(),
+            ))
+        });
+        let recording_dir_clone = recording_dir.clone();
+
+        delete_recording_dir_after_upload(handle, true, || async move {
+            tokio::fs::remove_dir_all(&recording_dir_clone).await.ok();
+        })
+        .await;
+
+        assert!(
+            recording_dir.exists(),
+            "recording dir must be preserved when commit fails"
+        );
+        assert!(
+            recording_dir.join("video.mp4").exists(),
+            "recording file must survive a failed commit"
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_does_not_happen_when_commit_task_panics() {
+        let dir = tempfile::tempdir().unwrap();
+        let recording_dir = dir.path().to_path_buf();
+        std::fs::write(recording_dir.join("video.mp4"), b"data").unwrap();
+
+        let handle: tokio::task::JoinHandle<Result<(), AuthedApiError>> =
+            tokio::spawn(async { panic!("simulated upload task panic") });
+        let recording_dir_clone = recording_dir.clone();
+
+        delete_recording_dir_after_upload(handle, true, || async move {
+            tokio::fs::remove_dir_all(&recording_dir_clone).await.ok();
+        })
+        .await;
+
+        assert!(
+            recording_dir.exists(),
+            "recording dir must be preserved when upload task panics"
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_does_not_happen_when_setting_is_off() {
+        let dir = tempfile::tempdir().unwrap();
+        let recording_dir = dir.path().to_path_buf();
+        std::fs::write(recording_dir.join("video.mp4"), b"data").unwrap();
+
+        let handle = tokio::spawn(async { Ok::<(), AuthedApiError>(()) });
+        let recording_dir_clone = recording_dir.clone();
+
+        delete_recording_dir_after_upload(handle, false, || async move {
+            tokio::fs::remove_dir_all(&recording_dir_clone).await.ok();
+        })
+        .await;
+
+        assert!(
+            recording_dir.exists(),
+            "recording dir must be preserved when delete_after_upload is false, even after successful commit"
+        );
+    }
+
+    #[tokio::test]
+    async fn delete_does_not_happen_when_task_is_aborted() {
+        let dir = tempfile::tempdir().unwrap();
+        let recording_dir = dir.path().to_path_buf();
+        std::fs::write(recording_dir.join("video.mp4"), b"data").unwrap();
+
+        let handle: tokio::task::JoinHandle<Result<(), AuthedApiError>> = tokio::spawn(async {
+            tokio::time::sleep(Duration::from_secs(60)).await;
+            Ok(())
+        });
+        handle.abort();
+        let recording_dir_clone = recording_dir.clone();
+
+        delete_recording_dir_after_upload(handle, true, || async move {
+            tokio::fs::remove_dir_all(&recording_dir_clone).await.ok();
+        })
+        .await;
+
+        assert!(
+            recording_dir.exists(),
+            "recording dir must be preserved when upload task is aborted before commit completes"
         );
     }
 }

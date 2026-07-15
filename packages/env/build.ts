@@ -1,5 +1,6 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { posthogHostSchema, webUrlSchema } from "./cap-mode-guard.ts";
 
 export const NODE_ENV = process.env.NODE_ENV || "";
 
@@ -10,10 +11,10 @@ const create = () =>
 		client: {
 			NEXT_PUBLIC_IS_CAP: z.string().optional(),
 			NEXT_PUBLIC_POSTHOG_KEY: z.string().optional(),
-			NEXT_PUBLIC_POSTHOG_HOST: z.string().optional(),
+			NEXT_PUBLIC_POSTHOG_HOST: posthogHostSchema,
 			NEXT_PUBLIC_META_PIXEL_ID: z.string().optional(),
 			NEXT_PUBLIC_GOOGLE_AW_ID: z.string().optional(),
-			NEXT_PUBLIC_WEB_URL: z.string(),
+			NEXT_PUBLIC_WEB_URL: webUrlSchema,
 			NEXT_PUBLIC_DOCKER_BUILD: z.string().optional(),
 		},
 		runtimeEnv: {

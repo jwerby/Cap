@@ -24,6 +24,7 @@ import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { runPromise } from "@/lib/server";
 import { Caps } from "./Caps";
+import { CAPS_PAGE_SIZE } from "./caps-page-size";
 
 export const metadata: Metadata = {
 	title: "Recordings — Port & Starboard Watch",
@@ -131,7 +132,7 @@ export default async function CapsPage(props: PageProps<"/dashboard/caps">) {
 	}
 
 	const page = Number(searchParams.page) || 1;
-	const limit = Number(searchParams.limit) || 15;
+	const limit = Number(searchParams.limit) || CAPS_PAGE_SIZE;
 
 	const userId = user.id;
 	const offset = (page - 1) * limit;

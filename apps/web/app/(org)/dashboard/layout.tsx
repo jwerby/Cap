@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthContextProvider } from "@/app/Layout/AuthContext";
 import { resolveCurrentUser } from "@/app/Layout/current-user";
+import { resolveTheme } from "@/app/themeScript";
 import { runPromise } from "@/lib/server";
 import DashboardInner from "./_components/DashboardInner";
 import MobileTab from "./_components/MobileTab";
@@ -65,7 +66,7 @@ export default async function DashboardLayout({
 		activeOrganization = organizationSelect[0];
 	}
 
-	const theme = (await cookies()).get("theme")?.value ?? "light";
+	const theme = resolveTheme((await cookies()).get("theme")?.value);
 	const sidebar = (await cookies()).get("sidebarCollapsed")?.value ?? "false";
 	const referClicked = (await cookies()).get("referClicked")?.value ?? "false";
 

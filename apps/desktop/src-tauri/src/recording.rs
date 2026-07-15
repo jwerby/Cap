@@ -2575,12 +2575,22 @@ async fn handle_recording_finish(
                 let recording_dir = recording_dir.clone();
 
                 async move {
-                    let upload_succeeded = segment_upload
-                        .handle
-                        .await
-                        .map_err(|e| e.to_string())
-                        .and_then(|r| r.map_err(|v| v.to_string()))
-                        .is_ok();
+                    let delete_setting = GeneralSettingsStore::get(&app)
+                        .ok()
+                        .flatten()
+                        .unwrap_or_default()
+                        .delete_instant_recordings_after_upload;
+
+                    let upload_succeeded = crate::upload::delete_recording_dir_after_upload(
+                        segment_upload.handle,
+                        delete_setting,
+                        || async {
+                            if let Err(err) = tokio::fs::remove_dir_all(&recording_dir).await {
+                                error!("Failed to remove recording files after upload: {err:?}");
+                            }
+                        },
+                    )
+                    .await;
 
                     if upload_succeeded {
                         info!("Segment upload succeeded");
@@ -2617,17 +2627,6 @@ async fn handle_recording_finish(
                                 "Error updating thumbnail for instant mode progressive upload: {err}"
                             );
                         }
-                    }
-
-                    if upload_succeeded
-                        && GeneralSettingsStore::get(&app)
-                            .ok()
-                            .flatten()
-                            .unwrap_or_default()
-                            .delete_instant_recordings_after_upload
-                        && let Err(err) = tokio::fs::remove_dir_all(&recording_dir).await
-                    {
-                        error!("Failed to remove recording files after upload: {err:?}");
                     }
                 }
             });

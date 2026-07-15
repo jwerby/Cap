@@ -1,5 +1,6 @@
 import { createEnv } from "@t3-oss/env-nextjs";
 import { z } from "zod";
+import { webUrlSchema } from "./cap-mode-guard.ts";
 
 const boolString = (_default = false) =>
 	z
@@ -14,9 +15,9 @@ function createServerEnv() {
 		server: {
 			/// General configuration
 			DATABASE_URL: z.string().describe("MySQL database URL"),
-			WEB_URL: z
-				.string()
-				.describe("Public URL of the server eg. https://cap.so"),
+			WEB_URL: webUrlSchema.describe(
+				"Public URL of the server eg. https://watch.portstbd.com",
+			),
 			NEXTAUTH_SECRET: z.string().describe("32 byte base64 string"),
 			NEXTAUTH_URL: z.string().describe("Should be the same as WEB_URL"),
 			DATABASE_ENCRYPTION_KEY: z

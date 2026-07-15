@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { useEffectMutation, useRpcClient } from "@/lib/EffectRuntime";
 import { useVideosAnalyticsQuery } from "@/lib/Queries/Analytics";
 import { useDashboardContext } from "../Contexts";
+import { CAPS_PAGE_SIZE } from "./caps-page-size";
 import {
 	NewFolderDialog,
 	SelectedCapsBar,
@@ -78,7 +79,7 @@ export const Caps = ({
 	const params = useSearchParams();
 	const page = Number(params.get("page")) || 1;
 	const { user } = useDashboardContext();
-	const limit = 15;
+	const limit = CAPS_PAGE_SIZE;
 	const [openNewFolderDialog, setOpenNewFolderDialog] = useState(false);
 	const totalPages = Math.ceil(count / limit);
 	const previousCountRef = useRef<number>(0);
