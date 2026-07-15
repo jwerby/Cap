@@ -1,6 +1,7 @@
 import { db } from "@cap/database";
 import { getCurrentUser } from "@cap/database/auth/session";
 import { nanoId } from "@cap/database/helpers";
+import { addUserToOrganizationSpaces } from "@cap/database/organization-space-membership";
 import {
 	organizationInvites,
 	organizationMembers,
@@ -139,6 +140,11 @@ export async function POST(request: NextRequest) {
 			}
 
 			await tx.update(users).set(userUpdate).where(eq(users.id, user.id));
+
+			await addUserToOrganizationSpaces(tx, {
+				organizationId: invite.organizationId,
+				userId: user.id,
+			});
 
 			await tx
 				.delete(organizationInvites)

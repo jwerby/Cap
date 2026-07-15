@@ -2,10 +2,12 @@ import { db } from "@cap/database";
 import { sendEmail } from "@cap/database/emails/config";
 import { FirstShareableLink } from "@cap/database/emails/first-shareable-link";
 import { nanoId } from "@cap/database/helpers";
+import { createAutoOrganizationVideoShare } from "@cap/database/organization-video-sharing";
 import {
 	importedVideos,
 	organizationMembers,
 	organizations,
+	sharedVideos,
 	users,
 	videos,
 	videoUploads,
@@ -219,6 +221,14 @@ app.get(
 					height,
 					fps,
 				});
+
+			const organizationShare = createAutoOrganizationVideoShare({
+				videoId: idToUse,
+				organizationId: videoOrgId,
+				sharedByUserId: user.id,
+			});
+			if (organizationShare)
+				await db().insert(sharedVideos).values(organizationShare);
 
 			const clientSupportsUploadProgress = isFromDesktopSemver(
 				c.req,

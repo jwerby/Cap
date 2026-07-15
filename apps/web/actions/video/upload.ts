@@ -3,7 +3,8 @@
 import { db } from "@cap/database";
 import { getCurrentUser } from "@cap/database/auth/session";
 import { nanoId } from "@cap/database/helpers";
-import { videos, videoUploads } from "@cap/database/schema";
+import { createAutoOrganizationVideoShare } from "@cap/database/organization-video-sharing";
+import { sharedVideos, videos, videoUploads } from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
 import { dub, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import { Storage as StorageService } from "@cap/web-backend";
@@ -218,6 +219,14 @@ export async function createVideoAndGetUploadUrl({
 		};
 
 		await db().insert(videos).values(videoData);
+
+		const organizationShare = createAutoOrganizationVideoShare({
+			videoId: idToUse,
+			organizationId: orgId,
+			sharedByUserId: user.id,
+		});
+		if (organizationShare)
+			await db().insert(sharedVideos).values(organizationShare);
 
 		if (supportsUploadProgress)
 			await db().insert(videoUploads).values({

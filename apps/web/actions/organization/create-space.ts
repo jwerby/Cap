@@ -4,6 +4,7 @@ import { db } from "@cap/database";
 import { getCurrentUser } from "@cap/database/auth/session";
 import { hashPassword } from "@cap/database/crypto";
 import { nanoId } from "@cap/database/helpers";
+import { addOrganizationMembersToSpace } from "@cap/database/organization-space-membership";
 import { spaceMembers, spaces } from "@cap/database/schema";
 import { userIsPro } from "@cap/utils";
 import {
@@ -136,6 +137,12 @@ export async function createSpace(
 
 				await tx.insert(spaceMembers).values(spaceMembersToInsert);
 			}
+
+			await addOrganizationMembersToSpace(tx, {
+				organizationId: user.activeOrganizationId,
+				spaceId,
+				adminUserIds: [user.id],
+			});
 		});
 
 		const iconFile = formData.get("icon") as File | null;

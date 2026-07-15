@@ -3,6 +3,7 @@ import { Organisation, User } from "@cap/web-domain";
 import { and, eq, isNull } from "drizzle-orm";
 import { nanoId } from "../helpers.ts";
 import { db } from "../index.ts";
+import { addUserToOrganizationSpaces } from "../organization-space-membership.ts";
 import { organizationMembers, organizations, users } from "../schema.ts";
 
 export const PORTSTBD_AUTO_JOIN_EMAIL_DOMAIN = "portstbd.com";
@@ -99,6 +100,11 @@ export async function autoJoinPortstbdOrganization({
 					defaultOrgId: targetOrganizationId,
 				})
 				.where(eq(users.id, targetUserId));
+
+			await addUserToOrganizationSpaces(tx, {
+				organizationId: targetOrganizationId,
+				userId: targetUserId,
+			});
 		});
 	} catch (error) {
 		console.error("Failed to auto-join Port & Starboard organization", error);

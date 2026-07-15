@@ -4,10 +4,13 @@ import { randomUUID } from "node:crypto";
 import { db } from "@cap/database";
 import { getCurrentUser } from "@cap/database/auth/session";
 import { nanoId } from "@cap/database/helpers";
+import { addOrganizationMembersToSpace } from "@cap/database/organization-space-membership";
+import { createAutoOrganizationVideoShare } from "@cap/database/organization-video-sharing";
 import {
 	importedVideos,
 	organizationMembers,
 	organizations,
+	sharedVideos,
 	spaceMembers,
 	spaces,
 	spaceVideos,
@@ -379,6 +382,14 @@ async function importLoomVideoForOwner({
 			...(oembedMeta?.height ? { height: oembedMeta.height } : {}),
 		});
 
+	const organizationShare = createAutoOrganizationVideoShare({
+		videoId,
+		organizationId: orgId,
+		sharedByUserId: ownerId,
+	});
+	if (organizationShare)
+		await db().insert(sharedVideos).values(organizationShare);
+
 	await db().insert(videoUploads).values({
 		videoId,
 		phase: "uploading",
@@ -569,6 +580,12 @@ async function getOrCreateImportSpace({
 			spaceId,
 			userId: createdById,
 			role: "admin",
+		});
+
+		await addOrganizationMembersToSpace(tx, {
+			organizationId: orgId,
+			spaceId,
+			adminUserIds: [createdById],
 		});
 	});
 
