@@ -35,13 +35,13 @@ export const AdminMobileNav = () => {
 								transition: { duration: 0.3, bounce: 0.2, type: "spring" },
 							}}
 							exit={{ x: "100%" }}
-							className="relative flex-1 flex flex-col ml-auto max-w-xs w-[285px] border-l border-[#D8E7EB] pt-5 pb-4 px-4 bg-[linear-gradient(180deg,#F7FBFC_0%,#EDF5F7_100%)]"
+							className="relative flex-1 flex flex-col ml-auto max-w-xs w-[285px] border-l border-[#D8E7EB] pt-5 pb-4 px-4 bg-[linear-gradient(180deg,#F7FBFC_0%,#EDF5F7_100%)] text-[#163760] dark:border-gray-3 dark:bg-none dark:bg-gray-1 dark:text-gray-12"
 						>
 							<div className="flex justify-between items-center mb-6 w-full">
 								<PortstbdLogo className="h-8 w-auto max-w-[178px]" />
 								<button
 									type="button"
-									className="grid place-items-center rounded-full border border-[#D8E7EB] bg-white/70 size-9 text-[#163760]"
+									className="grid place-items-center rounded-full border border-[#D8E7EB] bg-white/70 size-9 text-[#163760] dark:border-gray-4 dark:bg-gray-3 dark:text-gray-12"
 									onClick={() => setSidebarOpen(false)}
 								>
 									<X className="size-5" aria-hidden="true" />
@@ -52,7 +52,7 @@ export const AdminMobileNav = () => {
 					</motion.div>
 				) : null}
 			</AnimatePresence>
-			<div className="flex fixed z-[51] justify-between w-full h-16 border-b border-[#D8E7EB] bg-[#F7FBFC]/95 backdrop-blur lg:border-none lg:hidden">
+			<div className="flex fixed z-[51] justify-between w-full h-16 border-b border-[#D8E7EB] bg-[#F7FBFC]/95 backdrop-blur lg:border-none lg:hidden dark:border-gray-3 dark:bg-gray-1 dark:text-gray-12">
 				<div className="flex flex-shrink-0 items-center px-4 h-full lg:hidden">
 					<Link className="block" href="/dashboard">
 						<PortstbdMark className="size-9" />
@@ -65,7 +65,7 @@ export const AdminMobileNav = () => {
 							setThemeHandler(theme === "light" ? "dark" : "light");
 						}}
 						aria-label="Toggle theme"
-						className="flex justify-center items-center rounded-full border transition-colors cursor-pointer lg:hidden bg-white/70 hover:border-[#63A1B4] hover:bg-white size-9 border-[#D8E7EB] text-[#163760]"
+						className="flex justify-center items-center rounded-full border transition-colors cursor-pointer lg:hidden bg-white/70 hover:border-[#63A1B4] hover:bg-white size-9 border-[#D8E7EB] text-[#163760] dark:border-gray-4 dark:bg-gray-3 dark:text-gray-12 dark:hover:border-gray-5 dark:hover:bg-gray-4"
 					>
 						<ThemeToggleIcon />
 					</button>

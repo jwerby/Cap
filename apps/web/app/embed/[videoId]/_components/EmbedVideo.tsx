@@ -2,8 +2,9 @@
 
 import type { userSelectProps } from "@cap/database/auth/session";
 import type { comments as commentsSchema, videos } from "@cap/database/schema";
-import { NODE_ENV } from "@cap/env";
+import { buildEnv, NODE_ENV } from "@cap/env";
 import { Avatar, Logo } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import type { ViewerSettings } from "@cap/web-backend";
 import { AnimatePresence, motion } from "framer-motion";
 import { useTranscript } from "hooks/use-transcript";
@@ -314,23 +315,25 @@ export const EmbedVideo = forwardRef<
 									</div>
 								</div>
 							</motion.div>
-							<motion.button
-								initial={{ opacity: 0, y: 10 }}
-								animate={{ opacity: 1, y: 0 }}
-								exit={{ opacity: 0, y: 10 }}
-								transition={{ duration: 0.3, delay: 0.1 }}
-								onClick={(e) => {
-									e.stopPropagation();
-									window.open("https://cap.so", "_blank");
-								}}
-								className="hidden z-10 gap-2 items-center px-3 py-2 text-sm rounded-full border backdrop-blur-sm transition-colors duration-200 sm:flex border-white/10 w-fit text-white/80 hover:text-white bg-black/50"
-								aria-label="Powered by Cap"
-							>
-								<span className="text-xs md:text-sm text-white/80">
-									Powered by
-								</span>
-								<Logo className="w-auto h-4" white={true} />
-							</motion.button>
+							{isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) && (
+								<motion.button
+									initial={{ opacity: 0, y: 10 }}
+									animate={{ opacity: 1, y: 0 }}
+									exit={{ opacity: 0, y: 10 }}
+									transition={{ duration: 0.3, delay: 0.1 }}
+									onClick={(e) => {
+										e.stopPropagation();
+										window.open("https://cap.so", "_blank");
+									}}
+									className="hidden z-10 gap-2 items-center px-3 py-2 text-sm rounded-full border backdrop-blur-sm transition-colors duration-200 sm:flex border-white/10 w-fit text-white/80 hover:text-white bg-black/50"
+									aria-label="Powered by Cap"
+								>
+									<span className="text-xs md:text-sm text-white/80">
+										Powered by
+									</span>
+									<Logo className="w-auto h-4" white={true} />
+								</motion.button>
+							)}
 						</div>
 					)}
 				</AnimatePresence>

@@ -1,4 +1,5 @@
 import { buildEnv } from "@cap/env";
+import { isCapDeployment } from "@cap/utils";
 
 const activeSubscriptionStatuses = new Set([
 	"active",
@@ -53,7 +54,7 @@ export function calculateProSeats(organization: {
 	const proSeatsTotal = organization?.inviteQuota ?? 1;
 	const proSeatsUsed =
 		organization?.members?.filter((m) => m.hasProSeat).length ?? 0;
-	const proSeatsRemaining = buildEnv.NEXT_PUBLIC_IS_CAP
+	const proSeatsRemaining = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)
 		? Math.max(0, proSeatsTotal - proSeatsUsed)
 		: Number.MAX_SAFE_INTEGER;
 

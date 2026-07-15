@@ -5,9 +5,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import clsx from "clsx";
 import { usePathname } from "next/navigation";
 import { Fragment, useMemo } from "react";
+import { onboardingStepsForDeployment } from "../onboarding-flow";
 
 export default function Stepper({
 	completedSteps,
+	capDeployment,
 }: {
 	completedSteps: {
 		welcome?: boolean;
@@ -16,6 +18,7 @@ export default function Stepper({
 		inviteTeam?: boolean;
 		download?: boolean;
 	};
+	capDeployment: boolean;
 }) {
 	const currentPath = usePathname();
 	const currentStep = useMemo(() => {
@@ -27,33 +30,10 @@ export default function Stepper({
 		if (currentPath === "/onboarding/download") return "Download";
 	}, [currentPath]);
 
-	const steps = [
-		{
-			id: "1",
-			name: "Welcome",
-			completed: completedSteps.welcome || false,
-		},
-		{
-			id: "2",
-			name: "Organization Setup",
-			completed: completedSteps.organizationSetup || false,
-		},
-		{
-			id: "3",
-			name: "Custom Domain",
-			completed: completedSteps.customDomain || false,
-		},
-		{
-			id: "4",
-			name: "Invite your team",
-			completed: completedSteps.inviteTeam || false,
-		},
-		{
-			id: "5",
-			name: "Download",
-			completed: completedSteps.download || false,
-		},
-	];
+	const steps = onboardingStepsForDeployment(capDeployment).map((step) => ({
+		...step,
+		completed: completedSteps[step.completionKey] || false,
+	}));
 
 	return (
 		<>
@@ -141,7 +121,10 @@ const MobileStepper = ({
 			</div>
 			<div>
 				<p className="text-[13px] text-[#6B8791]">
-					Step <span className="text-[#163760]">{activeStep.id}/5</span>
+					Step{" "}
+					<span className="text-[#163760]">
+						{activeStep.id}/{steps.length}
+					</span>
 				</p>
 			</div>
 		</div>

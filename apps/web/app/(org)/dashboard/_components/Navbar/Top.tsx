@@ -9,6 +9,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import { faBell } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -47,6 +48,7 @@ import type { DownloadIconHandle } from "../AnimatedIcons/Download";
 import type { ReferIconHandle } from "../AnimatedIcons/Refer";
 
 const Top = () => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { activeSpace, anyNewNotifications, isDeveloperSection } =
 		useDashboardContext();
 	const [toggleNotifications, setToggleNotifications] = useState(false);
@@ -104,7 +106,7 @@ const Top = () => {
 		<div
 			className={clsx(
 				"flex fixed z-40 justify-between items-center py-3 pr-2 pl-5 w-full md:relative mt-[60px] lg:mt-0 lg:py-[19px] lg:pl-0 lg:pr-5",
-				"top-0 border-b border-[#D8E7EB]/80 bg-[#F7FBFC]/95 backdrop-blur lg:border-b-0",
+				"top-0 border-b border-[#D8E7EB]/80 bg-[#F7FBFC]/95 backdrop-blur lg:border-b-0 dark:border-gray-3 dark:bg-gray-1 dark:text-gray-12",
 			)}
 		>
 			<div className="flex flex-col gap-0.5">
@@ -118,13 +120,13 @@ const Top = () => {
 							className="relative flex-shrink-0 size-5"
 						/>
 					)}
-					<p className="relative text-lg font-bold truncate text-[#163760] lg:text-2xl">
+					<p className="relative text-lg font-bold truncate text-[#163760] lg:text-2xl dark:text-gray-12">
 						{title}
 					</p>
 				</div>
 			</div>
 			<div className="flex gap-4 items-center">
-				{buildEnv.NEXT_PUBLIC_IS_CAP && <ReferButton />}
+				{capDeployment && <ReferButton />}
 				<button
 					type="button"
 					data-state={toggleNotifications ? "open" : "closed"}
@@ -152,7 +154,7 @@ const Top = () => {
                 rounded-full transition-colors cursor-pointer lg:flex
                 hover:bg-[#D8E7EB] data-[state=open]:bg-[#D8E7EB]
                 focus:outline-none
-                size-9"
+					size-9 dark:bg-gray-3 dark:hover:bg-gray-4 dark:data-[state=open]:bg-gray-4 dark:data-[state=open]:hover:bg-gray-4"
 				>
 					{anyNewNotifications && (
 						<div className="absolute right-0 top-1 z-10">
@@ -162,7 +164,10 @@ const Top = () => {
 							</div>
 						</div>
 					)}
-					<FontAwesomeIcon className="text-[#163760] size-3.5" icon={faBell} />
+					<FontAwesomeIcon
+						className="text-[#163760] size-3.5 dark:text-gray-12"
+						icon={faBell}
+					/>
 					<AnimatePresence>
 						{toggleNotifications && <Notifications ref={notificationsRef} />}
 					</AnimatePresence>
@@ -180,7 +185,7 @@ const Top = () => {
 							}
 						}}
 						aria-label="Toggle theme"
-						className="hidden justify-center items-center rounded-full transition-colors cursor-pointer bg-[#EDF5F7] lg:flex hover:bg-[#D8E7EB] size-9 text-[#163760]"
+						className="hidden justify-center items-center rounded-full transition-colors cursor-pointer bg-[#EDF5F7] lg:flex hover:bg-[#D8E7EB] size-9 text-[#163760] dark:bg-gray-3 dark:text-gray-12 dark:hover:bg-gray-4"
 					>
 						<ThemeToggleIcon />
 					</button>
@@ -192,6 +197,7 @@ const Top = () => {
 };
 
 const User = () => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const [menuOpen, setMenuOpen] = useState(false);
 	const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 	const { user } = useDashboardContext();
@@ -204,7 +210,7 @@ const User = () => {
 				href: "/home",
 				onClick: () => setMenuOpen(false),
 				iconClassName: "text-gray-11 group-hover:text-gray-12",
-				showCondition: true,
+				showCondition: capDeployment,
 			},
 			{
 				name: "Upgrade to Pro",
@@ -214,7 +220,7 @@ const User = () => {
 					setUpgradeModalOpen(true);
 				},
 				iconClassName: "text-amber-400 group-hover:text-amber-500",
-				showCondition: buildEnv.NEXT_PUBLIC_IS_CAP && !user.isPro,
+				showCondition: capDeployment && !user.isPro,
 			},
 			{
 				name: "Earn 40% Referral",
@@ -222,7 +228,7 @@ const User = () => {
 				href: "/dashboard/refer",
 				onClick: () => setMenuOpen(false),
 				iconClassName: "text-gray-11 group-hover:text-gray-12",
-				showCondition: buildEnv.NEXT_PUBLIC_IS_CAP,
+				showCondition: capDeployment,
 			},
 			{
 				name: "Settings",
@@ -237,7 +243,7 @@ const User = () => {
 				icon: <MessageCircleMoreIcon />,
 				onClick: () => window.open("https://cap.link/discord", "_blank"),
 				iconClassName: "text-gray-11 group-hover:text-gray-12",
-				showCondition: true,
+				showCondition: capDeployment,
 			},
 			{
 				name: "Record Video",
@@ -255,7 +261,7 @@ const User = () => {
 				showCondition: true,
 			},
 		],
-		[user.isPro],
+		[capDeployment, user.isPro],
 	);
 
 	return (

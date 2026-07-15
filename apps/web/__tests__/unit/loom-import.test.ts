@@ -98,6 +98,7 @@ vi.mock("@cap/utils", () => ({
 			create: vi.fn(),
 		},
 	})),
+	isCapDeployment: (flag: unknown) => flag === "true",
 	userIsPro: vi.fn(() => true),
 }));
 
@@ -447,8 +448,7 @@ describe("importFromLoom", () => {
 			importedCount: 0,
 			failedCount: 501,
 			results: [],
-			error:
-				"CSV imports are limited to 500 rows at a time. Contact support to raise this limit.",
+			error: "CSV imports are limited to 500 rows at a time.",
 		});
 		expect(checkRateLimitMock).not.toHaveBeenCalled();
 		expect(fetchMock).not.toHaveBeenCalled();

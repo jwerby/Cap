@@ -565,6 +565,7 @@ export const useWebRecorder = ({
 	);
 
 	const cleanupRecordingState = useCallback(async () => {
+		const preserveInFlightRecording = stopInFlightRef.current;
 		cleanupStreams();
 		clearTimer();
 		resetRecorder();
@@ -574,10 +575,12 @@ export const useWebRecorder = ({
 		instantChunkModeRef.current = null;
 		lastInstantChunkAtRef.current = null;
 		recordingPipelineRef.current = null;
-		await disposeRecordingSpool();
+		if (!preserveInFlightRecording) {
+			await disposeRecordingSpool();
+		}
 		const instantUploader = instantUploaderRef.current;
 		instantUploaderRef.current = null;
-		if (instantUploader) {
+		if (instantUploader && !preserveInFlightRecording) {
 			try {
 				await instantUploader.cancel();
 			} catch (error) {
@@ -598,7 +601,7 @@ export const useWebRecorder = ({
 		pendingInstantVideoIdRef.current = null;
 		videoCreationRef.current = null;
 		setVideoId(null);
-		if (pendingInstantVideoId) {
+		if (pendingInstantVideoId && !preserveInFlightRecording) {
 			await deletePendingVideoSafely(pendingInstantVideoId);
 		}
 	}, [
@@ -1251,6 +1254,11 @@ export const useWebRecorder = ({
 					height,
 					fps,
 					subpath: rawSubpath,
+					onUploadCommitted: () => {
+						if (pendingInstantVideoIdRef.current === creationResult.id) {
+							pendingInstantVideoIdRef.current = null;
+						}
+					},
 				});
 
 				if (!uploader.getProcessingStarted()) {

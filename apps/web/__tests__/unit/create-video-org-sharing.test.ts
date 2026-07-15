@@ -60,6 +60,7 @@ vi.mock("@cap/utils", () => ({
 			create: vi.fn(),
 		},
 	})),
+	isCapDeployment: (flag: unknown) => flag === "true",
 	PORTSTBD_BRAND: {
 		companyName: "Port & Starboard",
 	},

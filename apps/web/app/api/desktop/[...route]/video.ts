@@ -13,7 +13,7 @@ import {
 	videoUploads,
 } from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
+import { dub, isCapDeployment, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import { Storage } from "@cap/web-backend";
 import { Organisation, Video } from "@cap/web-domain";
 import { zValidator } from "@hono/zod-validator";
@@ -241,7 +241,10 @@ app.get(
 					mode: "singlepart",
 				});
 
-			if (buildEnv.NEXT_PUBLIC_IS_CAP && NODE_ENV === "production")
+			if (
+				isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) &&
+				NODE_ENV === "production"
+			)
 				await dub().links.create({
 					url: `${serverEnv().WEB_URL}/s/${idToUse}`,
 					domain: "cap.link",
@@ -259,8 +262,8 @@ app.get(
 						"[SendFirstShareableLinkEmail] Sending first shareable link email with 5-minute delay",
 					);
 
-					const isCapDeployment = Boolean(buildEnv.NEXT_PUBLIC_IS_CAP);
-					const videoUrl = isCapDeployment
+					const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
+					const videoUrl = capDeployment
 						? `https://cap.link/${idToUse}`
 						: `${serverEnv().WEB_URL}/s/${idToUse}`;
 
@@ -270,9 +273,9 @@ app.get(
 						react: FirstShareableLink({
 							email: user.email,
 							url: videoUrl,
-							marketing: isCapDeployment,
+							marketing: capDeployment,
 						}),
-						marketing: isCapDeployment,
+						marketing: capDeployment,
 						scheduledAt: "in 5 min",
 					});
 

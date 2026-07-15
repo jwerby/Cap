@@ -1,4 +1,5 @@
 import { buildEnv } from "@cap/env";
+import { isCapDeployment } from "./deployment.ts";
 
 export const STRIPE_DEVELOPER_CREDITS_PRODUCT_ID: Record<string, string> = {
 	development: "prod_U4mswfBp0bFc39",
@@ -22,7 +23,7 @@ export const userIsPro = (
 		thirdPartyStripeSubscriptionId?: string | null;
 	} | null,
 ) => {
-	if (!buildEnv.NEXT_PUBLIC_IS_CAP) return true;
+	if (!isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)) return true;
 
 	if (!user) return false;
 

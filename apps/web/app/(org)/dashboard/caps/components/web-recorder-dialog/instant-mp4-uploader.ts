@@ -188,6 +188,7 @@ const abortMultipartUpload = async (
 
 interface FinalizeOptions extends MultipartCompletePayload {
 	finalBlob?: Blob | null;
+	onUploadCommitted?: () => void;
 }
 
 export class InstantRecordingUploader {
@@ -837,6 +838,7 @@ export class InstantRecordingUploader {
 		this.processingStarted = completionResult.processingStarted;
 
 		this.finished = true;
+		options.onUploadCommitted?.();
 		this.uploadedBytes = this.finalTotalBytes ?? this.uploadedBytes;
 		this.setUploadStatus({
 			status: "uploadingVideo",

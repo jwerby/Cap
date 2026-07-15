@@ -1,6 +1,8 @@
 "use client";
 
+import { buildEnv } from "@cap/env";
 import { Button } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import { faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/navigation";
@@ -21,7 +23,7 @@ export const UploadCapButton = ({
 	const handleClick = () => {
 		if (!user) return;
 
-		if (!user.isPro) {
+		if (isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) && !user.isPro) {
 			setUpgradeModalOpen(true);
 			return;
 		}

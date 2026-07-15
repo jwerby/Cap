@@ -55,7 +55,7 @@ export const authOptions = (): NextAuthOptions => {
 			_adapter = DrizzleAdapter(db());
 			return _adapter;
 		},
-		debug: true,
+		debug: process.env.NODE_ENV !== "production",
 		session: {
 			strategy: "jwt",
 		},

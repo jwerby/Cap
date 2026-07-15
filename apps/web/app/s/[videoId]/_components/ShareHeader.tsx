@@ -2,7 +2,7 @@
 
 import { buildEnv, NODE_ENV } from "@cap/env";
 import { Button } from "@cap/ui";
-import { PORTSTBD_BRAND } from "@cap/utils";
+import { isCapDeployment, PORTSTBD_BRAND } from "@cap/utils";
 import type { ViewerSettingKey } from "@cap/web-backend";
 import {
 	faChartSimple,
@@ -66,6 +66,7 @@ export const ShareHeader = ({
 	branding?: SharePageBranding | null;
 	canManageSharePageBranding?: boolean;
 }) => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const user = useCurrentUser();
 	const { push, refresh } = useRouter();
 	const [isEditing, setIsEditing] = useState(false);
@@ -134,13 +135,9 @@ export const ShareHeader = ({
 			return `https://${customDomain}/s/${data.id}`;
 		} else if (NODE_ENV === "development" && !customDomain && !domainVerified) {
 			return `${webUrl}/s/${data.id}`;
-		} else if (buildEnv.NEXT_PUBLIC_IS_CAP && customDomain && domainVerified) {
+		} else if (capDeployment && customDomain && domainVerified) {
 			return `https://${customDomain}/s/${data.id}`;
-		} else if (
-			buildEnv.NEXT_PUBLIC_IS_CAP &&
-			!customDomain &&
-			!domainVerified
-		) {
+		} else if (capDeployment && !customDomain && !domainVerified) {
 			return `https://cap.link/${data.id}`;
 		} else {
 			return `${webUrl}/s/${data.id}`;
@@ -152,13 +149,9 @@ export const ShareHeader = ({
 			return `${customDomain}/s/${data.id}`;
 		} else if (NODE_ENV === "development" && !customDomain && !domainVerified) {
 			return `${webUrl}/s/${data.id}`;
-		} else if (buildEnv.NEXT_PUBLIC_IS_CAP && customDomain && domainVerified) {
+		} else if (capDeployment && customDomain && domainVerified) {
 			return `${customDomain}/s/${data.id}`;
-		} else if (
-			buildEnv.NEXT_PUBLIC_IS_CAP &&
-			!customDomain &&
-			!domainVerified
-		) {
+		} else if (capDeployment && !customDomain && !domainVerified) {
 			return `cap.link/${data.id}`;
 		} else {
 			return `${webUrl}/s/${data.id}`;

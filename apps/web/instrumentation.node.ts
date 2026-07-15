@@ -12,7 +12,7 @@ import { migrateDb } from "@cap/database/migrate";
 import { buildEnv, serverEnv } from "@cap/env";
 
 export async function register() {
-	if (process.env.NEXT_PUBLIC_IS_CAP) return;
+	if (process.env.NEXT_PUBLIC_IS_CAP === "true") return;
 
 	console.log("Waiting 5 seconds to run migrations");
 	// Function to trigger migrations with retry logic

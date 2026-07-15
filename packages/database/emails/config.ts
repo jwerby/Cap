@@ -1,6 +1,6 @@
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
 import { buildEnv, serverEnv } from "@cap/env";
-import { PORTSTBD_BRAND } from "@cap/utils";
+import { isCapDeployment, PORTSTBD_BRAND } from "@cap/utils";
 import { render } from "@react-email/render";
 import type { JSXElementConstructor, ReactElement } from "react";
 
@@ -64,13 +64,13 @@ export const sendEmail = async ({
 		return;
 	}
 
-	if (marketing && !buildEnv.NEXT_PUBLIC_IS_CAP) return;
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
+	if (marketing && !capDeployment) return;
 
 	let from: string;
 	if (fromOverride) from = fromOverride;
 	else if (marketing) from = "Richie from Cap <richie@send.cap.so>";
-	else if (buildEnv.NEXT_PUBLIC_IS_CAP)
-		from = "Cap Auth <no-reply@auth.cap.so>";
+	else if (capDeployment) from = "Cap Auth <no-reply@auth.cap.so>";
 	else from = `${PORTSTBD_BRAND.companyName} <no-reply@${emailFromDomain()}>`;
 
 	const html = await render(react);

@@ -1,6 +1,7 @@
 import { getCurrentUser } from "@cap/database/auth/session";
-import { serverEnv } from "@cap/env";
-import { redirect } from "next/navigation";
+import { buildEnv, serverEnv } from "@cap/env";
+import { isCapDeployment } from "@cap/utils";
+import { notFound, redirect } from "next/navigation";
 import ReferClient from "./ReferClient";
 
 export const metadata = {
@@ -40,6 +41,8 @@ async function generateEmbedToken(
 }
 
 export default async function ReferPage() {
+	if (!isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)) notFound();
+
 	// Check if Dub Partners is available
 	if (!serverEnv().DUB_API_KEY) {
 		redirect("/dashboard/caps");

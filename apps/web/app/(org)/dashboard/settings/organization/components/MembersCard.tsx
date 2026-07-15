@@ -16,6 +16,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useMutation } from "@tanstack/react-query";
@@ -46,6 +47,7 @@ interface MembersCardProps {
 }
 
 export const MembersCard = ({ setIsInviteDialogOpen }: MembersCardProps) => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const router = useRouter();
 	const { activeOrganization, user } = useDashboardContext();
 	const { proSeatsRemaining } = calculateSeats(activeOrganization || {});
@@ -247,7 +249,7 @@ export const MembersCard = ({ setIsInviteDialogOpen }: MembersCardProps) => {
 							<TableHead>Member</TableHead>
 							<TableHead>Email</TableHead>
 							<TableHead>Role</TableHead>
-							{buildEnv.NEXT_PUBLIC_IS_CAP && <TableHead>Pro</TableHead>}
+							{capDeployment && <TableHead>Pro</TableHead>}
 							<TableHead>Joined</TableHead>
 							<TableHead>Status</TableHead>
 							<TableHead>Actions</TableHead>
@@ -308,7 +310,7 @@ export const MembersCard = ({ setIsInviteDialogOpen }: MembersCardProps) => {
 											/>
 										)}
 									</TableCell>
-									{buildEnv.NEXT_PUBLIC_IS_CAP && (
+									{capDeployment && (
 										<TableCell>
 											{memberIsOwner ? (
 												<span className="text-xs text-gray-10">-</span>
@@ -377,7 +379,7 @@ export const MembersCard = ({ setIsInviteDialogOpen }: MembersCardProps) => {
 											"member",
 									)}
 								</TableCell>
-								{buildEnv.NEXT_PUBLIC_IS_CAP && <TableCell>-</TableCell>}
+								{capDeployment && <TableCell>-</TableCell>}
 								<TableCell>-</TableCell>
 								<TableCell>Invited</TableCell>
 								<TableCell>

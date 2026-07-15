@@ -1,3 +1,5 @@
+import { buildEnv } from "@cap/env";
+import { isCapDeployment } from "@cap/utils";
 import { type NextRequest, NextResponse } from "next/server";
 import { getGitHubReleases } from "@/utils/releases";
 
@@ -50,6 +52,10 @@ export async function GET(
 	request: NextRequest,
 	props: { params: Promise<{ platform: string }> },
 ) {
+	if (!isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)) {
+		return NextResponse.redirect(new URL("/dashboard/caps", request.url));
+	}
+
 	const params = await props.params;
 	const platform = params.platform.toLowerCase();
 

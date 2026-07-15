@@ -201,6 +201,73 @@ describe("InstantRecordingUploader", () => {
 		);
 	});
 
+	it("marks an accepted upload committed before the final progress update finishes", async () => {
+		const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+			const url = input.toString();
+
+			if (url === "/api/upload/multipart/presign-part") {
+				return makeJsonResponse({
+					presignedUrl: "https://uploads.example/part-1",
+				});
+			}
+
+			if (url === "/api/upload/multipart/complete") {
+				return makeJsonResponse({
+					success: true,
+					processingStarted: true,
+				});
+			}
+
+			throw new Error(`Unexpected fetch call: ${url}`);
+		});
+
+		vi.stubGlobal("fetch", fetchMock);
+		MockXMLHttpRequest.setOutcomes([{ type: "success", etag: "etag-1" }]);
+
+		let resolveProgressUpdate: (() => void) | undefined;
+		const progressUpdate = new Promise<void>((resolve) => {
+			resolveProgressUpdate = resolve;
+		});
+		const events: string[] = [];
+		let progressUpdateCount = 0;
+		const uploader = new InstantRecordingUploader({
+			videoId,
+			uploadId: "upload-123",
+			mimeType: "video/webm;codecs=vp9,opus",
+			subpath: "raw-upload.webm",
+			setUploadStatus: vi.fn(),
+			sendProgressUpdate: vi.fn(async () => {
+				progressUpdateCount += 1;
+				if (progressUpdateCount === 1) {
+					events.push("stream-progress-update");
+					return;
+				}
+				events.push("final-progress-update");
+				await progressUpdate;
+			}),
+			onChunkStateChange: vi.fn(),
+		});
+
+		const chunk = makeBlob(STREAMED_PART_BYTES, "video/webm;codecs=vp9,opus");
+		uploader.handleChunk(chunk, chunk.size);
+
+		const finalizePromise = uploader.finalize({
+			durationSeconds: 8,
+			subpath: "raw-upload.webm",
+			onUploadCommitted: () => events.push("upload-committed"),
+		});
+
+		await vi.waitFor(() => {
+			expect(events).toEqual([
+				"stream-progress-update",
+				"upload-committed",
+				"final-progress-update",
+			]);
+		});
+		resolveProgressUpdate?.();
+		await finalizePromise;
+	});
+
 	it("normalizes multipart initiate content type before creating the upload", async () => {
 		const fetchMock = vi.fn(
 			async (input: RequestInfo | URL, init?: RequestInit) => {

@@ -1,6 +1,8 @@
 "use client";
 
+import { buildEnv } from "@cap/env";
 import { Button } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import { faDownload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { ChevronDown } from "lucide-react";
@@ -10,6 +12,7 @@ import { FREE_PLAN_MAX_RECORDING_MS } from "../components/web-recorder-dialog/we
 import { WebRecorderDialog } from "../components/web-recorder-dialog/web-recorder-dialog";
 
 export const RecordVideoPage = () => {
+	const showDesktopRecorder = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const checkingRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
 	const openDesktop = useCallback(() => {
@@ -46,23 +49,27 @@ export const RecordVideoPage = () => {
 				<div className="w-full px-5">
 					<div className="mx-auto w-full max-w-[560px] min-w-0">
 						<div className="flex flex-col items-center">
-							<p className="max-w-md text-[#3C7486] text-md">
+							<p className="max-w-md text-[#3C7486] text-md dark:text-gray-10">
 								Choose how you want to record in Port & Starboard Watch
 							</p>
 						</div>
 						<div className="flex flex-wrap gap-3 justify-center items-center mt-4">
 							<WebRecorderDialog />
-							<p className="text-sm text-gray-10">or</p>
-							<Button
-								onClick={openDesktop}
-								className="flex relative gap-2 justify-center items-center"
-								variant="gray"
-							>
-								<FontAwesomeIcon className="size-3.5" icon={faDownload} />
-								Open Desktop Recorder
-							</Button>
+							{showDesktopRecorder && (
+								<>
+									<p className="text-sm text-gray-10">or</p>
+									<Button
+										onClick={openDesktop}
+										className="flex relative gap-2 justify-center items-center"
+										variant="gray"
+									>
+										<FontAwesomeIcon className="size-3.5" icon={faDownload} />
+										Open Desktop Recorder
+									</Button>
+								</>
+							)}
 						</div>
-						<FaqAccordion />
+						<FaqAccordion showDesktopRecorder={showDesktopRecorder} />
 					</div>
 				</div>
 			</div>
@@ -70,7 +77,11 @@ export const RecordVideoPage = () => {
 	);
 };
 
-const FaqAccordion = () => {
+const FaqAccordion = ({
+	showDesktopRecorder,
+}: {
+	showDesktopRecorder: boolean;
+}) => {
 	const freeMinutes = Math.floor(FREE_PLAN_MAX_RECORDING_MS / 60000);
 	const items = [
 		{
@@ -101,12 +112,16 @@ const FaqAccordion = () => {
 		{
 			id: "system-audio",
 			q: "Can I record system audio?",
-			a: "Browsers limit system‑wide audio capture. Use the desktop recorder when you need full system audio.",
+			a: showDesktopRecorder
+				? "Browsers limit system‑wide audio capture. Use the desktop recorder when you need full system audio."
+				: "Browser support for system audio varies by operating system and by the screen or tab you choose to share.",
 		},
 		{
 			id: "install",
 			q: "Do I need to install the app?",
-			a: `No. You can record in your browser. For longer recordings, system audio, and advanced editing, use the desktop recorder. The Free plan supports up to ${freeMinutes} minutes per recording in the browser.`,
+			a: showDesktopRecorder
+				? `No. You can record in your browser. For longer recordings, system audio, and advanced editing, use the desktop recorder. The Free plan supports up to ${freeMinutes} minutes per recording in the browser.`
+				: "No. Port & Starboard Watch records directly in your browser.",
 		},
 	];
 

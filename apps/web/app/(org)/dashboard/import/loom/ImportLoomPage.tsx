@@ -1,5 +1,6 @@
 "use client";
 
+import { buildEnv } from "@cap/env";
 import {
 	Button,
 	Dialog,
@@ -16,6 +17,7 @@ import {
 	TableHeader,
 	TableRow,
 } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import {
 	faArrowLeft,
 	faCircleCheck,
@@ -227,6 +229,7 @@ const LoomMark = ({ size = 18 }: { size?: number }) => (
 );
 
 export const ImportLoomPage = () => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { user, activeOrganization } = useDashboardContext();
 	const router = useRouter();
 
@@ -234,7 +237,9 @@ export const ImportLoomPage = () => {
 		!!user && user.id === activeOrganization?.organization.ownerId;
 
 	const [mode, setMode] = useState<Mode>("single");
-	const [upgradeModalOpen, setUpgradeModalOpen] = useState(!user?.isPro);
+	const [upgradeModalOpen, setUpgradeModalOpen] = useState(
+		capDeployment && !user?.isPro,
+	);
 
 	const [loomUrl, setLoomUrl] = useState("");
 	const [isImporting, setIsImporting] = useState(false);
@@ -320,7 +325,7 @@ export const ImportLoomPage = () => {
 	const handleSingleImport = async () => {
 		if (!user || !activeOrganization) return;
 
-		if (!user.isPro) {
+		if (capDeployment && !user.isPro) {
 			setUpgradeModalOpen(true);
 			return;
 		}
@@ -359,7 +364,7 @@ export const ImportLoomPage = () => {
 		const url = URL.createObjectURL(blob);
 		const link = document.createElement("a");
 		link.href = url;
-		link.download = "cap-loom-import-template.csv";
+		link.download = "portstbd-loom-import-template.csv";
 		link.click();
 		URL.revokeObjectURL(url);
 	};
@@ -367,7 +372,7 @@ export const ImportLoomPage = () => {
 	const loadCsvFile = async (file: File) => {
 		if (!user) return;
 
-		if (!user.isPro) {
+		if (capDeployment && !user.isPro) {
 			setUpgradeModalOpen(true);
 			return;
 		}
@@ -505,14 +510,14 @@ export const ImportLoomPage = () => {
 					Back to Import
 				</Link>
 				<div className="flex gap-4 items-start">
-					<div className="flex flex-shrink-0 justify-center items-center rounded-full size-12 bg-[#EDF5F7] text-[#163760]">
+					<div className="flex flex-shrink-0 justify-center items-center rounded-full size-12 bg-[#EDF5F7] text-[#163760] dark:bg-gray-3 dark:text-gray-12">
 						<LoomMark size={20} />
 					</div>
 					<div>
-						<h1 className="text-2xl font-bold text-[#163760]">
+						<h1 className="text-2xl font-bold text-[#163760] dark:text-gray-12">
 							Import from Loom
 						</h1>
-						<p className="mt-1 max-w-xl text-sm text-[#3C7486]">
+						<p className="mt-1 max-w-xl text-sm text-[#3C7486] dark:text-gray-10">
 							{isOrganizationOwner
 								? "Bring a single Loom video into Port & Starboard Watch, or bulk import recordings for organization members from a CSV."
 								: "Paste a Loom share link to bring it into Port & Starboard Watch."}

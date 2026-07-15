@@ -1,6 +1,7 @@
 "use client";
 
 import { buildEnv } from "@cap/env";
+import { isCapDeployment } from "@cap/utils";
 import Cookies from "js-cookie";
 import { redirect, usePathname } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -202,7 +203,7 @@ export function DashboardContexts({
 					setIsOpen={setInviteDialogOpen}
 				/>
 
-				{buildEnv.NEXT_PUBLIC_IS_CAP && (
+				{isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) && (
 					<UpgradeModal
 						open={upgradeModalOpen}
 						onOpenChange={setUpgradeModalOpen}

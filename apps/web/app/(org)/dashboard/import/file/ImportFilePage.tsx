@@ -1,6 +1,8 @@
 "use client";
 
+import { buildEnv } from "@cap/env";
 import { Button } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import type { Folder, Organisation } from "@cap/web-domain";
 import { faArrowLeft, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -21,19 +23,22 @@ import { UpgradeModal } from "@/components/UpgradeModal";
 import { uploadWithTarget } from "@/utils/upload-target";
 
 export const ImportFilePage = () => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { user, activeOrganization } = useDashboardContext();
 	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { uploadingStore, setUploadStatus } = useUploadingContext();
 	const isUploading = useStore(uploadingStore, (s) => !!s.uploadStatus);
-	const [upgradeModalOpen, setUpgradeModalOpen] = useState(!user?.isPro);
+	const [upgradeModalOpen, setUpgradeModalOpen] = useState(
+		capDeployment && !user?.isPro,
+	);
 	const [isDragOver, setIsDragOver] = useState(false);
 
 	const processFile = useCallback(
 		async (file: File) => {
 			if (!user || !activeOrganization) return;
 
-			if (!user.isPro) {
+			if (capDeployment && !user.isPro) {
 				setUpgradeModalOpen(true);
 				return;
 			}
@@ -46,7 +51,7 @@ export const ImportFilePage = () => {
 			);
 			if (ok) router.push("/dashboard/caps");
 		},
-		[user, activeOrganization, setUploadStatus, router],
+		[user, activeOrganization, setUploadStatus, router, capDeployment],
 	);
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -78,7 +83,7 @@ export const ImportFilePage = () => {
 	const handleBrowseClick = () => {
 		if (!user) return;
 
-		if (!user.isPro) {
+		if (capDeployment && !user.isPro) {
 			setUpgradeModalOpen(true);
 			return;
 		}
@@ -113,8 +118,10 @@ export const ImportFilePage = () => {
 					<FontAwesomeIcon className="size-3" icon={faArrowLeft} />
 					Back to Import
 				</Link>
-				<h1 className="text-2xl font-bold text-[#163760]">Upload File</h1>
-				<p className="mt-1 text-sm text-[#3C7486]">
+				<h1 className="text-2xl font-bold text-[#163760] dark:text-gray-12">
+					Upload File
+				</h1>
+				<p className="mt-1 text-sm text-[#3C7486] dark:text-gray-10">
 					Upload a video file from your device.
 				</p>
 			</div>
@@ -129,15 +136,15 @@ export const ImportFilePage = () => {
 				onDrop={handleDrop}
 				className={`relative flex flex-col items-center justify-center w-full max-w-2xl rounded-xl border-2 border-dashed transition-all duration-200 py-16 px-8 ${
 					isUploading
-						? "border-[#D8E7EB] bg-[#EDF5F7] cursor-not-allowed"
+						? "border-[#D8E7EB] bg-[#EDF5F7] cursor-not-allowed dark:border-gray-4 dark:bg-gray-3"
 						: isDragOver
-							? "border-[#63A1B4] bg-[#EDF5F7]"
-							: "border-[#D8E7EB] bg-white/70 hover:border-[#63A1B4] hover:bg-[#F7FBFC]"
+							? "border-[#63A1B4] bg-[#EDF5F7] dark:border-gray-5 dark:bg-gray-3"
+							: "border-[#D8E7EB] bg-white/70 hover:border-[#63A1B4] hover:bg-[#F7FBFC] dark:border-gray-4 dark:bg-gray-2 dark:hover:border-gray-5 dark:hover:bg-gray-3"
 				}`}
 			>
 				{isUploading ? (
 					<div className="flex flex-col items-center gap-4">
-						<div className="flex items-center justify-center size-16 rounded-full bg-[#EDF5F7]">
+						<div className="flex items-center justify-center size-16 rounded-full bg-[#EDF5F7] dark:bg-gray-3">
 							<div className="size-6 border-2 border-[#D8E7EB] border-t-[#163760] rounded-full animate-spin" />
 						</div>
 						<div className="flex flex-col items-center gap-1">
@@ -154,7 +161,7 @@ export const ImportFilePage = () => {
 					</div>
 				) : (
 					<div className="flex flex-col items-center gap-4">
-						<div className="flex items-center justify-center size-16 rounded-full bg-[#EDF5F7] text-[#163760]">
+						<div className="flex items-center justify-center size-16 rounded-full bg-[#EDF5F7] text-[#163760] dark:bg-gray-3 dark:text-gray-12">
 							<FontAwesomeIcon className="size-6" icon={faUpload} />
 						</div>
 						<div className="flex flex-col items-center gap-1">

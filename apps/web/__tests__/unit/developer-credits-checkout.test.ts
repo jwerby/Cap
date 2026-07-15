@@ -74,6 +74,7 @@ const mockStripe = {
 };
 
 vi.mock("@cap/utils", () => ({
+	isCapDeployment: (flag: unknown) => flag === "true",
 	STRIPE_DEVELOPER_CREDITS_PRODUCT_ID: {
 		development: "prod_dev_test",
 		production: "prod_live_test",

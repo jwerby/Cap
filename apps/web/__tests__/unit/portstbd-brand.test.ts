@@ -234,7 +234,7 @@ describe("PORTSTBD_BRAND", () => {
 		expect(sources.desktopVideoApi).toMatch(
 			/subject: `Your first \$\{PORTSTBD_BRAND\.companyName\} share link is ready`,/,
 		);
-		expect(sources.desktopVideoApi).toContain("marketing: isCapDeployment");
+		expect(sources.desktopVideoApi).toContain("marketing: capDeployment");
 		expect(sources.desktopVideoApi).toContain(
 			"PORTSTBD_BRAND.recordingTitleSuffix",
 		);

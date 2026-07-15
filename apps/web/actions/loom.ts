@@ -19,7 +19,7 @@ import {
 	videoUploads,
 } from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub, userIsPro } from "@cap/utils";
+import { dub, isCapDeployment, userIsPro } from "@cap/utils";
 import { Storage } from "@cap/web-backend";
 import {
 	type Organisation,
@@ -84,16 +84,19 @@ const MAX_LOOM_SPACE_NAME_LENGTH = 255;
 const LOOM_IMPORT_RATE_LIMIT_ID = "rl_loom_import_per_user";
 const LOOM_IMPORT_RATE_LIMIT_ERROR =
 	"Too many Loom imports started. Please wait a few minutes, then try again.";
-const LOOM_CSV_LIMIT_ERROR = `CSV imports are limited to ${MAX_LOOM_CSV_ROWS} rows at a time. Contact support to raise this limit.`;
+const LOOM_CSV_LIMIT_ERROR = `CSV imports are limited to ${MAX_LOOM_CSV_ROWS} rows at a time.`;
 
 async function createLoomImportRateLimitCheck(userId: User.UserId) {
 	if (NODE_ENV !== "production") return async () => false;
 
 	const headersList = await headers();
-	const request = new Request("https://cap.so/api/loom-import-rate-limit", {
-		method: "POST",
-		headers: headersList,
-	});
+	const request = new Request(
+		`${serverEnv().WEB_URL}/api/loom-import-rate-limit`,
+		{
+			method: "POST",
+			headers: headersList,
+		},
+	);
 
 	return async () => {
 		const { rateLimited } = await checkRateLimit(LOOM_IMPORT_RATE_LIMIT_ID, {
@@ -406,7 +409,10 @@ async function importLoomVideoForOwner({
 
 	const rawFileKey = `${ownerId}/${videoId}/raw-upload.mp4`;
 
-	if (buildEnv.NEXT_PUBLIC_IS_CAP && NODE_ENV === "production") {
+	if (
+		isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) &&
+		NODE_ENV === "production"
+	) {
 		await dub()
 			.links.create({
 				url: `${serverEnv().WEB_URL}/s/${videoId}`,

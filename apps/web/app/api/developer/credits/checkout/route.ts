@@ -5,7 +5,11 @@ import {
 	users,
 } from "@cap/database/schema";
 import { buildEnv, serverEnv } from "@cap/env";
-import { STRIPE_DEVELOPER_CREDITS_PRODUCT_ID, stripe } from "@cap/utils";
+import {
+	isCapDeployment,
+	STRIPE_DEVELOPER_CREDITS_PRODUCT_ID,
+	stripe,
+} from "@cap/utils";
 import { zValidator } from "@hono/zod-validator";
 import { and, eq, isNull } from "drizzle-orm";
 import { Hono } from "hono";
@@ -106,7 +110,9 @@ app.post(
 							currency: "usd",
 							product:
 								STRIPE_DEVELOPER_CREDITS_PRODUCT_ID[
-									buildEnv.NEXT_PUBLIC_IS_CAP ? "production" : "development"
+									isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)
+										? "production"
+										: "development"
 								],
 							unit_amount: amountCents,
 						},

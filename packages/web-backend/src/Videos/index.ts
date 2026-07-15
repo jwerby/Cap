@@ -1,6 +1,6 @@
 import * as Db from "@cap/database/schema";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
-import { dub, PORTSTBD_BRAND } from "@cap/utils";
+import { dub, isCapDeployment, PORTSTBD_BRAND } from "@cap/utils";
 import { CurrentUser, type Folder, Policy, Video } from "@cap/web-domain";
 import * as Dz from "drizzle-orm";
 import { Array, Effect, Exit, Option } from "effect";
@@ -445,7 +445,10 @@ export class Videos extends Effect.Service<Videos>()("Videos", {
 
 					const shareUrl = `${serverEnv().WEB_URL}/s/${videoId}`;
 
-					if (buildEnv.NEXT_PUBLIC_IS_CAP && NODE_ENV === "production")
+					if (
+						isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) &&
+						NODE_ENV === "production"
+					)
 						yield* Effect.tryPromise(() =>
 							dub().links.create({
 								url: shareUrl,

@@ -9,7 +9,11 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@cap/ui";
-import { calculateStrokeDashoffset, getProgressCircleConfig } from "@cap/utils";
+import {
+	calculateStrokeDashoffset,
+	getProgressCircleConfig,
+	isCapDeployment,
+} from "@cap/utils";
 import type { SpaceRuleSource, ViewerSettingKey } from "@cap/web-backend";
 import type { ImageUpload, Video } from "@cap/web-domain";
 import { HttpClient } from "@effect/platform";
@@ -155,6 +159,7 @@ export const CapCard = ({
 	const effectivePasswordProtected =
 		passwordProtected || Boolean(cap.hasInheritedPassword);
 	const { webUrl } = usePublicEnv();
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 
 	const [copyPressed, setCopyPressed] = useState(false);
 	const [isDragging, setIsDragging] = useState(false);
@@ -347,9 +352,9 @@ export const CapCard = ({
 		handleCopy(
 			NODE_ENV === "development"
 				? `${webUrl}/s/${cap.id}`
-				: buildEnv.NEXT_PUBLIC_IS_CAP && customDomain && domainVerified
+				: capDeployment && customDomain && domainVerified
 					? `https://${customDomain}/s/${cap.id}`
-					: buildEnv.NEXT_PUBLIC_IS_CAP && !customDomain && !domainVerified
+					: capDeployment && !customDomain && !domainVerified
 						? `https://cap.link/${cap.id}`
 						: `${webUrl}/s/${cap.id}`,
 		);

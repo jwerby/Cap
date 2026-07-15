@@ -1,6 +1,8 @@
 "use client";
 
+import { buildEnv } from "@cap/env";
 import { Button, Input, Label, Select } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import type { Organisation } from "@cap/web-domain";
 import {
 	ChevronRightIcon,
@@ -87,6 +89,7 @@ export function OrganizationStorageIntegrations({
 }: {
 	initialSettings: OrganizationStorageSettings;
 }) {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const router = useRouter();
 	const { user, setUpgradeModalOpen } = useDashboardContext();
 	const [settings, setSettings] = useState(initialSettings);
@@ -122,7 +125,7 @@ export function OrganizationStorageIntegrations({
 	}, [initialSettings]);
 
 	const requirePro = () => {
-		if (user.isPro) return true;
+		if (!capDeployment || user.isPro) return true;
 		setUpgradeModalOpen(true);
 		return false;
 	};
@@ -139,7 +142,11 @@ export function OrganizationStorageIntegrations({
 				toast.success(successMessage);
 				router.refresh();
 			} catch (error) {
-				if (error instanceof Error && error.message === proRequiredMessage) {
+				if (
+					capDeployment &&
+					error instanceof Error &&
+					error.message === proRequiredMessage
+				) {
 					setUpgradeModalOpen(true);
 					return;
 				}
@@ -214,7 +221,11 @@ export function OrganizationStorageIntegrations({
 			setFolderBrowserFolders(folders);
 			setFolderBrowserOpen(true);
 		} catch (error) {
-			if (error instanceof Error && error.message === proRequiredMessage) {
+			if (
+				capDeployment &&
+				error instanceof Error &&
+				error.message === proRequiredMessage
+			) {
 				setUpgradeModalOpen(true);
 				return;
 			}
@@ -357,14 +368,16 @@ export function OrganizationStorageIntegrations({
 					<div className="border-t border-gray-3 px-3.5 py-4">
 						<p className="text-[12px] text-gray-10 mb-4">
 							Connect your own bucket for full control.{" "}
-							<a
-								href="https://cap.so/docs/s3-config"
-								target="_blank"
-								rel="noopener noreferrer"
-								className="underline text-gray-12 hover:text-gray-11"
-							>
-								Setup guide
-							</a>
+							{capDeployment && (
+								<a
+									href="https://cap.so/docs/s3-config"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="underline text-gray-12 hover:text-gray-11"
+								>
+									Setup guide
+								</a>
+							)}
 						</p>
 						<div className="grid gap-3 md:grid-cols-2">
 							<div className="flex flex-col gap-1">

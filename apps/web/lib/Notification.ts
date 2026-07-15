@@ -4,7 +4,7 @@ import { FirstView } from "@cap/database/emails/first-view";
 import { nanoId } from "@cap/database/helpers";
 import { comments, notifications, users, videos } from "@cap/database/schema";
 import { buildEnv, serverEnv } from "@cap/env";
-import { PORTSTBD_BRAND } from "@cap/utils";
+import { isCapDeployment, PORTSTBD_BRAND } from "@cap/utils";
 import type { Notification, NotificationBase } from "@cap/web-api-contract";
 import { type Comment, User, Video } from "@cap/web-domain";
 import { and, eq, gte, isNull, sql } from "drizzle-orm";
@@ -374,7 +374,7 @@ export async function sendFirstViewEmail(
 			viewerName = viewer?.name || viewer?.email || "Someone";
 		}
 
-		const videoUrl = buildEnv.NEXT_PUBLIC_IS_CAP
+		const videoUrl = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)
 			? `https://cap.link/${params.videoId}`
 			: `${serverEnv().WEB_URL}/s/${params.videoId}`;
 

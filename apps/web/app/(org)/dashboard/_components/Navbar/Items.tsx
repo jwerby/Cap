@@ -17,7 +17,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@cap/ui";
-import { classNames, PORTSTBD_BRAND } from "@cap/utils";
+import { classNames, isCapDeployment, PORTSTBD_BRAND } from "@cap/utils";
 import {
 	faBuilding,
 	faCircleInfo,
@@ -60,12 +60,12 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 	const pathname = usePathname();
 	const [open, setOpen] = useState(false);
 	const { user, sidebarCollapsed, userCapsCount } = useDashboardContext();
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 
 	const DEVELOPER_DASHBOARD_ALLOWED_EMAILS = ["richie@cap.so"];
 
 	const showDeveloperDashboard =
-		buildEnv.NEXT_PUBLIC_IS_CAP &&
-		DEVELOPER_DASHBOARD_ALLOWED_EMAILS.includes(user.email);
+		capDeployment && DEVELOPER_DASHBOARD_ALLOWED_EMAILS.includes(user.email);
 
 	const manageNavigation = [
 		{
@@ -163,7 +163,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 								duration: 0.2,
 							}}
 							className={clsx(
-								"mt-1.5 mx-auto rounded-xl cursor-pointer border border-[#D8E7EB] bg-white/65 shadow-[0_12px_28px_-24px_#163760]",
+								"mt-1.5 mx-auto rounded-xl cursor-pointer border border-[#D8E7EB] bg-white/65 text-[#163760] shadow-[0_12px_28px_-24px_#163760] dark:border-gray-4 dark:bg-gray-2 dark:text-gray-12",
 								sidebarCollapsed ? "w-fit px-2 py-0.5" : "w-full p-2.5",
 							)}
 						>
@@ -351,7 +351,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 											},
 										}}
 										layoutId="navlinks"
-										className="absolute h-[36px] w-full rounded-xl pointer-events-none bg-[#D8E7EB]"
+										className="absolute h-[36px] w-full rounded-xl pointer-events-none bg-[#D8E7EB] dark:bg-gray-3"
 									/>
 								)}
 
@@ -375,7 +375,7 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 						toggleMobileNav={() => toggleMobileNav?.()}
 						subscribed={user.isPro}
 					/>
-					{buildEnv.NEXT_PUBLIC_IS_CAP && (
+					{capDeployment && (
 						<div className="flex justify-center items-center mt-2">
 							<Link
 								href="/dashboard/refer"
@@ -471,7 +471,7 @@ const NavItem = ({
 						: "px-3 py-2 w-full",
 					isPathActive(href, matchChildren)
 						? "bg-transparent pointer-events-none"
-						: "hover:bg-white/70",
+						: "hover:bg-white/70 dark:hover:bg-gray-2 dark:text-gray-11",
 					"flex overflow-hidden justify-start items-center tracking-tight rounded-xl outline-none",
 				)}
 			>

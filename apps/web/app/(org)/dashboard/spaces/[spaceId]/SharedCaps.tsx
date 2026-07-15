@@ -422,7 +422,13 @@ export const SharedCaps = ({
 					</div>
 					{(data.length > limit || data.length === limit || page !== 1) && (
 						<div className="mt-4">
-							<CapPagination currentPage={page} totalPages={totalPages} />
+							<CapPagination
+								currentPage={page}
+								totalPages={totalPages}
+								hrefForPage={(targetPage) =>
+									`/dashboard/spaces/${spaceId}?page=${targetPage}`
+								}
+							/>
 						</div>
 					)}
 				</>

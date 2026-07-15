@@ -3,6 +3,7 @@ import { sendEmail } from "@cap/database/emails/config";
 import { NewComment } from "@cap/database/emails/new-comment";
 import { comments, users, videos } from "@cap/database/schema";
 import { buildEnv, serverEnv } from "@cap/env";
+import { isCapDeployment } from "@cap/utils";
 import { and, eq, gt, ne } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
@@ -197,7 +198,7 @@ export async function POST(request: NextRequest) {
 		}
 
 		// Generate the video URL
-		const videoUrl = buildEnv.NEXT_PUBLIC_IS_CAP
+		const videoUrl = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP)
 			? `https://cap.link/${video.id}`
 			: `${serverEnv().WEB_URL}/s/${video.id}`;
 		console.log(`Generated video URL: ${videoUrl}`);

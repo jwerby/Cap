@@ -1,3 +1,4 @@
+import { buildEnv } from "@cap/env";
 import {
 	Button,
 	DialogContent,
@@ -5,6 +6,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "@cap/ui";
+import { isCapDeployment } from "@cap/utils";
 import {
 	faInfoCircle,
 	faWandMagicSparkles,
@@ -14,6 +16,7 @@ import { Fit, Layout, useRive } from "@rive-app/react-canvas";
 import { useDashboardContext, useTheme } from "../../Contexts";
 
 const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
+	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { theme } = useTheme();
 	const { user, setUpgradeModalOpen } = useDashboardContext();
 
@@ -33,11 +36,13 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 			className="w-[calc(100%-20px)] max-w-[500px]"
 		>
 			<DialogHeader icon={<FontAwesomeIcon icon={faInfoCircle} />}>
-				<DialogTitle className="flex gap-2 items-center text-lg font-bold text-[#163760]">
+				<DialogTitle className="flex gap-2 items-center text-lg font-bold text-[#163760] dark:text-gray-12">
 					Watch AI
-					<span className="inline-flex items-center text-xs font-bold px-2 py-0.5 rounded-full bg-[#163760] text-white">
-						Pro
-					</span>
+					{capDeployment && (
+						<span className="inline-flex items-center text-xs font-bold px-2 py-0.5 rounded-full bg-[#163760] text-white">
+							Pro
+						</span>
+					)}
 				</DialogTitle>
 			</DialogHeader>
 			<div className="p-8">
@@ -63,7 +68,7 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 							>
 								<FontAwesomeIcon
 									icon={faWandMagicSparkles}
-									className="mr-2 mt-0.5 text-[#163760] size-3"
+									className="mr-2 mt-0.5 text-[#163760] size-3 dark:text-gray-12"
 								/>
 								<span className="text-gray-12">{feature}</span>
 							</li>
@@ -72,7 +77,7 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 				</div>
 			</div>
 			<DialogFooter>
-				{!user.isPro ? (
+				{capDeployment && !user.isPro ? (
 					<div className="flex gap-2 ml-auto">
 						<Button
 							autoFocus={false}
