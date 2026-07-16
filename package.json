@@ -65,5 +65,15 @@
 	"name": "cap",
 	"engines": {
 		"node": ">=20"
+	},
+	"pnpm": {
+		"overrides": {
+			"form-data": ">=4.0.4",
+			"fast-xml-parser": ">=5.3.5",
+			"protobufjs": ">=7.5.5",
+			"vitest": ">=3.2.6",
+			"shell-quote": ">=1.8.4",
+			"@xhmikosr/decompress": ">=10.2.1"
+		}
 	}
 }
