@@ -3,41 +3,52 @@
 import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 
 export function RecordingInProgressOverlay({
-	onConfirmStopped,
 	className,
+	onStoppedRecording,
+	isConfirmingStopped = false,
+	confirmStoppedError,
+	variant = "solid",
 }: {
-	onConfirmStopped: () => void;
 	className?: string;
+	onStoppedRecording: () => void;
+	isConfirmingStopped?: boolean;
+	confirmStoppedError?: string | null;
+	variant?: "solid" | "overlay";
 }) {
+	const backgroundClassName =
+		variant === "overlay" ? "bg-black/70 backdrop-blur-[1px]" : "bg-black";
+
 	return (
 		<div
-			className={`flex flex-col gap-3 justify-center items-center bg-black rounded-xl ${className ?? ""}`}
+			className={`flex flex-col gap-3 justify-center items-center rounded-xl ${backgroundClassName} ${className ?? ""}`}
 		>
-			<div className="flex gap-2.5 items-center">
-				<span className="relative flex size-3">
-					<span className="absolute inline-flex w-full h-full bg-red-500 rounded-full opacity-75 animate-ping" />
-					<span className="relative inline-flex rounded-full size-3 bg-red-500" />
-				</span>
-				<span className="text-white font-semibold text-base sm:text-lg">
-					Recording in progress
-				</span>
-			</div>
-			<p className="text-white/50 text-xs sm:text-sm text-center max-w-xs leading-relaxed">
-				This video is still being recorded and will be available once the
-				recording has stopped.
-			</p>
+			<p className="text-lg text-white/70">Recording in progress</p>
 			<button
 				type="button"
-				onClick={onConfirmStopped}
-				className="mt-1 text-white/30 text-xs hover:text-white/60 transition-colors underline underline-offset-2"
+				onClick={onStoppedRecording}
+				disabled={isConfirmingStopped}
+				className="text-sm text-white bg-transparent border border-white/20 hover:bg-white/10 transition-colors rounded-lg py-2 px-4"
 			>
-				I have stopped recording
+				{isConfirmingStopped
+					? "Finishing recording..."
+					: "I have stopped recording"}
 			</button>
+			{confirmStoppedError && (
+				<p className="text-xs text-red-200/80 text-center max-w-xs">
+					{confirmStoppedError}
+				</p>
+			)}
 		</div>
 	);
 }
 
-export function PreparingVideoOverlay({ className }: { className?: string }) {
+export function PreparingVideoOverlay({
+	className,
+	label = "Preparing video...",
+}: {
+	className?: string;
+	label?: string;
+}) {
 	return (
 		<div
 			className={`flex flex-col gap-3 justify-center items-center bg-black rounded-xl ${className ?? ""}`}
@@ -47,7 +58,7 @@ export function PreparingVideoOverlay({ className }: { className?: string }) {
 				markClassName="text-xl sm:text-2xl"
 				label="Preparing video"
 			/>
-			<p className="text-white/50 text-sm">Preparing video...</p>
+			<p className="text-white/50 text-sm">{label}</p>
 		</div>
 	);
 }

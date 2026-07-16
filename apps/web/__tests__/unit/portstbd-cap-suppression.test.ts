@@ -76,7 +76,7 @@ const SCAN_RULES: ScanRule[] = [
 	},
 	{
 		name: "cap-license-email-from",
-		pattern: /no-reply@auth\.cap\.so|richie@send\.cap\.so/,
+		pattern: /no-reply@auth\.cap\.so|richie@send\.cap\.so|richie@cap\.so/,
 		allowlist: [],
 	},
 	{
@@ -198,12 +198,13 @@ async function scanTree(rootDir: string): Promise<Hit[]> {
 		for (const rule of SCAN_RULES) {
 			if (isAllowlisted(rule, filePath)) continue;
 
-			for (let i = 0; i < lines.length; i++) {
-				if (rule.pattern.test(lines[i])) {
+			for (const [idx, rawLine] of lines.entries()) {
+				const line = rawLine ?? "";
+				if (rule.pattern.test(line)) {
 					hits.push({
 						file: relative(rootDir, filePath),
-						line: i + 1,
-						text: lines[i].trim(),
+						line: idx + 1,
+						text: line.trim(),
 						rule: rule.name,
 					});
 				}
@@ -215,23 +216,9 @@ async function scanTree(rootDir: string): Promise<Hit[]> {
 }
 
 const KNOWN_FINDINGS = [
-	"apps/desktop/src-tauri/src/general_settings.rs\tcap-server-url-default",
-	"apps/desktop/src-tauri/src/general_settings.rs\tcap-trusted-origin",
-	"apps/desktop/src-tauri/src/lib.rs\tcap-server-url-default",
-	"apps/desktop/src-tauri/src/lib.rs\tcap-trusted-origin",
 	"apps/desktop/src-tauri/src/posthog.rs\tcap-trusted-origin",
-	"apps/desktop/src-tauri/src/web_api.rs\tcap-server-url-default",
-	"apps/desktop/src-tauri/src/web_api.rs\tcap-trusted-origin",
-	"apps/desktop/src-tauri/tauri.prod.conf.json\tcrabnebula-cap-updater",
 	"apps/desktop/src/routes/(window-chrome)/onboarding.tsx\tcap-short-link-domain",
 	"apps/desktop/src/routes/(window-chrome)/settings/feedback.tsx\tcap-short-link-domain",
-	"apps/desktop/src/routes/(window-chrome)/settings/general.tsx\tcap-trusted-origin",
-	"apps/desktop/src/utils/auth.ts\tcap-server-url-default",
-	"apps/desktop/src/utils/auth.ts\tcap-trusted-origin",
-	"apps/desktop/src/utils/env.ts\tcap-server-url-default",
-	"apps/desktop/src/utils/env.ts\tcap-trusted-origin",
-	"apps/desktop/src/utils/web-api.ts\tcap-license-server",
-	"apps/desktop/src/utils/web-api.ts\tcap-short-link-domain",
 	"apps/web/actions/loom.ts\tcap-short-link-domain",
 	"apps/web/actions/video/create-for-processing.ts\tcap-short-link-domain",
 	"apps/web/actions/video/upload.ts\tcap-short-link-domain",
@@ -240,16 +227,13 @@ const KNOWN_FINDINGS = [
 	"apps/web/app/(org)/dashboard/settings/organization/components/CustomDomainDialog/CustomDomainDialog.tsx\tcap-short-link-domain",
 	"apps/web/app/api/desktop/[...route]/root.ts\tcap-license-email-from",
 	"apps/web/app/api/desktop/[...route]/video.ts\tcap-short-link-domain",
-	"apps/web/app/api/email/new-comment/route.ts\tcap-short-link-domain",
 	"apps/web/app/embed/[videoId]/_components/EmbedVideo.tsx\tcap-trusted-origin",
 	"apps/web/app/s/[videoId]/_components/ShareHeader.tsx\tcap-short-link-domain",
 	"apps/web/app/s/[videoId]/_components/playback-source.ts\tcap-trusted-origin",
 	"apps/web/lib/Notification.ts\tcap-short-link-domain",
-	"apps/web/next.config.mjs\tcap-license-server",
 	"apps/web/next.config.mjs\tcap-short-link-domain",
 	"apps/web/proxy.ts\tcap-trusted-origin",
 	"apps/web/utils/cors.ts\tcap-trusted-origin",
-	"apps/web/utils/getBootstrapData.ts\tposthog-hardcoded-fallback",
 	"packages/database/emails/config.ts\tcap-license-email-from",
 	"packages/sdk-embed/src/vanilla/cap-embed.ts\tcap-trusted-origin",
 	"packages/sdk-recorder/src/index.ts\tcap-trusted-origin",

@@ -1,17 +1,25 @@
 import { getCurrentUser } from "@cap/database/auth/session";
+import { serverEnv } from "@cap/env";
 import { faArrowLeft } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { PortstbdAuthScaffold } from "@/components/PortstbdAuthScaffold";
+import { getSafeNextPath } from "../safe-next";
 import { LoginForm } from "./form";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoginPage() {
-	const session = await getCurrentUser();
+export default async function LoginPage(props: {
+	searchParams: Promise<{ next?: string | string[] }>;
+}) {
+	const [searchParams, session] = await Promise.all([
+		props.searchParams,
+		getCurrentUser(),
+	]);
+
 	if (session) {
-		redirect("/dashboard");
+		redirect(getSafeNextPath(searchParams.next, serverEnv().WEB_URL));
 	}
 	return (
 		<PortstbdAuthScaffold contentClassName="min-h-dvh items-center justify-center px-4 py-10">

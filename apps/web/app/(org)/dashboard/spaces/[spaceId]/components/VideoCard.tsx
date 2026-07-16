@@ -1,4 +1,8 @@
-import { faHome, faRecordVinyl } from "@fortawesome/free-solid-svg-icons";
+import {
+	faHome,
+	faImage,
+	faRecordVinyl,
+} from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { Fit, Layout, useRive } from "@rive-app/react-canvas";
 import clsx from "clsx";
@@ -55,14 +59,8 @@ const VideoCard: React.FC<VideoCardProps> = memo(
 			<button
 				type="button"
 				onClick={onToggle}
-				onKeyDown={(e) => {
-					if (e.key === "Enter" || e.key === " ") {
-						e.preventDefault();
-						onToggle();
-					}
-				}}
 				className={clsx(
-					"flex relative flex-col p-3 w-full h-full rounded-xl border transition-all duration-200 group",
+					"flex relative flex-col p-3 w-full h-full rounded-xl border text-left transition-all duration-200 group",
 					className,
 					isAlreadyInEntity && isSelected && "border-red-500",
 					isAlreadyInEntity && !isSelected && "border-blue-500",
@@ -142,7 +140,17 @@ const VideoCard: React.FC<VideoCardProps> = memo(
 						containerClass="!h-full !rounded-lg !border-b-0"
 						imageStatus={imageStatus}
 						setImageStatus={setImageStatus}
+						showPreview={video.isScreenshot !== true}
 					/>
+					{video.isScreenshot === true && (
+						<span
+							title="Screenshot"
+							className="absolute bottom-2 left-2 z-30 flex size-6 items-center justify-center rounded-full bg-black/60 text-white backdrop-blur-sm"
+						>
+							<FontAwesomeIcon icon={faImage} className="size-3" />
+							<span className="sr-only">Screenshot</span>
+						</span>
+					)}
 				</div>
 
 				<div className="space-y-2 min-h-fit">
@@ -186,7 +194,7 @@ const VideoCard: React.FC<VideoCardProps> = memo(
 									icon={faRecordVinyl}
 									className="size-3 text-gray-10"
 								/>
-								<p className="font-medium truncate text-gray-11">Recordings</p>
+								<p className="font-medium truncate text-gray-11">Caps</p>
 							</>
 						)}
 					</div>

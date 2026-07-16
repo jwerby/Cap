@@ -231,7 +231,7 @@ export const EmbedVideo = forwardRef<
 				<div className="relative w-screen h-screen rounded-xl">
 					{isActivelyRecording ? (
 						<RecordingInProgressOverlay
-							onConfirmStopped={() => setUserConfirmedStopped(true)}
+							onStoppedRecording={() => setUserConfirmedStopped(true)}
 							className="w-full h-full"
 						/>
 					) : isTransitioning ? (

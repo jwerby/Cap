@@ -136,34 +136,34 @@ vi.mock("drizzle-orm", () => ({
 	sql: sqlTagged,
 }));
 
-const effectPipeable = { pipe: (fn: (_v: unknown) => unknown) => fn({}) };
-const effectPipeableArray = {
-	pipe: (fn: (_v: unknown) => unknown) => fn([]),
-};
-
-vi.mock("effect", () => ({
-	Effect: {
-		all: vi.fn(() => effectPipeableArray),
-		gen: vi.fn(() => effectPipeable),
-		fn: vi.fn((_fn: unknown) => {
-			return (..._args: unknown[]) => ({
-				pipe: (pipeArg: (_v: unknown) => unknown) => pipeArg({}),
-				_tag: "Effect",
-			});
-		}),
-		map: vi.fn(),
-		flatMap: vi.fn(),
-		tapErrorCause: vi.fn(),
-		catchTags: vi.fn(),
-		logError: vi.fn(),
-		exit: vi.fn(),
-		fail: vi.fn(),
-	},
-	Array: {},
-	Exit: {
-		isSuccess: vi.fn(() => true),
-	},
-}));
+vi.mock("effect", async (importOriginal) => {
+	const actual = await importOriginal<typeof import("effect")>();
+	const effectPipeable = { pipe: (fn: (_v: unknown) => unknown) => fn({}) };
+	const effectPipeableArray = {
+		pipe: (fn: (_v: unknown) => unknown) => fn([]),
+	};
+	return {
+		...actual,
+		Effect: {
+			...actual.Effect,
+			all: vi.fn(() => effectPipeableArray),
+			gen: vi.fn(() => effectPipeable),
+			fn: vi.fn((_fn: unknown) => {
+				return (..._args: unknown[]) => ({
+					pipe: (pipeArg: (_v: unknown) => unknown) => pipeArg({}),
+					_tag: "Effect",
+				});
+			}),
+			map: vi.fn(),
+			flatMap: vi.fn(),
+			tapErrorCause: vi.fn(),
+			catchTags: vi.fn(),
+			logError: vi.fn(),
+			exit: vi.fn(),
+			fail: vi.fn(),
+		},
+	};
+});
 
 vi.mock("next/navigation", () => ({
 	redirect: vi.fn((url: string) => {
@@ -175,12 +175,9 @@ vi.mock("@/lib/server", () => ({
 	runPromise: vi.fn(() => Promise.resolve([])),
 }));
 
-vi.mock(
-	"/Users/jeff/DevelopmentProjects/Cap/apps/web/app/(org)/dashboard/caps/Caps",
-	() => ({
-		Caps: vi.fn(() => null),
-	}),
-);
+vi.mock("@/app/(org)/dashboard/caps/Caps", () => ({
+	Caps: vi.fn(() => null),
+}));
 
 import { getCurrentUser } from "@cap/database/auth/session";
 import { CAPS_PAGE_SIZE } from "@/app/(org)/dashboard/caps/caps-page-size";
@@ -209,9 +206,9 @@ function resetChain() {
 	//   where() call 3 (folders query)  → resolves to []
 	//   where() call 4 (org settings)   → returns mockDb (.limit(1) terminates)
 	mockDb.where
-		.mockResolvedValueOnce([{ count: 0 }])
+		.mockResolvedValueOnce([{ count: 0 }] as unknown as typeof mockDb)
 		.mockReturnValueOnce(mockDb)
-		.mockResolvedValueOnce([])
+		.mockResolvedValueOnce([] as unknown as typeof mockDb)
 		.mockReturnValueOnce(mockDb);
 
 	limitMock.mockReturnValueOnce(mockDb).mockResolvedValueOnce([]);

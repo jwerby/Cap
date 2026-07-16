@@ -48,6 +48,10 @@ import {
 } from "@/actions/loom";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
 import { UpgradeModal } from "@/components/UpgradeModal";
+import {
+	canManageOrganizationSettings,
+	getEffectiveOrganizationRole,
+} from "@/lib/permissions/roles";
 
 type Mode = "single" | "csv";
 
@@ -233,8 +237,15 @@ export const ImportLoomPage = () => {
 	const { user, activeOrganization } = useDashboardContext();
 	const router = useRouter();
 
-	const isOrganizationOwner =
-		!!user && user.id === activeOrganization?.organization.ownerId;
+	const currentMember = activeOrganization?.members.find(
+		(member) => member.userId === user?.id,
+	);
+	const currentRole = getEffectiveOrganizationRole({
+		userId: user?.id,
+		ownerId: activeOrganization?.organization.ownerId,
+		memberRole: currentMember?.role,
+	});
+	const canUseCsvImport = canManageOrganizationSettings(currentRole);
 
 	const [mode, setMode] = useState<Mode>("single");
 	const [upgradeModalOpen, setUpgradeModalOpen] = useState(
@@ -371,6 +382,13 @@ export const ImportLoomPage = () => {
 
 	const loadCsvFile = async (file: File) => {
 		if (!user) return;
+
+		if (!canUseCsvImport) {
+			toast.error(
+				"Only organization admins and owners can import Loom videos from a CSV.",
+			);
+			return;
+		}
 
 		if (capDeployment && !user.isPro) {
 			setUpgradeModalOpen(true);
@@ -518,7 +536,7 @@ export const ImportLoomPage = () => {
 							Import from Loom
 						</h1>
 						<p className="mt-1 max-w-xl text-sm text-[#3C7486] dark:text-gray-10">
-							{isOrganizationOwner
+							{canUseCsvImport
 								? "Bring a single Loom video into Port & Starboard Watch, or bulk import recordings for organization members from a CSV."
 								: "Paste a Loom share link to bring it into Port & Starboard Watch."}
 						</p>
@@ -527,7 +545,7 @@ export const ImportLoomPage = () => {
 			</div>
 
 			<div className="flex flex-col gap-6 w-full max-w-4xl">
-				{isOrganizationOwner && (
+				{canUseCsvImport && (
 					<div
 						role="tablist"
 						aria-label="Loom import mode"

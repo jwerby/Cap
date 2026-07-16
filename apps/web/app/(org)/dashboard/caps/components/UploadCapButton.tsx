@@ -40,7 +40,7 @@ export const UploadCapButton = ({
 				size={size}
 			>
 				<FontAwesomeIcon className="size-3.5" icon={faUpload} />
-				Import Video
+				Import Media
 			</Button>
 			<UpgradeModal
 				open={upgradeModalOpen}

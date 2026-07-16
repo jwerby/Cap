@@ -41,7 +41,7 @@ export const getBootstrapData = cache(async (): Promise<BootstrapData> => {
 	}
 
 	const client = new PostHog(phProjectAPIKey, {
-		host: buildEnv.NEXT_PUBLIC_POSTHOG_HOST || "https://app.posthog.com",
+		host: buildEnv.NEXT_PUBLIC_POSTHOG_HOST,
 		personalApiKey: serverEnv().POSTHOG_PERSONAL_API_KEY,
 	});
 

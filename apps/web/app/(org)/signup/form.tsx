@@ -22,6 +22,8 @@ import { getOrganizationSSOData } from "@/actions/organization/get-organization-
 import { trackEvent } from "@/app/utils/analytics";
 import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
 import { usePublicEnv } from "@/utils/public-env";
+import { getEmailCodeCooldownSeconds, requestEmailCode } from "../auth-email";
+import { getSafeNextPath } from "../safe-next";
 
 const MotionInput = motion(Input);
 const MotionLink = motion(Link);
@@ -48,6 +50,8 @@ export function SignupForm() {
 		null,
 	);
 	const theme = Cookies.get("theme") || "light";
+	const getNextPath = () =>
+		next ? getSafeNextPath(next, window.location.origin) : null;
 
 	useEffect(() => {
 		document.body.className = theme === "dark" ? "dark" : "light";
@@ -108,13 +112,14 @@ export function SignupForm() {
 	}, [emailSent]);
 
 	const handleGoogleSignIn = () => {
+		const nextPath = getNextPath();
 		trackEvent("auth_started", {
 			method: "google",
 			is_signup: true,
 			auth_surface: "signup",
 		});
 		signIn("google", {
-			...(next && next.length > 0 ? { callbackUrl: next } : {}),
+			...(nextPath ? { callbackUrl: nextPath } : {}),
 		});
 	};
 
@@ -251,68 +256,47 @@ export function SignupForm() {
 											ease: "easeInOut",
 											opacity: { delay: 0.05 },
 										}}
+										noValidate
 										onSubmit={async (e) => {
 											e.preventDefault();
-											if (!email) return;
 
-											if (lastEmailSentTime) {
-												const timeSinceLastRequest =
-													Date.now() - lastEmailSentTime;
-												const waitTime = 30000;
-												if (timeSinceLastRequest < waitTime) {
-													const remainingSeconds = Math.ceil(
-														(waitTime - timeSinceLastRequest) / 1000,
-													);
-													toast.error(
-														`Please wait ${remainingSeconds} seconds before requesting a new code`,
-													);
-													return;
-												}
+											const remainingSeconds =
+												getEmailCodeCooldownSeconds(lastEmailSentTime);
+											if (remainingSeconds > 0) {
+												toast.error(
+													`Please wait ${remainingSeconds} seconds before requesting a new code.`,
+												);
+												return;
 											}
 
 											setLoading(true);
-											trackEvent("auth_started", {
-												method: "email",
-												is_signup: true,
-												auth_surface: "signup",
-											});
-											const normalizedEmail = email.trim().toLowerCase();
-											signIn("email", {
-												email: normalizedEmail,
-												redirect: false,
-												...(next && next.length > 0
-													? { callbackUrl: next }
-													: {}),
-											})
-												.then((res) => {
-													setLoading(false);
-
-													if (res?.ok && !res?.error) {
-														setEmailSent(true);
-														setLastEmailSentTime(Date.now());
-														trackEvent("auth_email_sent", {
-															method: "email",
-															is_signup: true,
-															auth_surface: "signup",
-															email_domain: normalizedEmail.split("@")[1],
-														});
-														const params = new URLSearchParams({
-															email: normalizedEmail,
-															...(next && { next }),
-															lastSent: Date.now().toString(),
-														});
-														router.push(`/verify-otp?${params.toString()}`);
-													} else {
-														toast.error(
-															"Please wait 30 seconds before requesting a new code",
-														);
-													}
-												})
-												.catch((_error) => {
-													setEmailSent(false);
-													setLoading(false);
-													toast.error("Error sending email - try again?");
+											try {
+												const nextPath = getNextPath();
+												const normalizedEmail = await requestEmailCode({
+													email,
+													next: nextPath,
+													isSignup: true,
+													authSurface: "signup",
 												});
+												if (!normalizedEmail) return;
+
+												const sentAt = Date.now();
+												setEmailSent(true);
+												setLastEmailSentTime(sentAt);
+												const params = new URLSearchParams({
+													email: normalizedEmail,
+													...(nextPath && { next: nextPath }),
+													lastSent: sentAt.toString(),
+												});
+												router.push(`/verify-otp?${params.toString()}`);
+											} catch {
+												setEmailSent(false);
+												toast.error(
+													"Sign up is taking longer than expected. Check your connection or browser extensions, then try again.",
+												);
+											} finally {
+												setLoading(false);
+											}
 										}}
 										className="flex flex-col space-y-3"
 									>

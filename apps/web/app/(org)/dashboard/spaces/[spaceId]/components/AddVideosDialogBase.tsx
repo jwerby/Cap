@@ -7,6 +7,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 	Input,
+	LoadingSpinner,
 } from "@cap/ui";
 import type { Video } from "@cap/web-domain";
 import { faVideo } from "@fortawesome/free-solid-svg-icons";
@@ -19,16 +20,39 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import * as z from "zod";
-import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import VirtualizedVideoGrid from "./VirtualizedVideoGrid";
 
-type ActionResult<T> =
-	| { success: true; data: T; error?: never; message?: string }
-	| { success: false; data?: never; error?: string; message?: string };
+export interface VideoData {
+	id: Video.VideoId;
+	ownerId: string;
+	name: string;
+	createdAt: Date;
+	isScreenshot?: boolean;
+	totalComments: number;
+	totalReactions: number;
+	ownerName: string;
+	folderName?: string | null;
+	folderColor?: "normal" | "blue" | "red" | "yellow" | null;
+	metadata?: {
+		customCreatedAt?: string;
+	};
+}
 
 type UpdateVideosResult = {
 	success: boolean;
 	message?: string;
+	error?: string;
+};
+
+type VideosResult = {
+	success: boolean;
+	data?: VideoData[];
+	error?: string;
+};
+
+type VideoIdsResult = {
+	success: boolean;
+	data?: Video.VideoId[];
 	error?: string;
 };
 
@@ -46,23 +70,8 @@ interface AddVideosDialogBaseProp<T> {
 		entityId: T,
 		videoIds: Video.VideoId[],
 	) => Promise<UpdateVideosResult>;
-	getVideos: () => Promise<ActionResult<VideoData[]>>;
-	getEntityVideoIds: () => Promise<ActionResult<Video.VideoId[]>>;
-}
-
-export interface VideoData {
-	id: Video.VideoId;
-	ownerId: string;
-	name: string;
-	createdAt: Date;
-	totalComments: number;
-	totalReactions: number;
-	ownerName: string;
-	folderName?: string | null;
-	folderColor?: "normal" | "blue" | "red" | "yellow" | null;
-	metadata?: {
-		customCreatedAt?: string;
-	};
+	getVideos: () => Promise<VideosResult>;
+	getEntityVideoIds: () => Promise<VideoIdsResult>;
 }
 
 const formSchema = z.object({
@@ -97,7 +106,7 @@ function AddVideosDialogBase<T>({
 		queryKey: ["user-videos"],
 		queryFn: async () => {
 			const result = await getVideos();
-			if (!result.success) {
+			if (!result.success || !result.data) {
 				throw new Error(result.error ?? "Failed to fetch videos");
 			}
 			return result.data;
@@ -111,8 +120,8 @@ function AddVideosDialogBase<T>({
 		queryKey: ["entity-video-ids", entityId, entityName],
 		queryFn: async () => {
 			const result = await getEntityVideoIds();
-			if (!result.success) {
-				throw new Error(result.error ?? "Failed to fetch video IDs");
+			if (!result.success || !result.data) {
+				throw new Error(result.error ?? "Failed to fetch video ids");
 			}
 			return result.data;
 		},
@@ -131,8 +140,8 @@ function AddVideosDialogBase<T>({
 			toAdd: Video.VideoId[];
 			toRemove: Video.VideoId[];
 		}) => {
-			let addResult: UpdateVideosResult = { success: true, message: "" };
-			let removeResult: UpdateVideosResult = { success: true, message: "" };
+			let addResult: UpdateVideosResult = { success: true };
+			let removeResult: UpdateVideosResult = { success: true };
 			if (toAdd.length > 0) {
 				addResult = await addVideos(entityId, toAdd);
 			}
@@ -281,11 +290,7 @@ function AddVideosDialogBase<T>({
 					<div className="flex-1 w-full h-64">
 						{isLoading ? (
 							<div className="flex justify-center items-center w-full h-64">
-								<PortstbdSpinner
-									className="size-10"
-									markClassName="text-2xl"
-									label="Loading videos"
-								/>
+								<LoadingSpinner size={36} />
 							</div>
 						) : filteredVideos.length === 0 ? (
 							<div className="flex flex-col justify-center items-center h-24 text-center">

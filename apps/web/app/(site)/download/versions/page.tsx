@@ -13,10 +13,11 @@ import {
 
 export const metadata: Metadata = {
 	title: "All Versions — Cap",
-	description: "Download previous versions of Cap for macOS and Windows.",
+	description:
+		"Download previous versions of Cap for macOS, Windows, and Linux.",
 };
 
-export const revalidate = 3600;
+export const revalidate = 60;
 
 function DownloadLinks({
 	downloads,
@@ -48,6 +49,13 @@ function DownloadLinks({
 				>
 					<WindowsIcon />
 					Windows
+				</a>
+				<a
+					href="/download/linux-deb"
+					className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-gray-3 text-gray-12 hover:bg-gray-4 transition-colors"
+				>
+					<LinuxIcon />
+					Linux .deb
 				</a>
 			</div>
 		);
@@ -86,6 +94,15 @@ function DownloadLinks({
 					Windows
 				</a>
 			)}
+			{downloads["linux-deb"] && (
+				<a
+					href={downloads["linux-deb"]}
+					className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-md bg-gray-3 text-gray-12 hover:bg-gray-4 transition-colors"
+				>
+					<LinuxIcon />
+					Linux .deb
+				</a>
+			)}
 		</div>
 	);
 }
@@ -112,6 +129,19 @@ function WindowsIcon() {
 			fill="currentColor"
 		>
 			<path d="M0,0H11.377V11.372H0ZM12.623,0H24V11.372H12.623ZM0,12.623H11.377V24H0Zm12.623,0H24V24H12.623" />
+		</svg>
+	);
+}
+
+function LinuxIcon() {
+	return (
+		<svg
+			aria-hidden="true"
+			className="w-4 h-4"
+			viewBox="0 0 24 24"
+			fill="currentColor"
+		>
+			<path d="M12 2a4.5 4.5 0 0 0-4.5 4.5c0 1.35.4 2.4.84 3.52.24.62.5 1.27.7 2.02C6.53 13.5 5 16.14 5 19.5 5 21.16 6.34 22 8 22c1.16 0 2.26-.5 3.06-1.28.58.18 1.3.28 2.06.28s1.48-.1 2.06-.28C15.98 21.5 17.08 22 18.24 22 19.9 22 21 21.16 21 19.5c0-3.36-1.53-6-4.04-7.46.2-.75.46-1.4.7-2.02.44-1.12.84-2.17.84-3.52A4.5 4.5 0 0 0 14 2h-2Zm-1.5 4.75a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm4.5 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0ZM10.2 9h3.6c-.27.47-.92 1-1.8 1s-1.53-.53-1.8-1ZM8 20.5c-.92 0-1.5-.36-1.5-1 0-2.5 1.02-4.55 2.76-5.72.2 1.66.58 3.6 1.24 5.08-.56.94-1.52 1.64-2.5 1.64Zm10.24 0c-.98 0-1.94-.7-2.5-1.64.66-1.48 1.04-3.42 1.24-5.08 1.74 1.17 2.52 3.22 2.52 5.72 0 .64-.34 1-1.26 1Z" />
 		</svg>
 	);
 }
@@ -189,7 +219,7 @@ export default async function VersionsPage() {
 						All Versions
 					</h1>
 					<p className="text-gray-10">
-						Download previous versions of Cap for macOS and Windows.
+						Download previous versions of Cap for macOS, Windows, and Linux.
 					</p>
 				</div>
 

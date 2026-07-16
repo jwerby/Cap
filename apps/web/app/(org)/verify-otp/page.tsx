@@ -1,8 +1,10 @@
 import { getCurrentUser } from "@cap/database/auth/session";
+import { serverEnv } from "@cap/env";
 import { PORTSTBD_BRAND } from "@cap/utils";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { PortstbdAuthScaffold } from "@/components/PortstbdAuthScaffold";
+import { getSafeNextPath } from "../safe-next";
 import { VerifyOTPForm } from "./form";
 
 export const metadata = {
@@ -16,7 +18,7 @@ export default async function VerifyOTPPage(props: {
 	const user = await getCurrentUser();
 
 	if (user) {
-		redirect(searchParams.next || "/dashboard");
+		redirect(getSafeNextPath(searchParams.next, serverEnv().WEB_URL));
 	}
 
 	if (!searchParams.email) {

@@ -6,14 +6,27 @@ import {
 import { fetch } from "@tauri-apps/plugin-http";
 import { type ApiFetcher, initClient } from "@ts-rest/core";
 
-import { authStore } from "~/store";
+import { authStore, generalSettingsStore } from "~/store";
 import { clientEnv } from "./env";
+import { resolveServerRequestPath } from "./server-url-routing";
+
+export async function getConfiguredServerUrl() {
+	return (
+		(await generalSettingsStore.get())?.serverUrl ?? clientEnv.VITE_SERVER_URL
+	);
+}
+
+async function resolveRequestPath(path: string) {
+	const serverUrl = await getConfiguredServerUrl();
+	return resolveServerRequestPath(path, serverUrl, clientEnv.VITE_SERVER_URL);
+}
 
 const api: ApiFetcher = async (args) => {
 	const bypassSecret = import.meta.env.VITE_VERCEL_AUTOMATION_BYPASS_SECRET;
 	if (bypassSecret) args.headers["x-vercel-protection-bypass"] = bypassSecret;
 
-	const resp = await fetch(args.path, args);
+	const path = await resolveRequestPath(args.path);
+	const resp = await fetch(path, args);
 
 	let body: unknown;
 
@@ -36,10 +49,9 @@ export const apiClient = initClient(contract, {
 	api,
 });
 export const licenseApiClient = initClient(licenseContract, {
-	baseUrl: `https://l.cap.so/api`,
+	baseUrl: `${clientEnv.VITE_SERVER_URL}/api`,
 	api,
 });
-
 export const orgCustomDomainClient = initClient(orgCustomDomainContract, {
 	baseUrl: `${clientEnv.VITE_SERVER_URL}/api/desktop`,
 	api,
@@ -62,7 +74,7 @@ export async function protectedHeaders() {
 	const { authorization } = await maybeProtectedHeaders();
 	if (!authorization)
 		throw new Error(
-			"Please sign in to continue. Alternatively, email hello@cap.so or join our Discord at cap.link/discord",
+			"Please sign in to continue. Visit watch.portstbd.com/settings to get your API key.",
 		);
 	return { authorization };
 }

@@ -9,6 +9,7 @@ import { spaceMembers, spaces } from "@cap/database/schema";
 import { userIsPro } from "@cap/utils";
 import {
 	type ImageUpload,
+	Organisation,
 	Space,
 	SpaceMemberId,
 	type SpaceMemberRole,
@@ -16,6 +17,7 @@ import {
 } from "@cap/web-domain";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { isOrganizationOwnerPro } from "@/lib/org-pro";
 import {
 	getSpaceSettingsFromFormData,
 	hasProSpaceSettingsEnabled,
@@ -46,6 +48,7 @@ export async function createSpace(
 		const name = formData.get("name") as string;
 		const passwordEnabled = formData.get("passwordEnabled") === "true";
 		const password = formData.get("password") as string | null;
+		const publicEnabled = formData.get("public") === "true";
 		const settings = getSpaceSettingsFromFormData(formData);
 		const canUseProFeatures = userIsPro(user);
 
@@ -74,6 +77,18 @@ export async function createSpace(
 			return {
 				success: false,
 				error: "Upgrade required to change these viewer rules",
+			};
+		}
+
+		if (
+			publicEnabled &&
+			!(await isOrganizationOwnerPro(
+				Organisation.OrganisationId.make(user.activeOrganizationId),
+			))
+		) {
+			return {
+				success: false,
+				error: "Upgrade to Cap Pro to create a public collection link",
 			};
 		}
 
@@ -111,6 +126,7 @@ export async function createSpace(
 				iconUrl: null,
 				settings,
 				password: hashedPassword,
+				public: publicEnabled,
 			});
 
 			const memberUserIds: string[] = [];

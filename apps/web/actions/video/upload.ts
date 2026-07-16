@@ -49,11 +49,15 @@ async function getVideoUploadPresignedUrl({
 				? "audio/webm"
 				: fileKey.endsWith(".mp4")
 					? "video/mp4"
-					: fileKey.endsWith(".mp3")
-						? "audio/mpeg"
-						: fileKey.endsWith(".m3u8")
-							? "application/x-mpegURL"
-							: "video/mp2t";
+					: fileKey.endsWith(".jpg") || fileKey.endsWith(".jpeg")
+						? "image/jpeg"
+						: fileKey.endsWith(".png")
+							? "image/png"
+							: fileKey.endsWith(".mp3")
+								? "audio/mpeg"
+								: fileKey.endsWith(".m3u8")
+									? "application/x-mpegURL"
+									: "video/mp2t";
 
 		const Fields = {
 			"x-amz-meta-userid": userId,
@@ -116,6 +120,7 @@ export async function createVideoAndGetUploadUrl({
 	isUpload = false,
 	folderId,
 	orgId,
+	screenshotContentType,
 	supportsUploadProgress = false,
 }: {
 	videoId?: Video.VideoId;
@@ -127,6 +132,7 @@ export async function createVideoAndGetUploadUrl({
 	isUpload?: boolean;
 	folderId?: Folder.FolderId;
 	orgId: Organisation.OrganisationId;
+	screenshotContentType?: string;
 	// TODO: Remove this once we are happy with it's stability
 	supportsUploadProgress?: boolean;
 }) {
@@ -162,8 +168,12 @@ export async function createVideoAndGetUploadUrl({
 					updatedAt: existingVideo.updatedAt.toISOString(),
 					metadata: existingVideo.metadata,
 				});
+				const screenshotExtension =
+					screenshotContentType?.toLowerCase() === "image/png" ? "png" : "jpg";
 				const fileKey = `${user.id}/${videoId}/${
-					isScreenshot ? "screenshot/screen-capture.jpg" : "result.mp4"
+					isScreenshot
+						? `screenshot/screen-capture.${screenshotExtension}`
+						: "result.mp4"
 				}`;
 				const { presignedPostData, upload } = await getVideoUploadPresignedUrl({
 					fileKey,
@@ -185,8 +195,12 @@ export async function createVideoAndGetUploadUrl({
 
 		const idToUse = Video.VideoId.make(videoId || nanoId());
 
+		const screenshotExtension =
+			screenshotContentType?.toLowerCase() === "image/png" ? "png" : "jpg";
 		const fileKey = `${user.id}/${idToUse}/${
-			isScreenshot ? "screenshot/screen-capture.jpg" : "result.mp4"
+			isScreenshot
+				? `screenshot/screen-capture.${screenshotExtension}`
+				: "result.mp4"
 		}`;
 		const { presignedPostData, upload, bucketId, storageIntegrationId } =
 			await getVideoUploadPresignedUrl({

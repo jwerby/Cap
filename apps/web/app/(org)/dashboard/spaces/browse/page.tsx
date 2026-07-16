@@ -183,6 +183,8 @@ export default function BrowseSpacesPage() {
 																(m: { user: { id: string } }) => m.user.id,
 															),
 															iconUrl: space.iconUrl ?? undefined,
+															settings: space.settings,
+															hasPassword: space.hasPassword,
 														});
 														setShowSpaceDialog(true);
 													}}

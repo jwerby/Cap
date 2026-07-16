@@ -12,12 +12,13 @@ import {
 	videos,
 	videoUploads,
 } from "@cap/database/schema";
+import type { VideoMetadata } from "@cap/database/types";
 import { buildEnv, NODE_ENV, serverEnv } from "@cap/env";
 import { dub, isCapDeployment, PORTSTBD_BRAND, userIsPro } from "@cap/utils";
 import { Storage } from "@cap/web-backend";
 import { Organisation, Video } from "@cap/web-domain";
 import { zValidator } from "@hono/zod-validator";
-import { and, count, eq, lte, or } from "drizzle-orm";
+import { and, count, eq, lte } from "drizzle-orm";
 import { Effect, Option } from "effect";
 import { Hono } from "hono";
 import { z } from "zod";
@@ -34,6 +35,28 @@ import { stringOrNumberOptional } from "@/utils/zod";
 import { withAuth } from "../../utils";
 
 export const app = new Hono().use(withAuth);
+
+type UserOrganizationSelection = {
+	id: Organisation.OrganisationId;
+	name: string;
+	createdAt: Date;
+};
+
+function mergeUserOrganizationSelections(
+	...rowSets: UserOrganizationSelection[][]
+) {
+	const organizationsById = new Map<string, UserOrganizationSelection>();
+
+	for (const rows of rowSets) {
+		for (const row of rows) {
+			organizationsById.set(row.id, row);
+		}
+	}
+
+	return Array.from(organizationsById.values())
+		.sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+		.map(({ createdAt, ...organization }) => organization);
+}
 
 app.get(
 	"/create",
@@ -105,7 +128,27 @@ app.get(
 					.from(videos)
 					.where(eq(videos.id, Video.VideoId.make(videoId)));
 
-				if (video)
+				if (video) {
+					if (video.ownerId !== user.id)
+						return c.json({ error: "forbidden" }, { status: 403 });
+
+					if (isScreenshot || video.isScreenshot) {
+						await db().transaction(async (tx) => {
+							if (isScreenshot && !video.isScreenshot) {
+								await tx
+									.update(videos)
+									.set({ isScreenshot: true })
+									.where(
+										and(eq(videos.id, video.id), eq(videos.ownerId, user.id)),
+									);
+							}
+
+							await tx
+								.delete(videoUploads)
+								.where(eq(videoUploads.videoId, video.id));
+						});
+					}
+
 					return c.json({
 						id: video.id,
 						// All deprecated
@@ -113,29 +156,35 @@ app.get(
 						aws_region: "n/a",
 						aws_bucket: "n/a",
 					});
+				}
 			}
 
-			const userOrganizations = await db()
-				.select({
-					id: organizations.id,
-					name: organizations.name,
-				})
-				.from(organizations)
-				.leftJoin(
-					organizationMembers,
-					eq(organizations.id, organizationMembers.organizationId),
-				)
-				.where(
-					or(
-						// User owns the organization
-						eq(organizations.ownerId, user.id),
-						// User is a member of the organization
-						eq(organizationMembers.userId, user.id),
-					),
-				)
-				// Remove duplicates if user is both owner and member
-				.groupBy(organizations.id, organizations.name)
-				.orderBy(organizations.createdAt);
+			const [ownedOrganizations, memberOrganizations] = await Promise.all([
+				db()
+					.select({
+						id: organizations.id,
+						name: organizations.name,
+						createdAt: organizations.createdAt,
+					})
+					.from(organizations)
+					.where(eq(organizations.ownerId, user.id)),
+				db()
+					.select({
+						id: organizations.id,
+						name: organizations.name,
+						createdAt: organizations.createdAt,
+					})
+					.from(organizationMembers)
+					.innerJoin(
+						organizations,
+						eq(organizations.id, organizationMembers.organizationId),
+					)
+					.where(eq(organizationMembers.userId, user.id)),
+			]);
+			const userOrganizations = mergeUserOrganizationSelections(
+				ownedOrganizations,
+				memberOrganizations,
+			);
 			const userOrgIds = userOrganizations.map((org) => org.id);
 
 			let videoOrgId: Organisation.OrganisationId;
@@ -173,6 +222,9 @@ app.get(
 				? `${PORTSTBD_BRAND.companyName} Screenshot`
 				: PORTSTBD_BRAND.recordingTitleSuffix;
 			const videoName = name ?? `${defaultVideoTitle} - ${formattedDate}`;
+			const metadata: VideoMetadata | undefined = name
+				? { sourceName: name }
+				: undefined;
 			const clientSupportsGoogleDriveUpload = hasDesktopFeature(
 				c.req,
 				GOOGLE_DRIVE_UPLOAD_FEATURE,
@@ -220,6 +272,7 @@ app.get(
 					width,
 					height,
 					fps,
+					...(metadata ? { metadata } : {}),
 				});
 
 			const organizationShare = createAutoOrganizationVideoShare({
@@ -235,7 +288,7 @@ app.get(
 				UPLOAD_PROGRESS_VERSION,
 			);
 
-			if (clientSupportsUploadProgress)
+			if (clientSupportsUploadProgress && !isScreenshot)
 				await db().insert(videoUploads).values({
 					videoId: idToUse,
 					mode: "singlepart",

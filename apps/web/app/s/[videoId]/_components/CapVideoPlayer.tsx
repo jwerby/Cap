@@ -13,7 +13,7 @@ import { toast } from "sonner";
 import { retryVideoProcessing } from "@/actions/video/retry-processing";
 import { PortstbdSpinner } from "@/components/PortstbdSpinner";
 import CommentStamp from "./CommentStamp";
-import { getCaptionTextAtTime } from "./caption-cues";
+import { bindCaptionTrackCueText } from "./caption-tracks";
 import {
 	AVC_LEVEL_IOS_HARDWARE_CEILING,
 	createLevelPatchedMp4ObjectUrl,
@@ -43,6 +43,7 @@ import {
 	MediaPlayerLoading,
 	MediaPlayerPiP,
 	MediaPlayerPlay,
+	MediaPlayerPlaybackSpeedDial,
 	MediaPlayerSeek,
 	MediaPlayerSeekBackward,
 	MediaPlayerSeekForward,
@@ -110,6 +111,7 @@ interface Props {
 	hasCaptions?: boolean;
 	canRetryProcessing?: boolean;
 	duration?: number | null;
+	defaultPlaybackSpeed?: number;
 	showPlaybackStatusBadge?: boolean;
 	showFloatingVolumeControl?: boolean;
 	onUploadComplete?: () => void;
@@ -142,6 +144,7 @@ export function CapVideoPlayer({
 	hasCaptions = false,
 	canRetryProcessing = false,
 	duration: fallbackDuration,
+	defaultPlaybackSpeed,
 	showPlaybackStatusBadge = false,
 	showFloatingVolumeControl = false,
 	onUploadComplete,
@@ -153,7 +156,6 @@ export function CapVideoPlayer({
 	const [showPlayButton, setShowPlayButton] = useState(false);
 	const [videoLoaded, setVideoLoaded] = useState(false);
 	const [hasPlayedOnce, setHasPlayedOnce] = useState(false);
-	const hasPlayedOnceRef = useRef(false);
 	const [isMobile, setIsMobile] = useState(false);
 	const [hasError, setHasError] = useState(false);
 	const [isRetryingProcessing, setIsRetryingProcessing] = useState(false);
@@ -164,11 +166,6 @@ export function CapVideoPlayer({
 		null,
 	);
 	const queryClient = useQueryClient();
-
-	const markHasPlayedOnce = useCallback(() => {
-		hasPlayedOnceRef.current = true;
-		setHasPlayedOnce(true);
-	}, []);
 
 	useEffect(() => {
 		const checkMobile = () => {
@@ -377,7 +374,7 @@ export function CapVideoPlayer({
 		const handleLoadedData = () => {
 			setVideoLoaded(true);
 			setHasError(false);
-			if (!hasPlayedOnceRef.current) {
+			if (!hasPlayedOnce) {
 				setShowPlayButton(true);
 			}
 		};
@@ -385,13 +382,13 @@ export function CapVideoPlayer({
 		const handleCanPlay = () => {
 			setVideoLoaded(true);
 			setHasError(false);
-			if (!hasPlayedOnceRef.current) {
+			if (!hasPlayedOnce) {
 				setShowPlayButton(true);
 			}
 		};
 
 		const handlePlay = () => {
-			markHasPlayedOnce();
+			setHasPlayedOnce(true);
 		};
 
 		const handleError = () => {
@@ -413,102 +410,40 @@ export function CapVideoPlayer({
 			setHasError(true);
 		};
 
-		let captionTrack: TextTrack | null = null;
-
-		const handleCueChange = (): void => {
-			if (!captionsSrc) {
-				setCurrentCue("");
-				return;
-			}
-
-			setCurrentCue(
-				getCaptionTextAtTime(captionTrack?.cues, video.currentTime),
-			);
-		};
-
-		const setupTracks = (): void => {
-			const tracks = Array.from(video.textTracks);
-
-			for (const track of tracks) {
-				if (track.kind === "captions" || track.kind === "subtitles") {
-					if (captionTrack && captionTrack !== track) {
-						captionTrack.removeEventListener("cuechange", handleCueChange);
-					}
-					captionTrack = track;
-					track.mode = "hidden";
-					track.addEventListener("cuechange", handleCueChange);
-					handleCueChange();
-					break;
-				}
-			}
-		};
-
-		const ensureTracksHidden = (): void => {
-			const tracks = Array.from(video.textTracks);
-			for (const track of tracks) {
-				if (track.kind === "captions" || track.kind === "subtitles") {
-					if (track.mode !== "hidden") {
-						track.mode = "hidden";
-					}
-				}
-			}
-		};
+		const cleanupCaptionTracks = bindCaptionTrackCueText(video, setCurrentCue);
 
 		const handleLoadedMetadataWithTracks = () => {
 			setVideoLoaded(true);
 			setHasError(false);
-			if (!hasPlayedOnceRef.current) {
+			if (!hasPlayedOnce) {
 				setShowPlayButton(true);
 			}
-			setupTracks();
-		};
-
-		const handleTrackChange = () => {
-			ensureTracksHidden();
-			setupTracks();
 		};
 
 		video.addEventListener("loadeddata", handleLoadedData);
 		video.addEventListener("canplay", handleCanPlay);
 		video.addEventListener("loadedmetadata", handleLoadedMetadataWithTracks);
 		video.addEventListener("play", handlePlay);
-		video.addEventListener("seeked", handleCueChange);
-		video.addEventListener("timeupdate", handleCueChange);
 		video.addEventListener("error", handleError as EventListener);
-
-		video.textTracks.addEventListener("change", handleTrackChange);
-		video.textTracks.addEventListener("addtrack", handleTrackChange);
-		video.textTracks.addEventListener("removetrack", handleTrackChange);
 
 		if (video.readyState === 4) {
 			handleLoadedData();
-		}
-		if (video.readyState >= 1) {
-			setupTracks();
 		}
 
 		return () => {
 			video.removeEventListener("loadeddata", handleLoadedData);
 			video.removeEventListener("canplay", handleCanPlay);
 			video.removeEventListener("play", handlePlay);
-			video.removeEventListener("seeked", handleCueChange);
-			video.removeEventListener("timeupdate", handleCueChange);
 			video.removeEventListener("error", handleError as EventListener);
 			video.removeEventListener(
 				"loadedmetadata",
 				handleLoadedMetadataWithTracks,
 			);
-			video.textTracks.removeEventListener("change", handleTrackChange);
-			video.textTracks.removeEventListener("addtrack", handleTrackChange);
-			video.textTracks.removeEventListener("removetrack", handleTrackChange);
-			if (captionTrack) {
-				captionTrack.removeEventListener("cuechange", handleCueChange);
-			}
+			cleanupCaptionTracks();
 		};
 	}, [
-		captionsSrc,
+		hasPlayedOnce,
 		hasTriedRawFallback,
-		markHasPlayedOnce,
 		rawFallbackSrc,
 		resolvedSrc.data?.type,
 		resolvedSrc.isPending,
@@ -727,7 +662,7 @@ export function CapVideoPlayer({
 					}}
 					onPlay={() => {
 						setShowPlayButton(false);
-						markHasPlayedOnce();
+						setHasPlayedOnce(true);
 					}}
 					crossOrigin={
 						resolvedSrc.data.supportsCrossOrigin ? "anonymous" : undefined
@@ -832,6 +767,17 @@ export function CapVideoPlayer({
 						</motion.div>
 					)}
 			</AnimatePresence>
+			{resolvedSrc.data &&
+				videoLoaded &&
+				!hasActiveProgress &&
+				!showUploadFailureOverlay &&
+				!showPlaybackResolutionError && (
+					<MediaPlayerPlaybackSpeedDial
+						defaultSpeed={defaultPlaybackSpeed}
+						fallbackDuration={playerDuration}
+						show={showPlayButton && !hasPlayedOnce}
+					/>
+				)}
 			{currentCue && toggleCaptions && (
 				<div
 					className={clsx(
@@ -892,7 +838,10 @@ export function CapVideoPlayer({
 				})()}
 
 			<MediaPlayerControls
-				className="flex-col items-start gap-2.5"
+				className={clsx(
+					"flex-col items-start gap-2.5",
+					showPlayButton && !hasPlayedOnce && "max-sm:hidden",
+				)}
 				mainControlsVisible={(arg: boolean) => setMainControlsVisible(arg)}
 				isUploadingOrFailed={blockPlaybackControls}
 			>
@@ -908,8 +857,8 @@ export function CapVideoPlayer({
 				<div className="flex gap-2 items-center w-full">
 					<div className="flex flex-1 gap-2 items-center">
 						<MediaPlayerPlay />
-						<MediaPlayerSeekBackward />
-						<MediaPlayerSeekForward />
+						<MediaPlayerSeekBackward className="hidden sm:inline-flex" />
+						<MediaPlayerSeekForward className="hidden sm:inline-flex" />
 						<MediaPlayerVolume
 							expandable
 							// enhancedAudioEnabled={enhancedAudioEnabled}

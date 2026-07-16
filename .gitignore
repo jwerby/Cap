@@ -49,6 +49,7 @@ apps/storybook/storybook-static
 .cargo/config.toml
 tauri.windows.conf.json
 tauri.macos.conf.json
+tauri.linux.conf.json
 .vercel
 
 # sst
@@ -68,6 +69,7 @@ scripts/releases-backfill-data.txt
 
 # SEO agent state (machine-local, contains sensitive ranking data)
 /seo/
+scripts/seo/
 /docs/
 /.growth-agent/
 
@@ -77,3 +79,8 @@ analysis/
 analysis/plans/
 .ralphy
 tmp/
+
+# Upstream Cap Chrome extension (cap-v0.5.3) — removed from the fork build
+# (product decision #3: no Chrome extension). Kept untracked on disk as a
+# future placeholder; ignored so `git add -A` cannot re-stage the ~106 files.
+apps/chrome-extension/

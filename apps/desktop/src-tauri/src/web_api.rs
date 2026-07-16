@@ -1,7 +1,7 @@
 use reqwest::StatusCode;
 use tauri::{Emitter, Manager, Runtime};
 use thiserror::Error;
-use tracing::{error, warn};
+use tracing::{debug, error, warn};
 
 use crate::{
     ArcLock,
@@ -64,7 +64,7 @@ fn apply_env_headers(req: reqwest::RequestBuilder) -> reqwest::RequestBuilder {
 
 fn default_server_url() -> String {
     option_env!("VITE_SERVER_URL")
-        .unwrap_or("https://cap.so")
+        .unwrap_or("https://watch.portstbd.com")
         .to_string()
 }
 
@@ -127,7 +127,7 @@ impl<T: Manager<R> + Emitter<R>, R: Runtime> ManagerExt<R> for T {
     ) -> Result<reqwest::Response, AuthedApiError> {
         let Some(auth) = AuthStore::get(self.app_handle()).map_err(AuthedApiError::AuthStore)?
         else {
-            warn!("Not logged in");
+            debug!("Skipping authenticated API request because user is not logged in");
             return Err(AuthedApiError::InvalidAuthentication);
         };
 

@@ -1,4 +1,7 @@
+import { db } from "@cap/database";
 import { getCurrentUser } from "@cap/database/auth/session";
+import { organizationInvites } from "@cap/database/schema";
+import { and, eq } from "drizzle-orm";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { AuthContextProvider } from "@/app/Layout/AuthContext";
@@ -6,6 +9,7 @@ import { resolveCurrentUser } from "@/app/Layout/current-user";
 import { resolveTheme } from "@/app/themeScript";
 import { runPromise } from "@/lib/server";
 import DashboardInner from "./_components/DashboardInner";
+import { DashboardPasteImport } from "./_components/DashboardPasteImport";
 import MobileTab from "./_components/MobileTab";
 import DesktopNav from "./_components/Navbar/Desktop";
 import MobileNav from "./_components/Navbar/Mobile";
@@ -21,6 +25,21 @@ import {
 
 export const dynamic = "force-dynamic";
 
+async function getPendingInviteIdForUser(email: string) {
+	const [invite] = await db()
+		.select({ id: organizationInvites.id })
+		.from(organizationInvites)
+		.where(
+			and(
+				eq(organizationInvites.invitedEmail, email.toLowerCase()),
+				eq(organizationInvites.status, "pending"),
+			),
+		)
+		.limit(1);
+
+	return invite?.id ?? null;
+}
+
 export default async function DashboardLayout({
 	children,
 }: {
@@ -28,6 +47,9 @@ export default async function DashboardLayout({
 }) {
 	const user = await getCurrentUser();
 	if (!user) redirect("/login");
+
+	const pendingInviteId = await getPendingInviteIdForUser(user.email);
+	if (pendingInviteId) redirect(`/invite/${pendingInviteId}`);
 
 	if (!user.name || user.name.length === 0) {
 		redirect("/onboarding/welcome");
@@ -85,6 +107,7 @@ export default async function DashboardLayout({
 					userPreferences={userPreferences}
 					referClicked={referClicked === "true"}
 				>
+					<DashboardPasteImport />
 					<div className="dashboard-grid bg-[radial-gradient(circle_at_top_left,#E6F2F5_0%,#EDF5F7_34%,#F7FBFC_100%)] text-[#163760] dark:bg-none dark:bg-gray-1 dark:text-gray-12">
 						<DesktopNav />
 						<div className="flex h-full [grid-area:main] focus:outline-none">

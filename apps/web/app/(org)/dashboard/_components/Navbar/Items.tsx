@@ -29,7 +29,13 @@ import { motion } from "framer-motion";
 import { Check, ChevronDown, Plus } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { cloneElement, type RefObject, useRef, useState } from "react";
+import {
+	cloneElement,
+	type ReactElement,
+	type RefObject,
+	useRef,
+	useState,
+} from "react";
 import { NewOrganization } from "@/components/forms/NewOrganization";
 import { SignedImageUrl } from "@/components/SignedImageUrl";
 import { Tooltip } from "@/components/Tooltip";
@@ -56,18 +62,24 @@ interface Props {
 	toggleMobileNav?: () => void;
 }
 
+interface NavItem {
+	name: string;
+	href: string;
+	icon: ReactElement;
+	subNav: { name: string; href: string }[];
+	extraText?: number | null;
+	matchChildren?: boolean;
+	ownerOnly?: boolean;
+	adminOnly?: boolean;
+}
+
 const AdminNavItems = ({ toggleMobileNav }: Props) => {
 	const pathname = usePathname();
 	const [open, setOpen] = useState(false);
 	const { user, sidebarCollapsed, userCapsCount } = useDashboardContext();
 	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 
-	const DEVELOPER_DASHBOARD_ALLOWED_EMAILS = ["richie@cap.so"];
-
-	const showDeveloperDashboard =
-		capDeployment && DEVELOPER_DASHBOARD_ALLOWED_EMAILS.includes(user.email);
-
-	const manageNavigation = [
+	const manageNavigation: NavItem[] = [
 		{
 			name: "Recordings",
 			href: `/dashboard/caps`,
@@ -103,18 +115,14 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 			icon: <CogIcon />,
 			subNav: [],
 		},
-		...(showDeveloperDashboard
-			? [
-					{
-						name: "Developers",
-						href: `/dashboard/developers`,
-						ownerOnly: true,
-						matchChildren: true,
-						icon: <CodeIcon />,
-						subNav: [] as { name: string; href: string }[],
-					},
-				]
-			: []),
+		{
+			name: "Developers",
+			href: `/dashboard/developers`,
+			adminOnly: true,
+			matchChildren: true,
+			icon: <CodeIcon />,
+			subNav: [] as { name: string; href: string }[],
+		},
 	];
 
 	const [dialogOpen, setDialogOpen] = useState(false);
@@ -439,11 +447,7 @@ const NavItem = ({
 }: {
 	name: string;
 	href: string;
-	icon: React.ReactElement<{
-		ref: RefObject<CogIconHandle | null>;
-		className: string;
-		size: number;
-	}>;
+	icon: ReactElement;
 	sidebarCollapsed: boolean;
 	toggleMobileNav?: () => void;
 	isPathActive: (path: string, matchChildren: boolean) => boolean;
@@ -475,13 +479,20 @@ const NavItem = ({
 					"flex overflow-hidden justify-start items-center tracking-tight rounded-xl outline-none",
 				)}
 			>
-				{cloneElement(icon, {
-					ref: iconRef,
-					className: clsx(
-						sidebarCollapsed ? "text-gray-12 mx-auto" : "text-gray-10",
-					),
-					size: sidebarCollapsed ? 18 : 16,
-				})}
+				{cloneElement(
+					icon as ReactElement<{
+						ref?: RefObject<CogIconHandle | null>;
+						className?: string;
+						size?: number;
+					}>,
+					{
+						ref: iconRef,
+						className: clsx(
+							sidebarCollapsed ? "text-gray-12 mx-auto" : "text-gray-10",
+						),
+						size: sidebarCollapsed ? 18 : 16,
+					},
+				)}
 				<p
 					className={clsx(
 						"text-sm text-gray-12 truncate",

@@ -8,6 +8,10 @@
 			"dependsOn": ["^build"],
 			"outputs": [".next/**", "!.next/cache/**", "dist/**"]
 		},
+		"@cap/desktop#build": {
+			"dependsOn": ["^build"],
+			"outputs": [".output/**"]
+		},
 		"build:web:docker": {
 			"inputs": ["**/*.ts", "**/*.tsx", "!src-tauri/**", "!node_modules/**"],
 			"dependsOn": ["^build"],

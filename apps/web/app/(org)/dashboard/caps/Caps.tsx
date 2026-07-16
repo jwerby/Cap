@@ -281,7 +281,9 @@ export const Caps = ({
 			{visibleVideos.length > 0 && (
 				<>
 					<div className="flex justify-between items-center mb-6 w-full">
-						<h1 className="text-2xl font-medium text-gray-12">Videos</h1>
+						<h1 className="text-2xl font-medium text-gray-12">
+							Videos and screenshots
+						</h1>
 					</div>
 
 					<div className="grid grid-cols-1 gap-4 sm:gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">

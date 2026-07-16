@@ -13,10 +13,7 @@ import { getBootstrapData } from "@/utils/getBootstrapData";
 import { PublicEnvContext } from "@/utils/public-env";
 import { AuthContextProvider } from "./Layout/AuthContext";
 import { resolveCurrentUser } from "./Layout/current-user";
-import { GTag } from "./Layout/GTag";
-import { MetaPixel } from "./Layout/MetaPixel";
 import { PosthogIdentify } from "./Layout/PosthogIdentify";
-import { PurchaseTracker } from "./Layout/PurchaseTracker";
 import {
 	PostHogProvider,
 	ReactQueryProvider,
@@ -118,9 +115,6 @@ export default ({ children }: PropsWithChildren) =>
 												<SonnerToaster />
 												<main className="w-full">{children}</main>
 												<PosthogIdentify />
-												<MetaPixel />
-												<GTag />
-												<PurchaseTracker />
 											</ReactQueryProvider>
 										</PublicEnvContext>
 									</StripeContextProvider>

@@ -80,6 +80,10 @@ function createServerEnv() {
 			CAP_VIDEOS_DEFAULT_PUBLIC: boolString(true).describe(
 				"Should videos be public or private by default",
 			),
+			CAP_CHROME_EXTENSION_ID: z
+				.string()
+				.optional()
+				.describe("Chrome Web Store extension id allowed to receive auth keys"),
 			CAP_ALLOWED_SIGNUP_DOMAINS: z
 				.string()
 				.optional()
@@ -97,6 +101,12 @@ function createServerEnv() {
 				.describe("Replicate API token for audio enhancement"),
 			SUPERMEMORY_API_KEY: z.string().optional(),
 			SUPERMEMORY_KNOWLEDGE_TAG: z.string().optional(),
+			MESSENGER_ADMIN_EMAIL: z
+				.string()
+				.optional()
+				.describe(
+					"Email address of the messenger admin (fails closed when unset)",
+				),
 
 			/// Cap Cloud
 			// These are only needed for Cap Cloud (https://cap.so)

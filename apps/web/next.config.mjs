@@ -39,6 +39,7 @@ const nextConfig = {
 		"@cap/web-domain",
 		"@cap/env",
 		"@cap/database",
+		"@cap/recorder-core",
 		"next-mdx-remote",
 	],
 	typescript: {
@@ -73,12 +74,6 @@ const nextConfig = {
 				port: "",
 				pathname: "**",
 			},
-			{
-				protocol: "https",
-				hostname: "l.cap.so",
-				port: "",
-				pathname: "**",
-			},
 			process.env.NODE_ENV === "development" && {
 				protocol: "http",
 				hostname: "localhost",
@@ -90,16 +85,18 @@ const nextConfig = {
 	async rewrites() {
 		return [
 			{
-				source: "/r/:path*",
-				destination: "https://dub.cap.link/:path*",
-			},
-			{
-				source: "/api/commercial/:path*",
-				destination: "https://l.cap.so/api/commercial/:path*",
-			},
-			{
 				source: "/s/:videoId",
 				destination: "/s/:videoId",
+				has: [
+					{
+						type: "host",
+						value: "(?!cap.so|cap.link).*",
+					},
+				],
+			},
+			{
+				source: "/c/:collectionId",
+				destination: "/c/:collectionId",
 				has: [
 					{
 						type: "host",

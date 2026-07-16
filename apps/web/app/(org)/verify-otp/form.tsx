@@ -12,6 +12,7 @@ import { signIn } from "next-auth/react";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
+import { getSafeNextPath } from "../safe-next";
 
 const authCardClassName =
 	"relative w-full p-[28px] max-w-[432px] rounded-2xl border border-[#63A1B4]/30 bg-white/90 shadow-[0_26px_90px_-58px_#163760] backdrop-blur-xl";
@@ -78,14 +79,17 @@ export function VerifyOTPForm({
 	};
 
 	const normalizedEmail = email.toLowerCase();
+	const getNextPath = () =>
+		next ? getSafeNextPath(next, window.location.origin) : "/dashboard";
 
 	const handleVerify = useMutation({
 		mutationFn: async (pastedCode?: string) => {
 			const otpCode = pastedCode ?? code.join("");
 			if (otpCode.length !== 6) throw "Please enter a complete 6-digit code";
 
+			const nextPath = getNextPath();
 			await fetch(
-				`/api/auth/callback/email?email=${encodeURIComponent(normalizedEmail)}&token=${encodeURIComponent(otpCode)}&callbackUrl=${encodeURIComponent(next || "/dashboard")}`,
+				`/api/auth/callback/email?email=${encodeURIComponent(normalizedEmail)}&token=${encodeURIComponent(otpCode)}&callbackUrl=${encodeURIComponent(nextPath)}`,
 			);
 
 			const sessionRes = await fetch("/api/auth/session");
@@ -97,8 +101,9 @@ export function VerifyOTPForm({
 			}
 		},
 		onSuccess: async () => {
+			const nextPath = getNextPath();
 			router.refresh();
-			router.replace(next || "/dashboard");
+			router.replace(nextPath);
 		},
 		onError: (e) => {
 			if (typeof e === "string") {

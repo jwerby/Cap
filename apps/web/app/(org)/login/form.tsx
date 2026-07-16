@@ -22,6 +22,7 @@ import { getOrganizationSSOData } from "@/actions/organization/get-organization-
 import { trackEvent } from "@/app/utils/analytics";
 import { PortstbdAuthLogo } from "@/components/PortstbdAuthLogo";
 import { usePublicEnv } from "@/utils/public-env";
+import { getSafeNextPath } from "../safe-next";
 
 const MotionInput = motion(Input);
 const MotionLink = motion(Link);
@@ -48,6 +49,8 @@ export function LoginForm() {
 		null,
 	);
 	const theme = Cookies.get("theme") || "light";
+	const getNextPath = () =>
+		next ? getSafeNextPath(next, window.location.origin) : null;
 
 	useEffect(() => {
 		document.body.className = theme === "dark" ? "dark" : "light";
@@ -108,13 +111,14 @@ export function LoginForm() {
 	}, [emailSent]);
 
 	const handleGoogleSignIn = () => {
+		const nextPath = getNextPath();
 		trackEvent("auth_started", {
 			method: "google",
 			is_signup: false,
 			auth_surface: "login",
 		});
 		signIn("google", {
-			...(next && next.length > 0 ? { callbackUrl: next } : {}),
+			...(nextPath ? { callbackUrl: nextPath } : {}),
 		});
 	};
 

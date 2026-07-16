@@ -3,12 +3,12 @@ import { Button } from "@cap/ui";
 import { isCapDeployment } from "@cap/utils";
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { Fit, Layout, useRive } from "@rive-app/react-canvas";
 import clsx from "clsx";
 import Link from "next/link";
 import { memo } from "react";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
 import { Tooltip } from "@/components/Tooltip";
+import { Fit, Layout, useRive } from "@/lib/rive";
 
 export const UsageButton = memo(
 	({

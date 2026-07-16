@@ -16,13 +16,13 @@ vi.mock("@cap/database/helpers", () => ({
 	nanoId: vi.fn(() => "generated-id"),
 }));
 
+import type { Organisation } from "@cap/web-domain";
 import {
 	createAutoOrganizationVideoShare,
 	shouldAutoShareVideoWithOrganization,
 } from "../../../../packages/database/organization-video-sharing";
 
-type OrgId = string & { readonly __brand: "OrganisationId" };
-const orgId = (s: string) => s as OrgId;
+const orgId = (s: string) => s as Organisation.OrganisationId;
 
 describe("shouldAutoShareVideoWithOrganization", () => {
 	describe("gate enabled: PORTSTBD_AUTO_JOIN_ORG_ID is set", () => {
