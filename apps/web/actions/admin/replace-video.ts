@@ -13,12 +13,12 @@ import { S3Bucket, Video } from "@cap/web-domain";
 import { eq } from "drizzle-orm";
 import { Effect, Option } from "effect";
 
-import { MESSENGER_ADMIN_EMAIL } from "@/lib/messenger/constants";
+import { messengerAdminEmail } from "@/lib/messenger/constants";
 import { runPromise } from "@/lib/server";
 
 async function requireAdmin() {
 	const user = await getCurrentUser();
-	if (!user || user.email !== MESSENGER_ADMIN_EMAIL) {
+	if (!user || user.email !== messengerAdminEmail()) {
 		throw new Error("Unauthorized");
 	}
 	return user;

@@ -7,12 +7,12 @@ import { serverEnv } from "@cap/env";
 import { Video } from "@cap/web-domain";
 import { eq } from "drizzle-orm";
 import { start } from "workflow/api";
-import { MESSENGER_ADMIN_EMAIL } from "@/lib/messenger/constants";
+import { messengerAdminEmail } from "@/lib/messenger/constants";
 import { adminReprocessVideoWorkflow } from "@/workflows/admin-reprocess-video";
 
 async function requireAdmin() {
 	const user = await getCurrentUser();
-	if (!user || user.email !== MESSENGER_ADMIN_EMAIL) {
+	if (!user || user.email !== messengerAdminEmail()) {
 		throw new Error("Unauthorized");
 	}
 	return user;

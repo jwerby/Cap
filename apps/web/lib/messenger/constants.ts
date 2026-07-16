@@ -1,7 +1,8 @@
 import type { MessengerAgent } from "@cap/database/schema";
 import { serverEnv } from "@cap/env";
 
-export const MESSENGER_ADMIN_EMAIL = serverEnv().MESSENGER_ADMIN_EMAIL ?? "";
+export const messengerAdminEmail = () =>
+	serverEnv().MESSENGER_ADMIN_EMAIL ?? "";
 export const MESSENGER_ANON_COOKIE = "cap-messenger-anon-id";
 export const MESSENGER_DEFAULT_KNOWLEDGE_TAG = "cap-support-knowledge";
 
