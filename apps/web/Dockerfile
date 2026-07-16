@@ -18,6 +18,10 @@ ENV BUILD_SHA=$BUILD_SHA
 
 RUN pnpm run build:web
 
+RUN pnpm --filter @cap/web exec esbuild migrate-entry.ts \
+  --bundle --platform=node --format=cjs \
+  --outfile=run-migrations.cjs
+
 
 # 3. Production image, copy all the files and run next
 FROM base AS runner
@@ -33,6 +37,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/.next/static ./apps/web/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/web/public ./apps/web/public
 COPY --from=builder --chown=nextjs:nodejs /app/packages/database/migrations ./apps/web/migrations
+COPY --from=builder --chown=nextjs:nodejs /app/apps/web/run-migrations.cjs ./apps/web/run-migrations.cjs
 
 ARG NEXT_PUBLIC_DOCKER_BUILD=true
 ARG NEXT_PUBLIC_WEB_URL=http://localhost:3000
