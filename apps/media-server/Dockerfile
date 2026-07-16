@@ -14,6 +14,8 @@ COPY apps/media-server/src ./src
 ENV PORT=3456
 EXPOSE 3456
 
+USER bun
+
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 	CMD ["bun", "-e", "const response = await fetch(`http://localhost:${process.env.PORT || 3456}/health`); process.exit(response.ok ? 0 : 1)"]
 
