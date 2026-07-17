@@ -15,14 +15,12 @@ export const WebRecorderDialogHeader = ({
 	isBusy,
 	onClose,
 }: WebRecorderDialogHeaderProps) => {
-	const { user, setUpgradeModalOpen } = useDashboardContext();
+	const { user } = useDashboardContext();
 	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const planLabel = user.isPro ? "Pro" : "Free";
 	const planClassName = clsx(
 		"ml-2 inline-flex items-center rounded-full px-2 text-[0.7rem] font-medium transition-colors",
-		user.isPro
-			? "bg-blue-9 text-gray-1"
-			: "cursor-pointer bg-gray-3 text-gray-12 hover:bg-gray-4",
+		user.isPro ? "bg-blue-9 text-gray-1" : "bg-gray-3 text-gray-12",
 	);
 
 	return (
@@ -89,14 +87,7 @@ export const WebRecorderDialogHeader = ({
 						></path>
 					</svg>
 					{capDeployment && (
-						<button
-							type="button"
-							onClick={() => {
-								if (!user.isPro) setUpgradeModalOpen(true);
-							}}
-							disabled={user.isPro}
-							className={planClassName}
-						>
+						<button type="button" disabled className={planClassName}>
 							{planLabel}
 						</button>
 					)}

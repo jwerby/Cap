@@ -1,6 +1,5 @@
 "use client";
 
-import { buildEnv } from "@cap/env";
 import {
 	Button,
 	Dialog,
@@ -17,7 +16,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@cap/ui";
-import { isCapDeployment } from "@cap/utils";
 import {
 	faArrowLeft,
 	faCircleCheck,
@@ -47,7 +45,6 @@ import {
 	type LoomCsvImportRowResult,
 } from "@/actions/loom";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import {
 	canManageOrganizationSettings,
 	getEffectiveOrganizationRole,
@@ -233,7 +230,6 @@ const LoomMark = ({ size = 18 }: { size?: number }) => (
 );
 
 export const ImportLoomPage = () => {
-	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { user, activeOrganization } = useDashboardContext();
 	const router = useRouter();
 
@@ -248,9 +244,6 @@ export const ImportLoomPage = () => {
 	const canUseCsvImport = canManageOrganizationSettings(currentRole);
 
 	const [mode, setMode] = useState<Mode>("single");
-	const [upgradeModalOpen, setUpgradeModalOpen] = useState(
-		capDeployment && !user?.isPro,
-	);
 
 	const [loomUrl, setLoomUrl] = useState("");
 	const [isImporting, setIsImporting] = useState(false);
@@ -336,11 +329,6 @@ export const ImportLoomPage = () => {
 	const handleSingleImport = async () => {
 		if (!user || !activeOrganization) return;
 
-		if (capDeployment && !user.isPro) {
-			setUpgradeModalOpen(true);
-			return;
-		}
-
 		if (!loomUrl.trim()) return;
 
 		setIsImporting(true);
@@ -387,11 +375,6 @@ export const ImportLoomPage = () => {
 			toast.error(
 				"Only organization admins and owners can import Loom videos from a CSV.",
 			);
-			return;
-		}
-
-		if (capDeployment && !user.isPro) {
-			setUpgradeModalOpen(true);
 			return;
 		}
 
@@ -1010,11 +993,6 @@ export const ImportLoomPage = () => {
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-
-			<UpgradeModal
-				open={upgradeModalOpen}
-				onOpenChange={setUpgradeModalOpen}
-			/>
 		</div>
 	);
 };

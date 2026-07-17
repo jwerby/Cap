@@ -1,7 +1,5 @@
 "use client";
 
-import { buildEnv } from "@cap/env";
-import { isCapDeployment } from "@cap/utils";
 import Cookies from "js-cookie";
 import { redirect, usePathname } from "next/navigation";
 import {
@@ -13,7 +11,6 @@ import {
 } from "react";
 import { InviteDialog } from "@/app/(org)/dashboard/settings/organization/components/InviteDialog";
 import { type CurrentUser, useCurrentUser } from "@/app/Layout/AuthContext";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import type {
 	Organization,
 	OrganizationSettings,
@@ -216,13 +213,6 @@ export function DashboardContexts({
 					isOpen={inviteDialogOpen}
 					setIsOpen={setInviteDialogOpen}
 				/>
-
-				{isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) && (
-					<UpgradeModal
-						open={upgradeModalOpen}
-						onOpenChange={setUpgradeModalOpen}
-					/>
-				)}
 			</DashboardContext.Provider>
 		</ThemeContext.Provider>
 	);

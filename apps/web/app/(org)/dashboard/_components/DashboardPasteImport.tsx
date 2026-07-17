@@ -39,8 +39,7 @@ function shouldIgnorePasteTarget(target: EventTarget | null) {
 
 export function DashboardPasteImport() {
 	const router = useRouter();
-	const { activeOrganization, setUpgradeModalOpen, user } =
-		useDashboardContext();
+	const { activeOrganization } = useDashboardContext();
 	const { uploadingStore, setUploadStatus } = useUploadingContext();
 	const isUploading = useStore(uploadingStore, (s) => !!s.uploadStatus);
 	const handlingPasteRef = useRef(false);
@@ -56,11 +55,6 @@ export function DashboardPasteImport() {
 			if (!file) return;
 
 			event.preventDefault();
-
-			if (!user.isPro) {
-				setUpgradeModalOpen(true);
-				return;
-			}
 
 			if (!activeOrganization) {
 				toast.error("Select an organization before importing media.");
@@ -87,14 +81,7 @@ export function DashboardPasteImport() {
 					handlingPasteRef.current = false;
 				});
 		},
-		[
-			activeOrganization,
-			isUploading,
-			router,
-			setUploadStatus,
-			setUpgradeModalOpen,
-			user.isPro,
-		],
+		[activeOrganization, isUploading, router, setUploadStatus],
 	);
 
 	useEffect(() => {

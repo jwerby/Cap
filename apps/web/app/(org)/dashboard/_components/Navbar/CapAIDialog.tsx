@@ -18,7 +18,7 @@ import { useDashboardContext, useTheme } from "../../Contexts";
 const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { theme } = useTheme();
-	const { user, setUpgradeModalOpen } = useDashboardContext();
+	const { user } = useDashboardContext();
 
 	const { RiveComponent: CapAIArt } = useRive({
 		src: "/rive/bento.riv",
@@ -86,17 +86,6 @@ const CapAIDialog = ({ setOpen }: { setOpen: (open: boolean) => void }) => {
 							onClick={() => setOpen(false)}
 						>
 							Close
-						</Button>
-						<Button
-							autoFocus={false}
-							className="min-w-[100px]"
-							variant="blue"
-							onClick={() => {
-								setOpen(false);
-								setUpgradeModalOpen(true);
-							}}
-						>
-							Upgrade to Watch Pro
 						</Button>
 					</div>
 				) : (

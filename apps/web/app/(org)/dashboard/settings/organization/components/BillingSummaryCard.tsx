@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Card, CardDescription, CardHeader, CardTitle } from "@cap/ui";
+import { Button, Card } from "@cap/ui";
 import { useQuery } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { useRouter } from "next/navigation";
@@ -14,7 +14,7 @@ import { manageBilling } from "@/actions/organization/manage-billing";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
 
 export function BillingSummaryCard() {
-	const { activeOrganization, setUpgradeModalOpen } = useDashboardContext();
+	const { activeOrganization } = useDashboardContext();
 	const router = useRouter();
 	const [billingLoading, setBillingLoading] = useState(false);
 	const organizationId = activeOrganization?.organization.id;
@@ -68,24 +68,7 @@ export function BillingSummaryCard() {
 	}
 
 	if (!subscription) {
-		return (
-			<Card className="flex flex-wrap gap-6 justify-between items-center w-full">
-				<CardHeader>
-					<CardTitle>Upgrade to Watch Pro</CardTitle>
-					<CardDescription>
-						Get unlimited sharing, custom domains, Watch AI, and more.
-					</CardDescription>
-				</CardHeader>
-				<Button
-					type="button"
-					size="sm"
-					variant="primary"
-					onClick={() => setUpgradeModalOpen(true)}
-				>
-					Upgrade to Watch Pro
-				</Button>
-			</Card>
-		);
+		return null;
 	}
 
 	const statusLabel =

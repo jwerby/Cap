@@ -39,7 +39,6 @@ import {
 import { NewOrganization } from "@/components/forms/NewOrganization";
 import { SignedImageUrl } from "@/components/SignedImageUrl";
 import { Tooltip } from "@/components/Tooltip";
-import { UsageButton } from "@/components/UsageButton";
 import {
 	canViewOrganizationSettings,
 	getEffectiveOrganizationRole,
@@ -379,10 +378,6 @@ const AdminNavItems = ({ toggleMobileNav }: Props) => {
 					<SpacesList toggleMobileNav={() => toggleMobileNav?.()} />
 				</div>
 				<div className="pb-4 mt-auto w-full">
-					<UsageButton
-						toggleMobileNav={() => toggleMobileNav?.()}
-						subscribed={user.isPro}
-					/>
 					{capDeployment && (
 						<div className="flex justify-center items-center mt-2">
 							<Link

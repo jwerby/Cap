@@ -1,6 +1,5 @@
 "use client";
 
-import { buildEnv } from "@cap/env";
 import {
 	Button,
 	Dialog,
@@ -10,7 +9,6 @@ import {
 	DialogTitle,
 	Input,
 } from "@cap/ui";
-import { isCapDeployment } from "@cap/utils";
 import { faFileImport } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useRouter } from "next/navigation";
@@ -18,28 +16,19 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { importFromLoom } from "@/actions/loom";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
-import { UpgradeModal } from "@/components/UpgradeModal";
 
 export const ImportLoomButton = ({
 	size = "md",
 }: {
 	size?: "sm" | "lg" | "md";
 }) => {
-	const { user, activeOrganization } = useDashboardContext();
+	const { activeOrganization } = useDashboardContext();
 	const router = useRouter();
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [loomUrl, setLoomUrl] = useState("");
 	const [isImporting, setIsImporting] = useState(false);
-	const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 
 	const handleClick = () => {
-		if (!user) return;
-
-		if (isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP) && !user.isPro) {
-			setUpgradeModalOpen(true);
-			return;
-		}
-
 		setDialogOpen(true);
 	};
 
@@ -140,11 +129,6 @@ export const ImportLoomButton = ({
 					</DialogFooter>
 				</DialogContent>
 			</Dialog>
-
-			<UpgradeModal
-				open={upgradeModalOpen}
-				onOpenChange={setUpgradeModalOpen}
-			/>
 		</>
 	);
 };

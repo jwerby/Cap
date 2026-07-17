@@ -18,7 +18,6 @@ import { setSpaceCollectionVisibility } from "@/actions/collections/visibility";
 import { Tooltip } from "@/components/Tooltip";
 import { useEffectMutation, useRpcClient } from "@/lib/EffectRuntime";
 import { useCopyCollectionLink } from "@/lib/public-collection-client";
-import { useDashboardContext } from "../Contexts";
 import { CollectionShareDialog } from "./CollectionShareDialog";
 
 type PublicPageSettings = PublicCollection.PublicPageSettings;
@@ -43,7 +42,6 @@ export const CollectionShareControl = ({
 }: CollectionShareControlProps) => {
 	const router = useRouter();
 	const rpc = useRpcClient();
-	const { setUpgradeModalOpen } = useDashboardContext();
 	const { url, copied, copy } = useCopyCollectionLink(collectionId);
 	const displayUrl = url.replace(/^https?:\/\//, "");
 
@@ -134,11 +132,6 @@ export const CollectionShareControl = ({
 
 	const handleTogglePublic = (next: boolean) => {
 		if (next) {
-			if (!isPro) {
-				setOpen(false);
-				setUpgradeModalOpen(true);
-				return;
-			}
 			setPub(true);
 			persist({ public: true });
 			return;

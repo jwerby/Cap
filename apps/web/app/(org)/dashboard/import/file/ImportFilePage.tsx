@@ -1,8 +1,6 @@
 "use client";
 
-import { buildEnv } from "@cap/env";
 import { Button } from "@cap/ui";
-import { isCapDeployment } from "@cap/utils";
 import type { Folder, Organisation } from "@cap/web-domain";
 import { faArrowLeft, faUpload } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,29 +17,19 @@ import {
 	type UploadStatus,
 	useUploadingContext,
 } from "@/app/(org)/dashboard/caps/UploadingContext";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import { uploadWithTarget } from "@/utils/upload-target";
 
 export const ImportFilePage = () => {
-	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const { user, activeOrganization } = useDashboardContext();
 	const router = useRouter();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const { uploadingStore, setUploadStatus } = useUploadingContext();
 	const isUploading = useStore(uploadingStore, (s) => !!s.uploadStatus);
-	const [upgradeModalOpen, setUpgradeModalOpen] = useState(
-		capDeployment && !user?.isPro,
-	);
 	const [isDragOver, setIsDragOver] = useState(false);
 
 	const processFile = useCallback(
 		async (file: File) => {
 			if (!user || !activeOrganization) return;
-
-			if (capDeployment && !user.isPro) {
-				setUpgradeModalOpen(true);
-				return;
-			}
 
 			const ok = await uploadVideoForServerProcessing(
 				file,
@@ -51,7 +39,7 @@ export const ImportFilePage = () => {
 			);
 			if (ok) router.push("/dashboard/caps");
 		},
-		[user, activeOrganization, setUploadStatus, router, capDeployment],
+		[user, activeOrganization, setUploadStatus, router],
 	);
 
 	const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -82,12 +70,6 @@ export const ImportFilePage = () => {
 
 	const handleBrowseClick = () => {
 		if (!user) return;
-
-		if (capDeployment && !user.isPro) {
-			setUpgradeModalOpen(true);
-			return;
-		}
-
 		inputRef.current?.click();
 	};
 
@@ -190,11 +172,6 @@ export const ImportFilePage = () => {
 				accept="video/*,.mov,.MOV,.mp4,.MP4,.avi,.AVI,.mkv,.MKV,.webm,.WEBM,.m4v,.M4V"
 				onChange={handleFileChange}
 				className="hidden"
-			/>
-
-			<UpgradeModal
-				open={upgradeModalOpen}
-				onOpenChange={setUpgradeModalOpen}
 			/>
 		</div>
 	);

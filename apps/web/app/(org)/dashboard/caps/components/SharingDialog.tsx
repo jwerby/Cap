@@ -25,7 +25,6 @@ import {
 } from "@/actions/videos/password";
 import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
 import type { Spaces } from "@/app/(org)/dashboard/dashboard-data";
-import type { CurrentUser } from "@/app/Layout/AuthContext";
 import { SignedImageUrl } from "@/components/SignedImageUrl";
 import { Tooltip } from "@/components/Tooltip";
 import { usePublicEnv } from "@/utils/public-env";
@@ -50,8 +49,6 @@ interface SharingDialogProps {
 	hasPassword?: boolean;
 	inheritedPasswordSources?: SpaceRuleSource[];
 	onPasswordUpdated?: (protectedStatus: boolean) => void;
-	user?: CurrentUser | null;
-	onUpgradeRequest?: (open: boolean) => void;
 }
 
 export const SharingDialog: React.FC<SharingDialogProps> = ({
@@ -66,18 +63,10 @@ export const SharingDialog: React.FC<SharingDialogProps> = ({
 	hasPassword = false,
 	inheritedPasswordSources = [],
 	onPasswordUpdated,
-	user: propUser,
-	onUpgradeRequest: propOnUpgradeRequest,
 }) => {
-	const {
-		spacesData: contextSpacesData,
-		user: contextUser,
-		setUpgradeModalOpen,
-		activeOrganization,
-	} = useDashboardContext() ?? {};
+	const { spacesData: contextSpacesData, activeOrganization } =
+		useDashboardContext() ?? {};
 	const spacesData = propSpacesData || contextSpacesData;
-	const user = propUser ?? contextUser;
-	const onUpgradeRequest = propOnUpgradeRequest ?? setUpgradeModalOpen;
 	const allowedEmailDomain =
 		activeOrganization?.organization.allowedEmailDomain;
 	const [selectedSpaces, setSelectedSpaces] = useState<Set<string>>(new Set());
@@ -216,10 +205,6 @@ export const SharingDialog: React.FC<SharingDialogProps> = ({
 	};
 
 	const handlePasswordToggle = (checked: boolean) => {
-		if (checked && user && !user.isPro) {
-			onUpgradeRequest?.(true);
-			return;
-		}
 		setPasswordEnabled(checked);
 		if (!checked) {
 			setPasswordValue("");

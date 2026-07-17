@@ -45,8 +45,7 @@ const FolderCard = ({
 	const folderRef = useRef<HTMLFieldSetElement>(null);
 	const [isDragOver, setIsDragOver] = useState(false);
 	const [isMovingVideo, setIsMovingVideo] = useState(false);
-	const { activeOrganization, setUpgradeModalOpen } = useDashboardContext();
-	const ownerIsPro = Boolean(activeOrganization?.ownerIsPro);
+	const { activeOrganization } = useDashboardContext();
 	const folderHref = spaceId
 		? `/dashboard/spaces/${spaceId}/folder/${id}`
 		: `/dashboard/folder/${id}`;
@@ -410,10 +409,6 @@ const FolderCard = ({
 				nameRef={nameRef}
 				onPublicToggle={() => {
 					const nextPublic = !publicEnabled;
-					if (nextPublic && !ownerIsPro) {
-						setUpgradeModalOpen(true);
-						return;
-					}
 					setPublicEnabled(nextPublic);
 					updateFolder.mutate({
 						id,

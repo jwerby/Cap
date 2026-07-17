@@ -216,8 +216,7 @@ export const NewSpaceForm: React.FC<NewSpaceFormProps> = (props) => {
 
 	const [selectedFile, setSelectedFile] = useState<File | null>(null);
 	const [isUploading, setIsUploading] = useState(false);
-	const { activeOrganization, user, setUpgradeModalOpen } =
-		useDashboardContext();
+	const { activeOrganization, user } = useDashboardContext();
 	const [settings, setSettings] = useState<OrganizationSettings>({
 		...defaultSettings,
 		...space?.settings,
@@ -252,10 +251,6 @@ export const NewSpaceForm: React.FC<NewSpaceFormProps> = (props) => {
 	};
 
 	const handlePasswordToggle = (checked: boolean) => {
-		if (checked && user && !user.isPro) {
-			setUpgradeModalOpen(true);
-			return;
-		}
 		setPasswordEnabled(checked);
 		if (!checked) {
 			setPasswordValue("");

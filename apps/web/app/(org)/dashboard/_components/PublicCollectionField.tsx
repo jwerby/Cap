@@ -57,11 +57,6 @@ export const PublicCollectionField = ({
 							<p className="text-sm font-medium text-gray-12">
 								Public collection link
 							</p>
-							{!isPro && (
-								<span className="rounded-full bg-blue-11 px-1.5 py-0.5 text-[10px] font-medium leading-none text-white">
-									Pro
-								</span>
-							)}
 						</div>
 						<p className="text-xs text-gray-10">
 							Anyone with the link can browse public caps in this {kind}.

@@ -27,7 +27,6 @@ import {
 	setOrganizationStorageProvider,
 	testOrganizationS3Config,
 } from "@/actions/organization/storage";
-import { useDashboardContext } from "@/app/(org)/dashboard/Contexts";
 
 const defaultS3Config = {
 	provider: "aws",
@@ -45,9 +44,6 @@ const s3ProviderOptions = [
 	{ value: "minio", label: "MinIO" },
 	{ value: "other", label: "Other S3-Compatible" },
 ];
-
-const proRequiredMessage =
-	"Watch Pro is required to manage organization integrations";
 
 const getOrganizationId = (settings: OrganizationStorageSettings) =>
 	settings.organization.id as Organisation.OrganisationId;
@@ -91,7 +87,6 @@ export function OrganizationStorageIntegrations({
 }) {
 	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const router = useRouter();
-	const { user, setUpgradeModalOpen } = useDashboardContext();
 	const [settings, setSettings] = useState(initialSettings);
 	const [s3Config, setS3Config] = useState(
 		initialSettings.s3 ?? defaultS3Config,
@@ -125,9 +120,7 @@ export function OrganizationStorageIntegrations({
 	}, [initialSettings]);
 
 	const requirePro = () => {
-		if (!capDeployment || user.isPro) return true;
-		setUpgradeModalOpen(true);
-		return false;
+		return true;
 	};
 
 	const runMutation = (
@@ -142,15 +135,6 @@ export function OrganizationStorageIntegrations({
 				toast.success(successMessage);
 				router.refresh();
 			} catch (error) {
-				if (
-					capDeployment &&
-					error instanceof Error &&
-					error.message === proRequiredMessage
-				) {
-					setUpgradeModalOpen(true);
-					return;
-				}
-
 				toast.error(error instanceof Error ? error.message : "Request failed");
 			}
 		});
@@ -221,15 +205,6 @@ export function OrganizationStorageIntegrations({
 			setFolderBrowserFolders(folders);
 			setFolderBrowserOpen(true);
 		} catch (error) {
-			if (
-				capDeployment &&
-				error instanceof Error &&
-				error.message === proRequiredMessage
-			) {
-				setUpgradeModalOpen(true);
-				return;
-			}
-
 			toast.error(
 				error instanceof Error ? error.message : "Failed to load Drive folders",
 			);

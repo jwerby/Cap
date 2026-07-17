@@ -20,7 +20,6 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useEffectMutation, useRpcClient } from "@/lib/EffectRuntime";
 import { PublicCollectionField } from "../../_components/PublicCollectionField";
-import { useDashboardContext } from "../../Contexts";
 
 interface Props {
 	open: boolean;
@@ -45,7 +44,6 @@ export const NewFolderDialog: React.FC<Props> = ({
 	>(null);
 	const [folderName, setFolderName] = useState<string>("");
 	const [publicEnabled, setPublicEnabled] = useState(false);
-	const { activeOrganization, setUpgradeModalOpen } = useDashboardContext();
 	const router = useRouter();
 
 	useEffect(() => {
@@ -135,8 +133,8 @@ export const NewFolderDialog: React.FC<Props> = ({
 							kind="folder"
 							enabled={publicEnabled}
 							onChange={setPublicEnabled}
-							isPro={Boolean(activeOrganization?.ownerIsPro)}
-							onUpgrade={() => setUpgradeModalOpen(true)}
+							isPro={true}
+							onUpgrade={() => {}}
 						/>
 					</div>
 				</div>

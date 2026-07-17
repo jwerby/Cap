@@ -45,8 +45,7 @@ export const SubfolderDialog: React.FC<Props> = ({
 	>(null);
 	const [folderName, setFolderName] = useState<string>("");
 	const [publicEnabled, setPublicEnabled] = useState(false);
-	const { activeSpace, activeOrganization, setUpgradeModalOpen } =
-		useDashboardContext();
+	const { activeSpace } = useDashboardContext();
 	const router = useRouter();
 
 	useEffect(() => {
@@ -137,8 +136,8 @@ export const SubfolderDialog: React.FC<Props> = ({
 							kind="folder"
 							enabled={publicEnabled}
 							onChange={setPublicEnabled}
-							isPro={Boolean(activeOrganization?.ownerIsPro)}
-							onUpgrade={() => setUpgradeModalOpen(true)}
+							isPro={true}
+							onUpgrade={() => {}}
 						/>
 					</div>
 				</div>

@@ -33,10 +33,8 @@ import { markAsRead } from "@/actions/notifications/mark-as-read";
 import Notifications from "@/app/(org)/dashboard/_components/Notifications";
 import { SignedImageUrl } from "@/components/SignedImageUrl";
 import { ThemeToggleIcon } from "@/components/theme-toggle-icon";
-import { UpgradeModal } from "@/components/UpgradeModal";
 import { useDashboardContext, useTheme } from "../../Contexts";
 import {
-	ArrowUpIcon,
 	DownloadIcon,
 	HomeIcon,
 	LogoutIcon,
@@ -199,7 +197,6 @@ const Top = () => {
 const User = () => {
 	const capDeployment = isCapDeployment(buildEnv.NEXT_PUBLIC_IS_CAP);
 	const [menuOpen, setMenuOpen] = useState(false);
-	const [upgradeModalOpen, setUpgradeModalOpen] = useState(false);
 	const { user } = useDashboardContext();
 
 	const menuItems = useMemo(
@@ -211,16 +208,6 @@ const User = () => {
 				onClick: () => setMenuOpen(false),
 				iconClassName: "text-gray-11 group-hover:text-gray-12",
 				showCondition: capDeployment,
-			},
-			{
-				name: "Upgrade to Pro",
-				icon: <ArrowUpIcon />,
-				onClick: () => {
-					setMenuOpen(false);
-					setUpgradeModalOpen(true);
-				},
-				iconClassName: "text-amber-400 group-hover:text-amber-500",
-				showCondition: capDeployment && !user.isPro,
 			},
 			{
 				name: "Earn 40% Referral",
@@ -261,58 +248,52 @@ const User = () => {
 				showCondition: true,
 			},
 		],
-		[capDeployment, user.isPro],
+		[capDeployment],
 	);
 
 	return (
-		<>
-			<UpgradeModal
-				open={upgradeModalOpen}
-				onOpenChange={setUpgradeModalOpen}
-			/>
-			<Popover open={menuOpen} onOpenChange={setMenuOpen}>
-				<PopoverTrigger asChild>
-					<div
-						data-state={menuOpen ? "open" : "closed"}
-						className="flex gap-2 justify-between  items-center p-2 rounded-xl border data-[state=open]:border-gray-3 data-[state=open]:bg-gray-3 border-transparent transition-colors cursor-pointer group lg:gap-6 hover:border-gray-3"
-					>
-						<div className="flex items-center">
-							<SignedImageUrl
-								image={user.imageUrl}
-								name={user.name ?? "User"}
-								letterClass="text-xs lg:text-md"
-								className="flex-shrink-0 size-[24px] text-gray-12"
-							/>
-							<span className="ml-2 text-sm truncate lg:ml-2 lg:text-md text-gray-12">
-								{user.name ?? "User"}
-							</span>
-						</div>
-						<MoreVertical
-							data-state={menuOpen ? "open" : "closed"}
-							className="w-5 h-5 data-[state=open]:text-gray-12 transition-colors text-gray-10 group-hover:text-gray-12"
+		<Popover open={menuOpen} onOpenChange={setMenuOpen}>
+			<PopoverTrigger asChild>
+				<div
+					data-state={menuOpen ? "open" : "closed"}
+					className="flex gap-2 justify-between  items-center p-2 rounded-xl border data-[state=open]:border-gray-3 data-[state=open]:bg-gray-3 border-transparent transition-colors cursor-pointer group lg:gap-6 hover:border-gray-3"
+				>
+					<div className="flex items-center">
+						<SignedImageUrl
+							image={user.imageUrl}
+							name={user.name ?? "User"}
+							letterClass="text-xs lg:text-md"
+							className="flex-shrink-0 size-[24px] text-gray-12"
 						/>
+						<span className="ml-2 text-sm truncate lg:ml-2 lg:text-md text-gray-12">
+							{user.name ?? "User"}
+						</span>
 					</div>
-				</PopoverTrigger>
-				<PopoverContent className="p-1 w-48">
-					<Command>
-						<CommandGroup>
-							{menuItems
-								.filter((item) => item.showCondition)
-								.map((item, index) => (
-									<MenuItem
-										key={index.toString()}
-										icon={item.icon}
-										name={item.name}
-										href={item.href ?? "#"}
-										onClick={item.onClick}
-										iconClassName={item.iconClassName}
-									/>
-								))}
-						</CommandGroup>
-					</Command>
-				</PopoverContent>
-			</Popover>
-		</>
+					<MoreVertical
+						data-state={menuOpen ? "open" : "closed"}
+						className="w-5 h-5 data-[state=open]:text-gray-12 transition-colors text-gray-10 group-hover:text-gray-12"
+					/>
+				</div>
+			</PopoverTrigger>
+			<PopoverContent className="p-1 w-48">
+				<Command>
+					<CommandGroup>
+						{menuItems
+							.filter((item) => item.showCondition)
+							.map((item, index) => (
+								<MenuItem
+									key={index.toString()}
+									icon={item.icon}
+									name={item.name}
+									href={item.href ?? "#"}
+									onClick={item.onClick}
+									iconClassName={item.iconClassName}
+								/>
+							))}
+					</CommandGroup>
+				</Command>
+			</PopoverContent>
+		</Popover>
 	);
 };
 
