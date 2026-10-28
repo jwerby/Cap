@@ -331,7 +331,7 @@ fn posthog_event(event: PostHogEvent, distinct_id: Option<&str>) -> posthog_rs::
 pub fn init() {
     if let Some(env) = option_env!("VITE_POSTHOG_KEY") {
         tokio::spawn(async move {
-            posthog_rs::init_global(env)
+            posthog_rs::init_global((env, posthog_rs::EU_INGESTION_ENDPOINT))
                 .await
                 .map_err(|err| error!("Error initializing PostHog: {err}"))
                 .ok();

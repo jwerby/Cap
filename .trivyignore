@@ -1,0 +1,5 @@
+# ip 2.0.1 (via node-av > werift in apps/media-server): no fixed release as of 2026-10-28
+CVE-2024-29415 exp:2026-12-31
+
+# zod 3.25.76: fix only in zod 4 major (4.6.6); migration out of scope for this deps PR
+CVE-2023-54404 exp:2026-12-31
