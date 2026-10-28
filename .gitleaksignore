@@ -1,0 +1,9 @@
+# Added 2026-10-28 after a fleet triage (jwerby/PSCICD#249). Only findings shown to be fake or dead.
+# fake: value is a placeholder, example, low-entropy or dictionary-word identifier
+c330714f68261eba6d531d66d64fb6df15adea23:apps/web/__tests__/unit/cloudfront-config.test.ts:private-key:5
+c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:117
+c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:163
+c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:207
+c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:247
+c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:270
+c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:316
