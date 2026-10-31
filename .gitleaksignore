@@ -7,3 +7,26 @@ c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:
 c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:247
 c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:270
 c85d15a0c7efabc8ed603b581f3892a8f18fd70c:apps/web/content/docs/api/rest-api.mdx:curl-auth-header:316
+# Added 2026-10-31: current-tree (`gitleaks dir`) findings proven harmless (jwerby/PSCICD#249). No values; see the PR for evidence.
+# placeholders and documented examples: placeholder text (YOUR_/replace/placeholder/example), sequential counting fillers, '...'-elided examples, or upstream template defaults
+apps/web/__tests__/unit/cloudfront-config.test.ts:private-key:5
+apps/web/content/docs/api/rest-api.mdx:curl-auth-header:117
+apps/web/content/docs/api/rest-api.mdx:curl-auth-header:163
+apps/web/content/docs/api/rest-api.mdx:curl-auth-header:207
+apps/web/content/docs/api/rest-api.mdx:curl-auth-header:247
+apps/web/content/docs/api/rest-api.mdx:curl-auth-header:270
+apps/web/content/docs/api/rest-api.mdx:curl-auth-header:316
+docker-compose.template.yml:generic-api-key:17
+docker-compose.template.yml:generic-api-key:18
+docker-compose.template.yml:generic-api-key:28
+docker-compose.template.yml:generic-api-key:60
+# test fixtures: the value appears only in test files at this commit
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:346
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:394
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:406
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:418
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:466
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:506
+apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:516
+# dead: provider rejected it (401) in a read-only call, or a CodePipeline approval token whose approval action already completed (read-only list-action-executions)
+infra/sst.config.ts:generic-api-key:12
