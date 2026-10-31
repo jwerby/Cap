@@ -28,5 +28,5 @@ apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:418
 apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:466
 apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:506
 apps/web/__tests__/unit/developer-api-auth.test.ts:generic-api-key:516
-# dead: provider rejected it (401) in a read-only call, or a CodePipeline approval token whose approval action already completed (read-only list-action-executions)
+# dead: the provider returned 401 to a read-only call, and the value matches no live secret store or running container
 infra/sst.config.ts:generic-api-key:12
